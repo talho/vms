@@ -1,0 +1,1 @@
+Talho.ScriptManager.addInitializer('Talho.VMS.CommandCenter', {js:'$(ext_extensions)/DoNotCollapseActive.js /javascripts/vms/command_center.js'});

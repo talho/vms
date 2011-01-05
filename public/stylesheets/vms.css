@@ -1,0 +1,12 @@
+
+.vms-row-icon{
+  display: block;
+  float: left;
+  height: 26px;
+  width: 26px;
+  margin: 0 3px 0 0;
+}
+
+.vms-row-text{
+  line-height: 26px;
+}
