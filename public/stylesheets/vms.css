@@ -1,12 +1,91 @@
 
+/* -------------- Grid row tool display ---------- */
+.vms-tool-row{
+  position: relative;
+  min-height: 27px;
+}
+
 .vms-row-icon{
   display: block;
-  float: left;
   height: 26px;
+  position: absolute;
   width: 26px;
-  margin: 0 3px 0 0;
 }
 
 .vms-row-text{
-  line-height: 26px;
+  position: absolute;    
+  left: 29px;
+  right: 0;
+  white-space: normal;
+  word-wrap: normal;
+}
+
+/* ------------- Drag Proxy tool display ------------ */
+.x-grid-dd-wrap .vms-row-icon{
+  position: inherit;
+  float: left;
+  margin: 0 3px 0 0;
+}
+
+.x-grid-dd-wrap .vms-row-text{
+  position: inherit;
+  float: left;
+  left: 0px;
+}
+
+/* ------------- Icons ----------------------------- */
+.vms-tool-icon-active.vms-site{
+  background: #1111BB;
+}
+.vms-tool-icon-inactive.vms-site{
+  background: #5577AA;
+}
+
+.vms-tool-icon-active.vms-inventory{
+  background: #666600;
+}
+.vms-tool-icon-inactive.vms-inventory{
+  background: #888866;
+}
+
+.vms-tool-icon-active.vms-pod{
+  background: #BB5555;
+}
+.vms-tool-icon-inactive.vms-pod{
+  background: #997777;
+}
+
+.vms-tool-icon-active.vms-profile{
+  background: #BB5555;
+}
+.vms-tool-icon-inactive.vms-profile{
+  background: #997777;
+}
+
+.vms-tool-icon-active.vms-role{
+  background: #BB5555;
+}
+.vms-tool-icon-inactive.vms-role{
+  background: #997777;
+}
+
+.vms-tool-icon-active.vms-team{
+  background: #BB5555;
+}
+.vms-tool-icon-inactive.vms-team{
+  background: #997777;
+}
+
+.vms-tool-icon-active.vms-auto-user{
+  background: #BB5555;
+}
+.vms-tool-icon-inactive.vms-auto-user{
+  background: #997777;
+}
+
+.vms-tool-icon-active.vms-manual-user{
+  background: #BB5555;
+}
+.vms-tool-icon-inactive.vms-manual-user{
+  background: #997777;
 }
