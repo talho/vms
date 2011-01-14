@@ -94,31 +94,26 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       },
       { xtype: 'container', itemId: 'westRegion', region: 'west', layout: 'accordion', items:[
         { title: 'Site', itemId: 'siteGrid', xtype: 'vms-toolgrid',
-          store: new tool_store({data: [{name: 'New Site (drag to create)', status: 'new', type: 'site'}, {name: 'Immunization Center 1', status: 'active', type: 'site'}, {name: 'FBC', status: 'inactive', type: 'site', address: '706 Newsom Ave, Lufkin, TX 75904, USA'}]}),
-          buttons: [{text: 'Add/Create Site', handler: this.addSite, scope: this}]
+          store: new tool_store({data: [{name: 'New Site (drag to create)', status: 'new', type: 'site'}, {name: 'Immunization Center 1', status: 'inactive', type: 'site'}, {name: 'FBC', status: 'inactive', type: 'site', address: '706 Newsom Ave, Lufkin, TX 75904, USA'}]})
         },
         {title: 'PODS/Inventory', xtype: 'vms-toolgrid', itemId: 'inventory_grid', 
-          store: new tool_store({data: [{name: 'New POD/Inventory (drag to site)', type: 'inventory', status: 'new'}, {name: 'Hurricane Pack', status: 'inactive', type: 'inventory' }, {name: 'Foodborn Pathogen Response POD', status: 'inactive', type: 'pod'}]}),
-          buttons: [{text: 'Add/Create Inventory'}]
+          store: new tool_store({data: [{name: 'New POD/Inventory (drag to site)', type: 'inventory', status: 'new'}, {name: 'Hurricane Pack', status: 'inactive', type: 'inventory' }, {name: 'Foodborn Pathogen Response POD', status: 'inactive', type: 'pod'}]})
         }
-      ], width: 200, split: true },
+      ], plugins: ['donotcollapseactive'], width: 200, split: true },
       { xtype: 'container', itemId: 'eastRegion', region: 'east', layout: 'accordion', items:[
         {title: 'Exigency Profile', xtype: 'vms-toolgrid',
           store: new tool_store({data: [{name: 'Immunization Outbreak Profile', type: 'profile', status: 'inactive'}, {name: 'Hurrican Response Profile', type: 'profile', status: 'inactive'}]})
         },
         {title: 'Roles', xtype: 'vms-toolgrid', itemId: 'roles_grid',
-          store: new tool_store({data: [{name: 'Add Role (drag to site)', type: 'role', status: 'new'}, {name: 'Health and Alert Communication Coordinator', type: 'role', status: 'inactive'}]}), 
-          fbar: { layout: 'anchor', items: [{xtype: 'combo', anchor: '100%', store: ['role'], editable: false}] } 
+          store: new tool_store({data: [{name: 'Add Role (drag to site)', type: 'role', status: 'new'}, {name: 'Health and Alert Communication Coordinator', type: 'role', status: 'inactive'}]})
         },
         {title: 'Teams', xtype: 'vms-toolgrid', itemId: 'teams_grid',
-          store: new tool_store({data: [{name: 'New Team (drag to site)', type: 'team', status: 'new'}, {name: 'City Response Team 1 - Bob Billick', type: 'team', status: 'active'}, {name: 'Babtist Men\'s', type: 'team', status: 'active'}, {name: 'City Response Team 2 - Jack Sheppard', type: 'team', status: 'inactive'}]}), 
-          buttons: [{text: 'Add/Create Team'}]
+          store: new tool_store({data: [{name: 'New Team (drag to site)', type: 'team', status: 'new'}]})
         },
         {title: 'Staff', xtype: 'vms-toolgrid', itemId: 'staff_grid',
-          store: new tool_store({data: [{name: 'Add User (drag to site)', type: 'manual_user', status: 'new'}, {name: 'Bob Billick', type: 'auto_user', status: 'active'}, {name: 'James Soamad', type: 'auto_user', status: 'active'}, {name: 'Amaro Oliver', type: 'manual_user', status: 'active'}, {name: 'Jack Sheppard', type: 'auto_user', status: 'inactive'}, {name: 'London Citanam', type: 'manual_user', status: 'inactive'}]}),
-          fbar: { layout: 'anchor', items: [{xtype: 'combo', store:['user'], anchor: '100%'}]}
+          store: new tool_store({data: [{name: 'Add User (drag to site)', type: 'manual_user', status: 'new'}]})
         }
-      ], width: 200, split: true }
+      ], plugins: ['donotcollapseactive'], width: 200, split: true }
     ];
     
     Talho.VMS.CommandCenter.superclass.constructor.apply(this, arguments);
@@ -133,7 +128,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     this.eastRegion = this.getComponent('eastRegion');
     this.rolesGrid = this.eastRegion.getComponent('roles_grid');
     this.teamsGrid = this.eastRegion.getComponent('teams_grid');
-    this.staffGrid = this.eastRegion.getComponent('staffs_grid');
+    this.staffGrid = this.eastRegion.getComponent('staff_grid');
     this.map = this.getComponent('map');
   },
   
@@ -324,6 +319,44 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         init_record(record);
       }
     }
+    else if(record.get('type') === 'team'){
+      var win = new Talho.VMS.ux.TeamWindow({
+        record: record,
+        listeners: {
+          scope: this,
+          'save': function(win, name, users){
+            if(record.get('status') === 'new')
+              record = prep_record(record);
+            if(record.get('status') === 'active' && record.site)
+              record.site.get('team').remove(record);
+            record.set('name', name);
+            record.site = site;
+            init_record(record);
+            
+            var manual_users = [];
+            Ext.each(users, function(user){
+              var u = this.staffGrid.getStore().find('name', user.get('name'));
+              if(u !== -1){
+                u = this.staffGrid.getStore().getAt(u);
+                if(u.get('status') === 'active' && record.site)
+                  u.site.get('auto_user').remove(u);// remove the user from his current site
+              }
+              else{
+                u = new (this.staffGrid.getStore().recordType)({name: user.get('name'), status: 'new', type: 'auto_user'});
+                this.addItemToTypeStore(u);                
+              }
+              manual_users.push(u);
+              init_record(u);
+              u.site = site;
+            }, this);
+            
+            record.users = manual_users;
+            win.close();
+          }
+        }
+      });
+      win.show();
+    }
     else if(record.get('type') === 'manual_user'){
       if(record.get('status') === 'new'){
         var win = new Talho.VMS.ux.UserWindow({
@@ -347,6 +380,12 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         record.site = site;
       }
     }
+    else if(record.get('type') === 'auto_user'){
+        if(record.get('status') === 'active' && record.site)
+          record.site.get('auto_user').remove(record);// remove the user from his current site
+        init_record(record);
+        record.site = site;
+    }
     else{
       record = prep_record(record);
       if(record.status != 'inactive') 
@@ -369,6 +408,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         this.rolesGrid.getStore().add(record);
         break;
       case 'manual_user':
+      case 'auto_user':
         this.staffGrid.getStore().add(record);
         break;
     }
@@ -383,6 +423,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       '<tpl if="this.has(values, &quot;role&quot;)"><div>Roles: <tpl for="role"><span>{values.data.name}</tpl></div></tpl>',
       '<tpl if="this.has(values, &quot;team&quot;)"><div>Teams: <tpl for="team"><span>{values.data.name}</tpl></div></tpl>',
       '<tpl if="this.has(values, &quot;manual_user&quot;)"><div>Staff: <tpl for="manual_user"><span>{values.data.name}</tpl></div></tpl>',
+      '<tpl if="this.has(values, &quot;auto_user&quot;)"><div>Staff: <tpl for="auto_user"><span>{values.data.name}</tpl></div></tpl>',
       {
         has: function(values, key){ return Ext.isDefined(values[key])},
         test: function(){
