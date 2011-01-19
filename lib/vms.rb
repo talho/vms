@@ -16,6 +16,13 @@ end
 $expansion_list = [] unless defined?($expansion_list)
 $expansion_list.push(:vms) unless $expansion_list.index(:vms)
 
+$menu_config = {} unless defined?($menu_config)
+$menu_config[:vms] = "{name: 'VMS', items:[
+                    {name: 'Command Center', tab:{id: 'vms_main', title:'VMS Command Center', url:'', initializer: 'Talho.VMS.CommandCenter'}},
+                    {name: 'New Scenario', win:{id: 'vms_new_scenario', title:'New Scenario', initializer: 'Talho.VMS.CreateAndEditScenario'}},
+                    {name: 'Open Scenario', win:{id: 'vms_open_scenario', title:'Open Scenario', initializer: 'Talho.VMS.OpenScenario'}}
+                    ]}"
+
 # Register any required javascript or stylesheet files with the appropriate
 # rails expansion helper
 ActionView::Helpers::AssetTagHelper.register_javascript_expansion(
@@ -23,3 +30,5 @@ ActionView::Helpers::AssetTagHelper.register_javascript_expansion(
 ActionView::Helpers::AssetTagHelper.register_stylesheet_expansion(
   :vms => [ "vms/vms" ])
 
+module Vms
+end
