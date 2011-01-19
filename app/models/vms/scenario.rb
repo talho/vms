@@ -1,8 +1,4 @@
 
-class User
-  has_many :scenarios, :class_name => 'Vms::Scenario', :foreign_key => 'creator_id'
-end
-
 class Vms::Scenario < ActiveRecord::Base  
   set_table_name "vms_scenarios"
   

@@ -4,7 +4,7 @@ class Vms::ScenariosController < ApplicationController
   after_filter :change_include_root_back
   
   def index
-    @scenarios = current_user.scenarios
+    @scenarios = User.find(current_user.id).scenarios
     respond_to do |format|
       format.json {render :json => {:scenarios => @scenarios.as_json(:only => [:id, :name] ) } }
     end
@@ -28,7 +28,7 @@ class Vms::ScenariosController < ApplicationController
   end
   
   def create
-    @scenario = Vms::Scenario.new(params[:scenario])
+    @scenario = current_user.scenarios.build(params[:scenario])
     if @scenario.save
       respond_to do |format|
         format.json {render :json => {:scenario => @scenario.as_json, :success => true} }
@@ -55,13 +55,23 @@ class Vms::ScenariosController < ApplicationController
     @scenario = current_user.scenarios.find(params[:id])
     if @scenario.update_attributes(params[:scenario])
       respond_to do |format|
-        format.json {render :json => @scenario.as_json }
+        format.json {render :json => {:scenario => @scenario.as_json, :success => true} }
       end
     else
       respond_to do |format|
         format.json {render :json => {:msg => 'Error creating the scenario', :errors => @scenario.errors }, :status => 406 }
       end
+    end    
+  end
+  
+  def destroy
+    @scenario = current_user.scenarios.find(params[:id])
+    respond_to do |format|
+      if @scenario.destroy
+        format.json {render :json => {:success => true} }
+      else
+        format.json {render :json => {:success => false, :errors => @scenario.errors}, :status => 406}
+      end
     end
-    
   end
 end

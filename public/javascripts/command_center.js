@@ -435,4 +435,4 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   }
 });
 
-Talho.ScriptManager.reg('Talho.VMS.CommandCenter', Talho.VMS.CommandCenter, function(){return new Talho.VMS.CommandCenter();});
+Talho.ScriptManager.reg('Talho.VMS.CommandCenter', Talho.VMS.CommandCenter, function(config){return new Talho.VMS.CommandCenter(config);});
