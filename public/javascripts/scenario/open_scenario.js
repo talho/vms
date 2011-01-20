@@ -5,6 +5,7 @@ Talho.VMS.OpenScenario = Ext.extend(Ext.Window, {
   height: 300,
   width: 400,
   layout: 'fit',
+  modal: true,
   constructor: function(config){
     Ext.apply(config, {
       items: [
@@ -22,8 +23,8 @@ Talho.VMS.OpenScenario = Ext.extend(Ext.Window, {
         }),
         columns:[
           {dataIndex: 'name', id: 'name_column'},
-          {xtype: 'xactioncolumn', tooltip: 'edit', icon: '/stylesheets/images/pencil.png', scope: this, handler: this.edit_click },
-          {xtype: 'xactioncolumn', tooltip: 'delete', icon: '/stylesheets/images/cross-circle.png', scope: this, handler: this.delete_click }
+          {xtype: 'xactioncolumn', tooltip: 'edit', icon: '/stylesheets/images/pencil.png', iconCls: 'edit', scope: this, handler: this.edit_click },
+          {xtype: 'xactioncolumn', tooltip: 'delete', icon: '/stylesheets/images/cross-circle.png', iconCls: 'delete', scope: this, handler: this.delete_click }
         ], autoExpandColumn: 'name_column',
         sm: new Ext.grid.RowSelectionModel({singleSelect: true}) }
       ],

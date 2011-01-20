@@ -2,6 +2,7 @@ Ext.ns("Talho.VMS")
 
 Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
   title: 'Create Scenario',
+  modal: true,
   constructor: function(config){
     this.edit_mode = false;
     if(!Ext.isEmpty(config.scenarioId)){
@@ -12,13 +13,16 @@ Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
       var buttons = [
         {text: 'Save', handler: this.save, scope: this, mode: 'list'},
         {text: 'Save and Open Scenario', handler: this.save, scope: this},
-        {text: 'Cancel', handler: function(){this.close();}, scope: this}
+        {text: 'Cancel', handler: function(){
+          Application.fireEvent('openwindow', {id: 'vms_open_scenario', title:'Open Scenario', initializer: 'Talho.VMS.OpenScenario'});
+          this.close();
+        }, scope: this}
       ];
     }
     else{
       var buttons = [
         {text: 'Save', handler: this.save, scope: this},
-        {text: 'Cancel', handler: function(){this.close();}, scope: this}
+        {text: 'Cancel', handler: function(){ this.close();}, scope: this}
       ];
     }
     
