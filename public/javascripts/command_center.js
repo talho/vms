@@ -5,7 +5,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   closable: true,
   layout: 'border',
   
-  constructor: function(){
+  constructor: function(config){
     this.row_template = new Ext.XTemplate(
       '<div class="vms-tool-row">',
         '<div class="vms-row-icon {[this.iconClass(values)]}"></div>',
@@ -63,6 +63,20 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           }
         })});
         vms_tool_grid.superclass.constructor.call(this, config);
+        this.getStore().on('load', this.add_default_rows, this);
+      },
+      add_default_rows: function(store){
+        var fn = function(rec_data){
+          store.insert(0, new (store.recordType)(rec_data));
+        }
+        if(Ext.isArray(this.seed_data)){
+          for(var i = this.seed_data.length - 1; i >= 0; i--){
+            fn(this.seed_data[i]);
+          }
+        }
+        else if(Ext.isObject(this.seed_data)){
+          fn(this.seed_data);
+        }
       }
     });
     
@@ -93,25 +107,25 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           }
       },
       { xtype: 'container', itemId: 'westRegion', region: 'west', layout: 'accordion', items:[
-        { title: 'Site', itemId: 'siteGrid', xtype: 'vms-toolgrid',
-          store: new tool_store({data: [{name: 'New Site (drag to create)', status: 'new', type: 'site'}, {name: 'Immunization Center 1', status: 'inactive', type: 'site'}, {name: 'FBC', status: 'inactive', type: 'site', address: '706 Newsom Ave, Lufkin, TX 75904, USA'}]})
+        { title: 'Site', itemId: 'siteGrid', xtype: 'vms-toolgrid', seed_data: {name: 'New Site (drag to create)', status: 'new', type: 'site'},
+          store: new tool_store()
         },
-        {title: 'PODS/Inventory', xtype: 'vms-toolgrid', itemId: 'inventory_grid', 
-          store: new tool_store({data: [{name: 'New POD/Inventory (drag to site)', type: 'inventory', status: 'new'}, {name: 'Hurricane Pack', status: 'inactive', type: 'inventory' }, {name: 'Foodborn Pathogen Response POD', status: 'inactive', type: 'pod'}]})
+        {title: 'PODS/Inventory', xtype: 'vms-toolgrid', itemId: 'inventory_grid', seed_data: {name: 'New POD/Inventory (drag to site)', type: 'inventory', status: 'new'},
+          store: new tool_store()
         }
       ], plugins: ['donotcollapseactive'], width: 200, split: true },
       { xtype: 'container', itemId: 'eastRegion', region: 'east', layout: 'accordion', items:[
         {title: 'Exigency Profile', xtype: 'vms-toolgrid',
-          store: new tool_store({data: [{name: 'Immunization Outbreak Profile', type: 'profile', status: 'inactive'}, {name: 'Hurrican Response Profile', type: 'profile', status: 'inactive'}]})
+          store: new tool_store()
         },
-        {title: 'Roles', xtype: 'vms-toolgrid', itemId: 'roles_grid',
-          store: new tool_store({data: [{name: 'Add Role (drag to site)', type: 'role', status: 'new'}, {name: 'Health and Alert Communication Coordinator', type: 'role', status: 'inactive'}]})
+        {title: 'Roles', xtype: 'vms-toolgrid', itemId: 'roles_grid', seed_data: {name: 'Add Role (drag to site)', type: 'role', status: 'new'},
+          store: new tool_store()
         },
-        {title: 'Teams', xtype: 'vms-toolgrid', itemId: 'teams_grid',
-          store: new tool_store({data: [{name: 'New Team (drag to site)', type: 'team', status: 'new'}]})
+        {title: 'Teams', xtype: 'vms-toolgrid', itemId: 'teams_grid', seed_data: {name: 'New Team (drag to site)', type: 'team', status: 'new'},
+          store: new tool_store()
         },
-        {title: 'Staff', xtype: 'vms-toolgrid', itemId: 'staff_grid',
-          store: new tool_store({data: [{name: 'Add User (drag to site)', type: 'manual_user', status: 'new'}]})
+        {title: 'Staff', xtype: 'vms-toolgrid', itemId: 'staff_grid', seed_data: {name: 'Add User (drag to site)', type: 'manual_user', status: 'new'},
+          store: new tool_store()
         }
       ], plugins: ['donotcollapseactive'], width: 200, split: true }
     ];
@@ -130,11 +144,33 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     this.teamsGrid = this.eastRegion.getComponent('teams_grid');
     this.staffGrid = this.eastRegion.getComponent('staff_grid');
     this.map = this.getComponent('map');
+    
+    Ext.Ajax.request({
+      url: '/vms/scenarios/' + this.scenarioId,
+      method: 'GET',
+      success: this.loadScenario_success,
+      scope: this
+    });
+    
+    this.on('afterrender', function(){
+      if(!this.initial_load_complete){
+        this.loadMask = new Ext.LoadMask(this.getLayoutTarget());
+        this.loadMask.show();
+      }
+    }, this, {delay: 1});
   },
   
-  addSite: function(){
-    var store = this.siteGrid.getStore();
-    store.add(new store.recordType({name: 'Site', status: 'active', type: 'single_site'}));
+  loadScenario_success: function(response, options){
+    this.initial_load_complete = true;
+    if(this.loadMask) this.loadMask.hide();
+    
+    var result = Ext.decode(response.responseText);
+    
+    this.siteGrid.getStore().loadData([]);
+    this.inventoryGrid.getStore().loadData([]);
+    this.rolesGrid.getStore().loadData([]);
+    this.teamsGrid.getStore().loadData([]);
+    this.staffGrid.getStore().loadData([]);
   },
   
   initMapDropZone: function(){

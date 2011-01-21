@@ -12,7 +12,7 @@ Feature: VMS Scenario
     And I go to the ext dashboard page
 
   Scenario: Create New Scenario
-    When I navigate to "VMS > New Scenario"
+    When I navigate to "Apps > VMS > New Scenario"
     Then I should see "New Scenario"
     Then the "New Scenario" window should be open
     When I fill in "Scenario Name" with "My Scenario"
@@ -23,7 +23,7 @@ Feature: VMS Scenario
 
   Scenario: View List of Scenarios and Open Command Center
     Given I have the scenarios "Scenario 1, Scenario 2, Scenario 3"
-    When I navigate to "VMS > Open Scenario"
+    When I navigate to "Apps > VMS > Open Scenario"
     Then I should see "Open Scenario"
     And the "Open Scenario" window should be open
     And I should see "Scenario 1" in grid row 1
@@ -35,7 +35,7 @@ Feature: VMS Scenario
 
   Scenario: Edit Existing Scenario and Go Back to List
     Given I have the scenarios "Scenario 1, Scenario 2, Scenario 3"
-    When I navigate to "VMS > Open Scenario"
+    When I navigate to "Apps > VMS > Open Scenario"
     And I click edit on the "Scenario 1" grid row
     Then I should see "Modify Scenario 1"
     And the "Modify Scenario 1" window should be open
@@ -49,7 +49,7 @@ Feature: VMS Scenario
 
   Scenario: Edit Existing Scenario and Open Command Center
     Given I have the scenarios "Scenario 1, Scenario 2, Scenario 3"
-    When I navigate to "VMS > Open Scenario"
+    When I navigate to "Apps > VMS > Open Scenario"
     And I click edit on the "Scenario 1" grid row
     Then I should see "Modify Scenario 1"
     And the "Modify Scenario 1" window should be open
@@ -60,7 +60,7 @@ Feature: VMS Scenario
 
   Scenario: Cancelling from Edit Scenario should return to Scenario List
     Given I have the scenarios "Scenario 1, Scenario 2, Scenario 3"
-    When I navigate to "VMS > Open Scenario"
+    When I navigate to "Apps > VMS > Open Scenario"
     And I click edit on the "Scenario 1" grid row
     Then I should see "Modify Scenario 1"
     And the "Modify Scenario 1" window should be open
@@ -70,7 +70,7 @@ Feature: VMS Scenario
 
   Scenario: Delete Existing Scenario
     Given I have the scenarios "Scenario 1, Scenario 2, Scenario 3"
-    When I navigate to "VMS > Open Scenario"
+    When I navigate to "Apps > VMS > Open Scenario"
     And I click delete on the "Scenario 1" grid row
     Then the "Delete Scenario" window should be open
     When I press "Yes"
