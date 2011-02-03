@@ -97,7 +97,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           mapConfOpts: ['enableScrollWheelZoom','enableDoubleClickZoom','enableDragging'],
           mapControls: ['GSmallMapControl','GMapTypeControl','NonExistantControl'],
           setCenter: {
-              geoCodeAddr: 'Lufkin, Tx, USA'
+              geoCodeAddr: 'Austin, Tx, USA'
           },
           listeners: {
             scope: this,
