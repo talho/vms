@@ -1,4 +1,6 @@
-# Require Vms models
+require 'inflections'
+
+# Require VMS models
 Dir[File.join(File.dirname(__FILE__), 'models', '*.rb')].each do |f|
   require f
 end

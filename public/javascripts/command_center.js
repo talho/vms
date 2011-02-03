@@ -88,6 +88,8 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       autoLoad: false
     });
     
+    var tool_cfg = [{id: 'refresh', handler: function(evt, el, pnl){pnl.getStore().load();}}];
+    
     this.items = [{
           region: 'center',
           itemId: 'map',
@@ -109,7 +111,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           }
       },
       { xtype: 'container', itemId: 'westRegion', region: 'west', layout: 'accordion', items:[
-        { title: 'Site', itemId: 'siteGrid', xtype: 'vms-toolgrid', tools: [{id: 'refresh', handler: function(evt, el, pnl){pnl.getStore().load();}}], seed_data: {name: 'New Site (drag to create)', status: 'new', type: 'site'},
+        { title: 'Site', itemId: 'siteGrid', xtype: 'vms-toolgrid', tools: tool_cfg, seed_data: {name: 'New Site (drag to create)', status: 'new', type: 'site'},
           store: new tool_store({
             reader: new Ext.data.JsonReader({
               root: 'sites',
@@ -127,8 +129,8 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
             'rowcontextmenu': this.showSiteContextMenu
           }
         },
-        {title: 'PODS/Inventory', xtype: 'vms-toolgrid', itemId: 'inventory_grid', seed_data: {name: 'New POD/Inventory (drag to site)', type: 'inventory', status: 'new'},
-          store: new tool_store()
+        {title: 'PODS/Inventory', xtype: 'vms-toolgrid', tools: tool_cfg, itemId: 'inventory_grid', seed_data: {name: 'New POD/Inventory (drag to site)', type: 'inventory', status: 'new'},
+          store: new Talho.VMS.ux.Inventory.InventoryController.inventory_list_store({ scenarioId: config.scenarioId })
         }
       ], plugins: ['donotcollapseactive'], width: 200, split: true },
       { xtype: 'container', itemId: 'eastRegion', region: 'east', layout: 'accordion', items:[
@@ -184,7 +186,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     var result = Ext.decode(response.responseText);
     
     this.siteGrid.getStore().load();
-    this.inventoryGrid.getStore().loadData([]);
+    this.inventoryGrid.getStore().load();
     this.rolesGrid.getStore().loadData([]);
     this.teamsGrid.getStore().loadData([]);
     this.staffGrid.getStore().loadData([]);
@@ -386,7 +388,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     
     var prep_record = function(rec){
       if(record.get('status') != 'inactive'){
-        rec = record.copy();
+        var rec = record.copy();
         rec.id = Ext.data.Record.id(rec);
         this.addItemToTypeStore(rec);
       }
@@ -398,14 +400,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         record: record,
         listeners: {
           scope: this,
-          'save': function(win, name, type){
-            record = prep_record(record);
-            record.set('name', name);
-            record.set('type', type);
-            init_record(record);
-            record.site = site;
-            win.close();
-          }
+          'save': Talho.VMS.ux.Inventory.InventoryController.create.createDelegate(this, [record, site, this.inventoryGrid.getStore()], true) 
         }
       });
       win.show();

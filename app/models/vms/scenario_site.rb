@@ -6,6 +6,8 @@ class Vms::ScenarioSite < ActiveRecord::Base
   belongs_to :scenario, :class_name => "Vms::Scenario"
   STATES = {:inactive => 1, :active => 2}  
   
+  has_many :inventories, :class_name => "Vms::Inventory"
+  
   def as_json (options = {})
     options[:include] = {} if options[:include].nil?
     options[:include].merge! :site => {}

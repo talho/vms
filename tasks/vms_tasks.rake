@@ -23,7 +23,7 @@ namespace :db do
   end
 
   namespace :seed do
-    description = "Add Vms seed data to the database"
+    description = "Add VMS seed data to the database"
     desc description
     task :vms => :environment do
       Dir.glob(File.join(File.dirname(__FILE__),'..','db','fixtures','*.rb')).each do |file|
