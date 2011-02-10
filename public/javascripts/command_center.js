@@ -130,7 +130,15 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           }
         },
         {title: 'PODS/Inventory', xtype: 'vms-toolgrid', tools: tool_cfg, itemId: 'inventory_grid', seed_data: {name: 'New POD/Inventory (drag to site)', type: 'inventory', status: 'new'},
-          store: new Talho.VMS.ux.Inventory.InventoryController.inventory_list_store({ scenarioId: config.scenarioId })
+          store: new Talho.VMS.ux.InventoryController.inventory_list_store({ scenarioId: config.scenarioId,
+            listeners: {
+              scope: this,
+              'load': this.applyToSite
+          } }),
+          listeners: {
+            scope: this,
+            'rowcontextmenu': this.showInventoryContextMenu
+          }
         }
       ], plugins: ['donotcollapseactive'], width: 200, split: true },
       { xtype: 'container', itemId: 'eastRegion', region: 'east', layout: 'accordion', items:[
@@ -397,10 +405,10 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     
     if(record.get('type') == 'inventory' || record.get('type') == 'pod'){
       var win = new Talho.VMS.ux.InventoryWindow({
+        scenarioId: this.scenarioId,
         record: record,
         listeners: {
-          scope: this,
-          'save': Talho.VMS.ux.Inventory.InventoryController.create.createDelegate(this, [record, site, this.inventoryGrid.getStore()], true) 
+          'save': Talho.VMS.ux.InventoryController.create.createDelegate(Talho.VMS.ux.InventoryController, [record, this.scenarioId, site, this.inventoryGrid.getStore()], true) 
         }
       });
       win.show();
@@ -551,6 +559,8 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         }
       }
     }, this)
+    
+    this.applyToSite(this.inventoryGrid.getStore(), this.inventoryGrid.getStore().getRange(), {});
   },
   
   showSiteContextMenu: function(grid, row_index, evt){
@@ -559,7 +569,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     var row = grid.getView().getRow(row_index);
     var record = grid.getStore().getAt(row_index);
     
-    menuConfig = [
+    var menuConfig = [
       {text: 'Edit', scope: this, handler: function(){
         var original_address = record.get('address');
         
@@ -674,6 +684,40 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     menu.show(row);
   },
   
+  showInventoryContextMenu: function(grid, row_index, evt){
+    evt.preventDefault();
+    
+    var row = grid.getView().getRow(row_index);
+    var record = grid.getStore().getAt(row_index);
+    
+    var menuConfig = [
+      {text: 'Edit', scope: this, handler: function(){
+        var win = new Talho.VMS.ux.InventoryWindow({
+          scenarioId: this.scenarioId,
+          record: record,
+          mode: 'edit',
+          listeners: {
+            'save': Talho.VMS.ux.InventoryController.edit.createDelegate(Talho.VMS.ux.InventoryController, [record, this.scenarioId, grid.getStore()], true) 
+          }
+        });
+        
+        win.show();
+      }},
+      {text: 'Delete', scope: this, handler: function(){
+        Talho.VMS.ux.InventoryController.destroy(record, this.scenarioId);
+        grid.getStore().load();
+      }}
+    ];
+    // later add in the ability to have inactive inventories already assigned to sites
+    
+    var menu = new Ext.menu.Menu({
+      floating: true, defaultAlign: 'tr-br?',
+      items: menuConfig
+    });
+    
+    menu.show(row);
+  },
+  
   findMarker: function(record){
     var marker = null;
     Ext.each(this.map.markers, function(m){ if(m.data.record.id === record.id){
@@ -681,6 +725,25 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       return false;
     }});
     return marker;
+  },
+  
+  applyToSite: function(store, records, opts){
+    Ext.each(records, function(record){      
+      var site = this.siteGrid.getStore().getById(record.get('site_id'));
+      if(site){
+        var type = record.get('type');
+        type = type === 'pod' ? 'inventory' : type; // show inventory and pod as the same thing
+        
+        if(!site.get(type))
+          site.set(type, []); // initialize an empty array for the type that we just dragged onto this site
+        var arr = site.get(type);
+        
+        if(arr.indexOf(record) == -1){ // only add if the item does not exist in that site already
+          arr.push(record);
+        }
+        record.site = site;
+      }
+    }, this);
   }
 });
 

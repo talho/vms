@@ -11,6 +11,7 @@ class CreateInventory < ActiveRecord::Migration
     
     create_table :vms_inventory_sources do |t|
       t.string :name
+      t.index :name, :unique => true
     end
     
     create_table :vms_inventory_item_collections do |t|
@@ -32,12 +33,14 @@ class CreateInventory < ActiveRecord::Migration
     
     create_table :vms_inventory_items do |t|
       t.string :name
+      t.index :name, :unique => true
       t.integer :item_category_id
       t.boolean :consumable, :default => false
     end
     
     create_table :vms_inventory_item_categories do |t|
       t.string :name
+      t.index :name, :unique => true
     end
   end
 
