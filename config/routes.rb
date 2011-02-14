@@ -5,4 +5,6 @@ ActionController::Routing::Routes.draw do |map|
   end
   
   map.inventory_sources 'vms/inventory_sources', :controller => 'vms/inventories', :action => 'sources'
+  map.inventory_items 'vms/inventory_items', :controller => 'vms/inventories', :action => 'items'
+  map.inventory_item_categories 'vms/inventory_item_categories', :controller => 'vms/inventories', :action => 'categories'
 end

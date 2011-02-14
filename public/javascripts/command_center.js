@@ -118,6 +118,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
               idProperty: 'site_id',
               fields: [{name:'name', mapping:'site.name'}, {name: 'type', defaultValue: 'site'}, {name:'status', convert: function(v){return v == 2 ? 'active': 'inactive';} }, {name: 'address', mapping: 'site.address'}, {name: 'lat', mapping: 'site.lat'}, {name: 'lng', mapping: 'site.lng'}, {name: 'id', mapping: 'site_id'}]
             }),
+            type: 'site',
             url: '/vms/scenarios/' + config.scenarioId + '/sites',
             listeners:{
               scope: this,
@@ -130,7 +131,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           }
         },
         {title: 'PODS/Inventory', xtype: 'vms-toolgrid', tools: tool_cfg, itemId: 'inventory_grid', seed_data: {name: 'New POD/Inventory (drag to site)', type: 'inventory', status: 'new'},
-          store: new Talho.VMS.ux.InventoryController.inventory_list_store({ scenarioId: config.scenarioId,
+          store: new Talho.VMS.ux.InventoryController.inventory_list_store({ scenarioId: config.scenarioId, type: 'inventory',
             listeners: {
               scope: this,
               'load': this.applyToSite
@@ -403,108 +404,23 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       return rec;
     }.createDelegate(this);
     
-    if(record.get('type') == 'inventory' || record.get('type') == 'pod'){
-      var win = new Talho.VMS.ux.InventoryWindow({
-        scenarioId: this.scenarioId,
-        record: record,
-        listeners: {
-          'save': Talho.VMS.ux.InventoryController.create.createDelegate(Talho.VMS.ux.InventoryController, [record, this.scenarioId, site, this.inventoryGrid.getStore()], true) 
-        }
-      });
-      win.show();
-    }
-    else if(record.get('type') === 'role'){
-      if(record.get('status') == 'new'){
-        var win = new Talho.VMS.ux.RoleWindow({
-          listeners: {
-            scope: this,
-            'save': function(win, role){
-              record = prep_record(record);
-              record.set('name', role);
-              init_record(record);
-              win.close();
-            }
-          }
-        });
-        win.show();
-      }
-      else{
-        init_record(record);
-      }
-    }
-    else if(record.get('type') === 'team'){
-      var win = new Talho.VMS.ux.TeamWindow({
-        record: record,
-        listeners: {
-          scope: this,
-          'save': function(win, name, users){
-            if(record.get('status') === 'new')
-              record = prep_record(record);
-            if(record.get('status') === 'active' && record.site)
-              record.site.get('team').remove(record);
-            record.set('name', name);
-            record.site = site;
-            init_record(record);
-            
-            var manual_users = [];
-            Ext.each(users, function(user){
-              var u = this.staffGrid.getStore().find('name', user.get('name'));
-              if(u !== -1){
-                u = this.staffGrid.getStore().getAt(u);
-                if(u.get('status') === 'active' && record.site)
-                  u.site.get('auto_user').remove(u);// remove the user from his current site
-              }
-              else{
-                u = new (this.staffGrid.getStore().recordType)({name: user.get('name'), status: 'new', type: 'auto_user'});
-                this.addItemToTypeStore(u);                
-              }
-              manual_users.push(u);
-              init_record(u);
-              u.site = site;
-            }, this);
-            
-            record.users = manual_users;
-            win.close();
-          }
-        }
-      });
-      win.show();
-    }
-    else if(record.get('type') === 'manual_user'){
-      if(record.get('status') === 'new'){
-        var win = new Talho.VMS.ux.UserWindow({
-          listeners:{
-            scope: this,
-            'save': function(win, user){
-              record = prep_record(record);
-              record.set('name', user);
-              init_record(record);
-              record.site = site;
-              win.close();
-            }
-          }
-        });
-        win.show();
-      }
-      else{
-        if(record.get('status') === 'active')
-          record.site.get('manual_user').remove(record);// remove the user from his current site
+    switch(record.get('type')){
+      case 'inventory':
+      case 'pod': this.addInventoryToSite(record, site);
+        break;
+      case 'role': this.addRoleToSite(record, site, prep_record, init_record);
+        break;
+      case 'team': this.addTeamToSite(record, site, prep_record, init_record);
+        break;
+      case 'manual_user': this.addManualUserToSite(record, site, prep_record, init_record);
+        break;
+      case 'auto_user': this.addAutoUserToSite(record, site, prep_record, init_record);
+        break;
+      default: record = prep_record(record);
+        if(record.status != 'inactive') 
+          record.set('name', record.get('status') == 'new' ? ('New ' + Ext.util.Format.capitalize(record.get('type')) ) : ('Copy of ' + record.get('name') ) );        
         init_record(record);
         record.site = site;
-      }
-    }
-    else if(record.get('type') === 'auto_user'){
-        if(record.get('status') === 'active' && record.site)
-          record.site.get('auto_user').remove(record);// remove the user from his current site
-        init_record(record);
-        record.site = site;
-    }
-    else{
-      record = prep_record(record);
-      if(record.status != 'inactive') 
-        record.set('name', record.get('status') == 'new' ? ('New ' + Ext.util.Format.capitalize(record.get('type')) ) : ('Copy of ' + record.get('name') ) );        
-      init_record(record);
-      record.site = site;
     }    
   },
   
@@ -704,8 +620,10 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         win.show();
       }},
       {text: 'Delete', scope: this, handler: function(){
-        Talho.VMS.ux.InventoryController.destroy(record, this.scenarioId);
-        grid.getStore().load();
+        Ext.Msg.confirm('Confirm Deletion', 'Are you sure you wish to delete the ' + record.get('name') + ' POD/Inventory? This action cannot be undone.', function(btn){
+          if(btn === 'yes')
+            Talho.VMS.ux.InventoryController.destroy(record, this.scenarioId, grid.getStore());
+        }, this)
       }}
     ];
     // later add in the ability to have inactive inventories already assigned to sites
@@ -727,7 +645,14 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     return marker;
   },
   
+  /**
+   * Applies the records in the record array to the sites already loaded in the site grid
+   * @param {Ext.data.Store}  store   The source store of the records. Checks for a property, "type" on the store to determine if it should clear the current sites
+   * @param {Array}           records The records that were loaded into the store
+   * @param {Object}          opts    The options for the load command. What we're looking for here is the 'keepExisting' option, which will let us determine if we really want to clear off the records
+   */
   applyToSite: function(store, records, opts){
+    if(!opts.keepExisting && store.type) this.clearOldAppliedRecords(store.type);
     Ext.each(records, function(record){      
       var site = this.siteGrid.getStore().getById(record.get('site_id'));
       if(site){
@@ -738,12 +663,158 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           site.set(type, []); // initialize an empty array for the type that we just dragged onto this site
         var arr = site.get(type);
         
+        var mc = new Ext.util.MixedCollection();
+        mc.addAll(arr);
         if(arr.indexOf(record) == -1){ // only add if the item does not exist in that site already
+          var rec = mc.find(function(i){return i.id === record.id;});
+          if(rec){
+            arr.remove(rec);
+          }
           arr.push(record);
         }
         record.site = site;
       }
     }, this);
+  },
+  
+  /**
+   * Clears records that were applied to the array of the given type. This is used to reapply the records to the sites after that record's grid has been reloaded
+   * @param   {String}  type  The type of record that we want to clear from the site
+   * @return                  NOTHING
+   */
+  clearOldAppliedRecords: function(type){
+    var siteStore = this.siteGrid.getStore();
+    siteStore.each(function(site){
+      var typeArr = site.get(type);
+      while(typeArr && typeArr.length > 0){
+        var tObj = typeArr.pop();
+        delete tObj.site;
+      }
+    }, this);
+  },
+  
+  addInventoryToSite: function(record, site){
+    var inv_cntrl = Talho.VMS.ux.InventoryController;
+    var inv_win_fn = function(){        
+      var win = new Talho.VMS.ux.InventoryWindow({
+        scenarioId: this.scenarioId,
+        record: record,
+        listeners: {
+          'save': inv_cntrl.create.createDelegate(inv_cntrl, [record, this.scenarioId, site, this.inventoryGrid.getStore()], true) 
+        }
+      });
+      win.show();
+    }.createDelegate(this);
+    
+    if(record.get('status') === 'new'){
+      inv_win_fn();
+    }
+    else{
+      Ext.Msg.show({
+        title: 'Move or Copy POD/Inventory',
+        msg: 'Would you like to move this POD/Inventory or copy it to the location?',
+        buttons: {yes: 'Move', no: 'Copy'},
+        scope: this,
+        fn: function(btn){
+          if(btn === 'yes'){
+            inv_cntrl.move(record, this.scenarioId, site, this.inventoryGrid.getStore());
+          }
+          else if(btn === 'no'){
+            inv_win_fn();
+          }
+        }        
+      });
+    }
+  },
+  
+  addRoleToSite: function(record, site, prep_record, init_record){    
+    if(record.get('status') == 'new'){
+      var win = new Talho.VMS.ux.RoleWindow({
+        listeners: {
+          scope: this,
+          'save': function(win, role){
+            record = prep_record(record);
+            record.set('name', role);
+            init_record(record);
+            win.close();
+          }
+        }
+      });
+      win.show();
+    }
+    else{
+      init_record(record);
+    }
+  },
+  
+  addTeamToSite: function(record, site, prep_record, init_record){
+    var win = new Talho.VMS.ux.TeamWindow({
+      record: record,
+      listeners: {
+        scope: this,
+        'save': function(win, name, users){
+          if(record.get('status') === 'new')
+            record = prep_record(record);
+          if(record.get('status') === 'active' && record.site)
+            record.site.get('team').remove(record);
+          record.set('name', name);
+          record.site = site;
+          init_record(record);
+          
+          var manual_users = [];
+          Ext.each(users, function(user){
+            var u = this.staffGrid.getStore().find('name', user.get('name'));
+            if(u !== -1){
+              u = this.staffGrid.getStore().getAt(u);
+              if(u.get('status') === 'active' && record.site)
+                u.site.get('auto_user').remove(u);// remove the user from his current site
+            }
+            else{
+              u = new (this.staffGrid.getStore().recordType)({name: user.get('name'), status: 'new', type: 'auto_user'});
+              this.addItemToTypeStore(u);                
+            }
+            manual_users.push(u);
+            init_record(u);
+            u.site = site;
+          }, this);
+          
+          record.users = manual_users;
+          win.close();
+        }
+      }
+    });
+    win.show();
+  },
+  
+  addManualUserToSite: function(record, site, prep_record, init_record){
+    if(record.get('status') === 'new'){
+      var win = new Talho.VMS.ux.UserWindow({
+        listeners:{
+          scope: this,
+          'save': function(win, user){
+            record = prep_record(record);
+            record.set('name', user);
+            init_record(record);
+            record.site = site;
+            win.close();
+          }
+        }
+      });
+      win.show();
+    }
+    else{
+      if(record.get('status') === 'active')
+        record.site.get('manual_user').remove(record);// remove the user from his current site
+      init_record(record);
+      record.site = site;
+    }
+  },
+  
+  addAutoUserToSite: function(record, site, prep_record, init_record){
+    if(record.get('status') === 'active' && record.site)
+      record.site.get('auto_user').remove(record);// remove the user from his current site
+    init_record(record);
+    record.site = site;
   }
 });
 

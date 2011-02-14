@@ -1,6 +1,6 @@
 class Vms::InventoriesController < ApplicationController
   before_filter :non_public_role_required, :change_include_root
-  before_filter :initialize_scenario, :except => [:sources]
+  before_filter :initialize_scenario, :except => [:sources, :items, :categories]
   after_filter :change_include_root_back
   
   def index
@@ -85,6 +85,8 @@ class Vms::InventoriesController < ApplicationController
   
   def update
     @inv = @scenario.inventories.find(params[:id])
+    template = params[:inventory][:template]
+    params[:inventory][:template] = 'false'
     @inv.attributes = params[:inventory]
     #update source
     if params[:source] && !params[:source].blank?
@@ -115,8 +117,16 @@ class Vms::InventoriesController < ApplicationController
       for_deletion.map(&:destroy)
     end
     
-    unless params[:site].nil? || params[:site].blank?
+    unless params[:site_id].nil? || params[:site_id].blank?
       @inv.scenario_site = @scenario.site_instances.for_site(params[:site_id])  
+    end
+        
+    #if it's a template, duplicate for assignment
+    if template == 'true' && @inv.save!
+      inv = @inv.clone
+      inv.template = 1
+      inv.scenario_site = nil
+      inv.save!
     end
     
     respond_to do |format|
@@ -129,7 +139,7 @@ class Vms::InventoriesController < ApplicationController
   end
   
   def destroy    
-    @inv = @scenario.inventories.find(params[:inventory][:id])
+    @inv = @scenario.inventories.find(params[:id])
     
     respond_to do |format|
       if @inv.destroy #should remove all of the  
@@ -151,6 +161,18 @@ class Vms::InventoriesController < ApplicationController
   	respond_to do |format|
   		format.json { render :json => Vms::Inventory::Source.find(:all, :conditions => "name LIKE '%#{params[:name]}%'") }
   	end
+  end
+  
+  def items
+    respond_to do |format|
+      format.json { render :json => Vms::Inventory::Item.find(:all, :conditions => "name LIKE '%#{params[:name]}%'", :include => :item_category).map{ |item| item.as_json(:include => [:item_category]) } }
+    end
+  end
+  
+  def categories
+    respond_to do |format|
+      format.json { render :json => Vms::Inventory::ItemCategory.find(:all, :conditions => "name LIKE '%#{params[:name]}%'") }
+    end
   end
   
   private

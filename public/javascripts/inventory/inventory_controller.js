@@ -66,15 +66,7 @@ Ext.ns('Talho.VMS.ux');
           record.id = resp_obj.inventory.id;
           store.add(record); 
           store.commitChanges();
-          
-          if(!site.get('inventory'))
-            site.set('inventory', []); // initialize an empty array for the type that we just dragged onto this site
-          var arr = site.get('inventory');
-          
-          if(arr.indexOf(record) == -1){ // only add if the item does not exist in that site already
-            arr.push(record);
-          }
-          record.site = site;
+          store.load();
           win.close();
         }
         else{
@@ -102,8 +94,29 @@ Ext.ns('Talho.VMS.ux');
       }, this);
     },
     
-    destroy: function(record, scenarioId){
-      
+    destroy: function(record, scenarioId, store){
+      this.save(record, null, 'delete', scenarioId, null, function(opts, success, response){
+        var resp_obj = Ext.decode(response.responseText);
+        if(success && (resp_obj.success !== undefined && resp_obj.success !== false) ){
+          store.load();
+        }
+        else{
+          Ext.Msg.alert("Error", "There was an error deleting the POD/inventory. " + resp_obj.error);
+        }
+      });
+    },
+    
+    move: function(record, scenarioId, site, store){
+      record.set('site_id', site.id);
+      this.save(record, null, 'edit', scenarioId, site.id, function(opts, success, response){
+        var resp_obj = Ext.decode(response.responseText);
+        if(success && (resp_obj.success !== undefined && resp_obj.success !== false) ){
+          store.load();
+        }
+        else{
+          Ext.Msg.alert("Error", "There was an error moving the POD/inventory. " + resp_obj.error);
+        }
+      }, this)
     },
     
     build_url: function(scenario_id, inventory_id, site_id){

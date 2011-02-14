@@ -2,13 +2,13 @@ Ext.ns('Talho.VMS.ux');
 
 Talho.VMS.ux.InventoryWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {  
   modal: true,
-  
+  padding: '5',
   constructor: function(config){
     this.mode = config.mode || (config.record && config.record.get('status') !== 'new' ? 'copy' : 'create');
     
     var name_config = {xtype: 'textfield', itemId: 'name', fieldLabel: 'Inventory/POD name', anchor: '100%'}
     if(this.mode === 'create') {
-      Ext.apply(name_config, {xtype: 'combo', itemId: 'name', fieldLabel: 'Inventory/POD name', store: new Talho.VMS.ux.InventoryController.inventory_template_store({scenarioId: config.scenarioId}), displayField: 'name', valueField: 'id', queryParam: 'name',
+      Ext.apply(name_config, {xtype: 'combo', itemId: 'name', fieldLabel: 'Inventory/POD name', store: new Talho.VMS.ux.InventoryController.inventory_template_store({scenarioId: config.scenarioId}), displayField: 'name', queryParam: 'name',
         mode: 'remote', triggerAction: 'query', minChars: 0, listeners: {
         scope: this,
         'select': this.templateSelected
@@ -16,6 +16,7 @@ Talho.VMS.ux.InventoryWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
     }
     
     Ext.apply(config, {
+      title: this.mode === 'edit' ? 'Edit Inventory/POD' : (this.mode === 'copy' ? 'Copy Inventory/POD' : 'Create Inventory/POD'),
       items: [
         name_config,
         {xtype: 'combo', itemId: 'source', fieldLabel: 'Source', displayField: 'name', queryParam: 'name', mode: 'remote', triggerAction: 'query', minChars: 0, store: new Ext.data.JsonStore({
@@ -108,16 +109,33 @@ Talho.VMS.ux.InventoryWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
     var mode = Ext.isObject(record) ? 'edit' : 'create';
     
     var win = new Ext.Window({
-      height: 300,
-      width: 300,
-      title: 'Add Item',
+      height: 200,
+      width: 350,
+      title: mode === 'edit' ? 'Change Item' : 'Add Item',
       layout: 'fit',
       items: {
+        padding: '5',
         xtype: 'form',
         itemId: 'form',
-        items: [{xtype: 'textfield', fieldLabel: 'Item Name', name: 'name', value: mode === 'edit' ? record.get('name') : ''},
-          {xtype: 'textfield', fieldLabel: 'Category', name: 'category', value: mode === 'edit' ? record.get('category') : ''},
-          {xtype: 'textfield', fieldLabel: 'Quantity', name: 'quantity', value: mode === 'edit' ? record.get('quantity') : '', maskRe: /^\d*$/, filterKeys : function(e){
+        items: [{xtype: 'combo', fieldLabel: 'Item Name', name: 'name', value: mode === 'edit' ? record.get('name') : '', anchor: '100%', displayField: 'name', queryParam: 'name', mode: 'remote', triggerAction: 'query', minChars: 0, store: new Ext.data.JsonStore({
+            url: '/vms/inventory_items',
+            restful: true,
+            fields: ['name', 'id', {name: 'item_category', convert: function(val){ if(Ext.isObject(val)) return val['name']; else return val; } }, {name: 'consumable', type: 'boolean'}]
+          }),
+          listeners: {
+            scope: this,
+            'select': function(combo, record){
+              // apply the data to the window
+              win.getComponent('form').getComponent('category').setValue(record.get('item_category'));
+              win.getComponent('form').getComponent('consumable').setValue(record.get('consumable'));
+            }
+          }},
+          {xtype: 'combo', fieldLabel: 'Category', itemId: 'category', name: 'category', value: mode === 'edit' ? record.get('category') : '', anchor: '100%', displayField: 'name', queryParam: 'name', mode: 'remote', triggerAction: 'query', minChars: 0, store: new Ext.data.JsonStore({
+            url: '/vms/inventory_item_categories',
+            restful: true,
+            fields: ['name', 'id']
+          })},
+          {xtype: 'textfield', fieldLabel: 'Quantity', name: 'quantity', value: mode === 'edit' ? record.get('quantity') : '', anchor: '100%', maskRe: /^\d*$/, filterKeys : function(e){
         if(e.ctrlKey){
             return;
         }
@@ -133,7 +151,7 @@ Talho.VMS.ux.InventoryWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
             e.stopEvent();
         }
     }},
-          {xtype: 'checkbox', hideLabel: true, boxLabel: 'Consumable', checked: false, inputValue: true, name: 'consumable', value: mode === 'edit' ? record.get('consumable') : ''}
+          {xtype: 'checkbox', itemId: 'consumable', hideLabel: true, boxLabel: 'Consumable', checked: false, inputValue: true, name: 'consumable', value: mode === 'edit' ? record.get('consumable') : ''}
         ]
       },
       buttons: [
@@ -148,7 +166,29 @@ Talho.VMS.ux.InventoryWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
             record.commit();
           }
           else{
-            this.itemGrid.getStore().add([new (this.itemGrid.getStore().recordType)(vals)]);
+            var itemStore = this.itemGrid.getStore();
+            var index = itemStore.find('name', new RegExp('^' + vals['name'] + '$'));
+            if(index === -1) 
+              itemStore.add([new (this.itemGrid.getStore().recordType)(vals)]);
+            else {
+              Ext.MessageBox.show({
+                title: 'Attempting to Add Duplicate Item',
+                msg: 'The item you have selected already exists for this inventory. What would you like to do?',
+                buttons: {yes: 'Replace', no: 'Add to Existing', cancel: 'Cancel'},
+                scope: this,
+                fn: function(btnId){
+                  if(btnId === 'yes'){
+                    itemStore.removeAt(index);
+                    itemStore.add([new (this.itemGrid.getStore().recordType)(vals)]);
+                  }
+                  else if(btnId === 'no'){
+                    var orig = itemStore.getAt(index);
+                    orig.set('quantity', orig.get('quantity')*1 + vals['quantity']*1); // make sure vals['quantity'] is added as an integer
+                    orig.commit();
+                  }
+                }
+              })
+            }
           }
           win.close();
         }},
