@@ -4,6 +4,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   title: 'VMS Command Center',
   closable: true,
   layout: 'border',
+  itemId: 'vms_command_center',
   
   constructor: function(config){
     this.row_template = new Ext.XTemplate(
@@ -93,6 +94,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     this.items = [{
           region: 'center',
           itemId: 'map',
+          bodyCssClass: 'google_map',
           xtype: 'gmappanel',
           zoomLevel: 10,
           gmapType: 'map',
@@ -111,7 +113,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           }
       },
       { xtype: 'container', itemId: 'westRegion', region: 'west', layout: 'accordion', items:[
-        { title: 'Site', itemId: 'siteGrid', xtype: 'vms-toolgrid', tools: tool_cfg, seed_data: {name: 'New Site (drag to create)', status: 'new', type: 'site'},
+        { title: 'Sites', itemId: 'siteGrid', cls: 'siteGrid', xtype: 'vms-toolgrid', tools: tool_cfg, seed_data: {name: 'New Site (drag to create)', status: 'new', type: 'site'},
           store: new tool_store({
             reader: new Ext.data.JsonReader({
               root: 'sites',
@@ -130,7 +132,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
             'rowcontextmenu': this.showSiteContextMenu
           }
         },
-        {title: 'PODS/Inventory', xtype: 'vms-toolgrid', tools: tool_cfg, itemId: 'inventory_grid', seed_data: {name: 'New POD/Inventory (drag to site)', type: 'inventory', status: 'new'},
+        {title: 'PODs/Inventories', xtype: 'vms-toolgrid', cls: 'inventoryGrid', tools: tool_cfg, itemId: 'inventory_grid', seed_data: {name: 'New POD/Inventory (drag to site)', type: 'inventory', status: 'new'},
           store: new Talho.VMS.ux.InventoryController.inventory_list_store({ scenarioId: config.scenarioId, type: 'inventory',
             listeners: {
               scope: this,
@@ -204,12 +206,11 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   initMapDropZone: function(){
     this.map.dropZone = new Ext.dd.DropZone(this.map.getEl(), {
       parent: this,
-      map: this.map,
       ddGroup: 'vms',
       
       getTargetFromEvent: function(e){
         var target = e.getTarget('div');
-        if(this.map.getCurrentHover()){
+        if(this.parent.map.getCurrentHover()){
           return target;
         }
         else{
@@ -237,7 +238,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           return false;
         }
         
-        var marker = this.map.getCurrentHover();
+        var marker = this.parent.map.getCurrentHover();
         if(marker && marker.data && marker.data.record){
           this.parent.addItemToSite(marker.data.record, rec);
           return true;
@@ -246,9 +247,9 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           return false;
       },
       
-      onContainerDrop: function(dd, e, data){
+      onContainerDrop: function(dd, e, data, forceLatLng){
         if(data.selections[0].get('type') == 'site'){
-          this.parent.addSiteToMap(this.map.getCurrentLatLng(), data.selections[0]);
+          this.parent.addSiteToMap((forceLatLng && forceLatLng.lat) ? new google.maps.LatLng(forceLatLng.lat, forceLatLng.lng) : this.parent.map.getCurrentLatLng(), data.selections[0]);
           return true;
         }
         else{
@@ -295,7 +296,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           fields: ['name', 'lat', 'lng', 'id', 'address']
       });
       Ext.apply(name_field_config, {xtype: 'combo', queryParam: 'name',
-          mode: 'remote', triggerAction: 'query', typeAhead: true,
+          mode: 'remote', triggerAction: 'query', 
           store: json_store, displayField: 'name', valueField: 'name',
           tpl:'<tpl for="."><div ext:qtip=\'{address}\' class="x-combo-list-item">{name}</div></tpl>',
           minChars: 0,
@@ -325,7 +326,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         'save': function(win){
           var store = this.siteGrid.getStore();
           var addr = win.getComponent('address_field').getValue();
-          var name = win.getComponent('name_field').getValue();
+          var name = win.getComponent('name_field').getRawValue();
           
           var rec = mode == 'activate' ? record : new store.recordType({status: 'active', type: 'site'});
           if(mode != 'activate' || store.indexOf(rec) === -1)
@@ -490,6 +491,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         var original_address = record.get('address');
         
         var win = new Talho.VMS.ux.ItemDetailWindow({
+          title: 'Edit Site',
           items: [
             {xtype: 'textfield', itemId: 'name_field', fieldLabel: 'Name', value: record.get('name') },
             {xtype: 'textfield', itemId: 'address_field', fieldLabel: 'Address', value: original_address}

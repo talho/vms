@@ -51,11 +51,14 @@ Talho.VMS.ux.UserWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
         }),
         idProperty: 'id',
         bodyCssClass: 'users',
+        root: 'users',
+        totalProperty: 'total',
         restful: true,
         fields: ['name', 'email', 'id', 'title', 'extra']
     });
     Ext.apply(config, {items: [{ xtype: 'combo', itemId: 'user', queryParam: 'tag',
         mode: 'remote', forceSelection: true, fieldLabel: 'Search for User',
+        pageSize: 10,
         store: json_store, displayField: 'name', name: 'User', valueField: 'name',
         tpl:'<tpl for="."><div ext:qtip=\'{extra}\' class="x-combo-list-item">{name} - {email}</div></tpl>',
         minChars: 2

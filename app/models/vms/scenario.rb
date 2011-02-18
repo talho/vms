@@ -7,6 +7,9 @@ class Vms::Scenario < ActiveRecord::Base
     def for_site(id)
       find_by_site_id(id)
     end
+    def for_site_by_name(name)
+      for_site(Vms::Site.find_by_name(name))
+    end
   end
   has_many :sites, :through => :site_instances
   
