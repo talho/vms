@@ -18,8 +18,8 @@ When /^the site "([^\"]*)" should exist at "([^\"]*)", "([^\"]*)", "([^\"]*)"$/ 
   site = Vms::Site.find_by_name(site_name)
   site.should_not be nil
   site.address.should == address
-  site.lat.round(6).should == lat.round(6)
-  site.lng.round(6).should == lng.round(6)
+  site.lat.to_f.round(6).should == lat.to_f.round(6)
+  site.lng.to_f.round(6).should == lng.to_f.round(6)
 end
 
 Given /^the following sites exist:$/ do |table|
