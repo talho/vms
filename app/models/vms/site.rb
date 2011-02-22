@@ -4,6 +4,6 @@ class Vms::Site < ActiveRecord::Base
   
   has_many :scenario_instances, :class_name => "Vms::ScenarioSite", :dependent => :destroy
   has_many :scenarios, :through => :scenario_instances
-  
+    
   validates_presence_of :name
 end

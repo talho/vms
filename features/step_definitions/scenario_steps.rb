@@ -8,3 +8,10 @@ Given /^I have the scenarios "([^\"]*)"$/ do |scenarios|
     Factory(:scenario, :name => scenario.strip, :creator => current_user)
   end
 end
+When /^I open the "([^\"]*)" scenario$/ do |name|
+    When %Q{I go to the ext dashboard page}
+    When %Q{I navigate to "Apps > VMS > Open Scenario"}
+    When %Q{I select the "#{name}" grid row}
+    When %Q{I press "Open"}
+    Then %Q{I should see "New Site (drag to create)"}
+end

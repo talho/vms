@@ -35,24 +35,30 @@
 
 /* ------------- Icons ----------------------------- */
 .vms-tool-icon-active.vms-site{
-  background: #1111BB;
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-site-active.png);
 }
 .vms-tool-icon-inactive.vms-site{
-  background: #5577AA;
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-site-available.png);
+}
+.vms-tool-icon-new.vms-site{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-site-new.png);
 }
 
 .vms-tool-icon-active.vms-inventory{
-  background: #666600;
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-inventory-active.png);
 }
 .vms-tool-icon-inactive.vms-inventory{
-  background: #888866;
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-inventory-available.png);
+}
+.vms-tool-icon-new.vms-inventory{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-inventory-new.png);
 }
 
 .vms-tool-icon-active.vms-pod{
-  background: #BB5555;
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-pod-active.png);
 }
 .vms-tool-icon-inactive.vms-pod{
-  background: #997777;
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-pod-available.png);
 }
 
 .vms-tool-icon-active.vms-profile{
@@ -63,29 +69,35 @@
 }
 
 .vms-tool-icon-active.vms-role{
-  background: #BB5555;
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-role-active.png);
 }
-.vms-tool-icon-inactive.vms-role{
-  background: #997777;
+.vms-tool-icon-new.vms-role{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-role-new.png);
 }
 
 .vms-tool-icon-active.vms-team{
-  background: #BB5555;
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-team-active.png);
 }
 .vms-tool-icon-inactive.vms-team{
-  background: #997777;
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-team-available.png);
 }
-
-.vms-tool-icon-active.vms-auto-user{
-  background: #BB5555;
-}
-.vms-tool-icon-inactive.vms-auto-user{
-  background: #997777;
+.vms-tool-icon-new.vms-team{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-team-new.png);
 }
 
 .vms-tool-icon-active.vms-manual-user{
-  background: #BB5555;
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-active.png);
 }
 .vms-tool-icon-inactive.vms-manual-user{
-  background: #997777;
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-available.png);
+}
+.vms-tool-icon-new.vms-manual-user{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-new.png);
+}
+
+.vms-tool-icon-active.vms-auto-user{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-active-auto.png);
+}
+.vms-tool-icon-inactive.vms-auto-user{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-available-auto.png);
 }

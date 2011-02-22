@@ -1,4 +1,4 @@
-Vms
+VMS
 ===========
 
 This is a plugin for OpenPHIN.
@@ -9,8 +9,8 @@ This is a plugin for OpenPHIN.
   - the paths must be relative to Rails.root/public
   - the plugin install.rb must make links to the plugin js/css dirs in
     Rails.root/public
-3) run cucumber tests for this plugin with 'rake cucumber:Vms'
-4) run spec tests for this plugin with 'rake spec:Vms'
+3) run cucumber tests for this plugin with 'rake cucumber:VMS'
+4) run spec tests for this plugin with 'rake spec:VMS'
 
 The following was done initially to setup the plugin:
 1) edited Rails.root/spec/spec_helper.rb to
