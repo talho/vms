@@ -19,12 +19,12 @@ Talho.VMS.ux.InventoryWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
       title: this.mode === 'edit' ? 'Edit POD/Inventory' : (this.mode === 'copy' ? 'Copy POD/Inventory' : 'Create POD/Inventory'),
       items: [
         name_config,
-        {xtype: 'combo', itemId: 'source', fieldLabel: 'Source', displayField: 'name', queryParam: 'name', mode: 'remote', triggerAction: 'query', minChars: 0, store: new Ext.data.JsonStore({
+        {xtype: 'combo', itemId: 'source', anchor: '100%', fieldLabel: 'Source', displayField: 'name', queryParam: 'name', mode: 'remote', triggerAction: 'query', minChars: 0, store: new Ext.data.JsonStore({
         	url: '/vms/inventory_sources',
         	restful: true,
         	fields: ['name', 'id']
         })},
-        {xtype:'radiogroup', itemId: 'type', hideLabel: true, items: [{boxLabel: 'Inventory', checked: true, inputValue: 'inventory', name: 'inventory_type'}, {boxLabel: 'POD', inputValue: 'pod', name: 'inventory_type'}]},
+        {xtype:'radiogroup', itemId: 'type', anchor: '100%', hideLabel: true, items: [{boxLabel: 'Inventory', checked: true, inputValue: 'inventory', name: 'inventory_type'}, {boxLabel: 'POD', inputValue: 'pod', name: 'inventory_type'}]},
         {xtype: 'grid', itemId: 'items', cls: 'itemGrid', anchor: '100%', height: 150, hideLabel: true, tbar: ['Items', '->', {text: 'Add Item', scope: this, handler: function(){this.showItemDetailWindow();} }], store: new Ext.data.JsonStore({
             fields: ['name', {name: 'quantity', type: 'int'}, 'category', 'consumable']
           }),
@@ -42,7 +42,7 @@ Talho.VMS.ux.InventoryWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
             'rowcontextmenu': this.showItemMenu
           }
         },
-        {xtype: 'checkbox', boxLabel: 'Save as a Template', itemId: 'template', checked: false, name: 'inventory_template', hideLabel: true}
+        {xtype: 'checkbox', boxLabel: 'Save as a Template', anchor: '100%', itemId: 'template', checked: false, name: 'inventory_template', hideLabel: true}
     ]});
     
     Talho.VMS.ux.InventoryWindow.superclass.constructor.call(this, config);

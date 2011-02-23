@@ -3,6 +3,9 @@ Ext.ns("Talho.VMS")
 Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
   title: 'Create Scenario',
   modal: true,
+  height: 100,
+  layout: 'fit',
+  width: 300,
   constructor: function(config){
     this.edit_mode = false;
     if(!Ext.isEmpty(config.scenarioId)){
@@ -28,7 +31,7 @@ Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
     
     Ext.apply(config, {
       items:[{xtype: 'form', border: false, padding: '5', itemId: 'form_panel', items:[
-        {xtype: 'textfield', fieldLabel: 'Scenario Name', name: 'scenario[name]', value: this.edit_mode ? config.scenarioName : ''}
+        {xtype: 'textfield', fieldLabel: 'Scenario Name', name: 'scenario[name]', value: this.edit_mode ? config.scenarioName : '', anchor: '100%'}
       ]}],
       buttons: buttons
     });

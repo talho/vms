@@ -2,7 +2,8 @@ Ext.ns('Talho.VMS.ux');
 
 Talho.VMS.ux.ItemDetailWindow = Ext.extend(Ext.Window, {
   layout: 'form',
-  
+  height: 300,
+  width: 400,
   constructor: function(config){
     this.addEvents(
       /**
@@ -72,6 +73,7 @@ Talho.VMS.ux.UserWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
 });
 
 Talho.VMS.ux.TeamWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
+  height: 400,
   constructor: function(config){
     Ext.apply(config, {items: [
       {xtype: 'textfield', fieldLabel: 'Team Name', itemId: 'name'},

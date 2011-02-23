@@ -264,119 +264,17 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
    * @param {LatLng} latLng Google's latitude/longitude object for where the record was dropped.
    * @param {Record} record Ext record that represents the transported object
    */
-  addSiteToMap: function(latLng, record){
-    var mode = 'activate';
-    
-    if(record.get('status') == 'new')
-      mode = 'new';
-    else if(record.get('status') == 'active')
-      mode = 'copy';
-    
-    var original_address = '';
-    if(mode == 'activate' && !Ext.isEmpty(record.get('address')) ){
-      original_address = record.get('address');
-      this.map.geocoder.geocode({address: original_address}, function(results, status){
-        latLng = results[0].geometry.location;
-      }.createDelegate(this));
-    }
-    else {
-      this.map.geocoder.geocode({latLng: latLng}, function(results, status){
-        original_address = results[0].formatted_address;
-        win.getComponent('address_field').setValue(original_address);
-      }.createDelegate(this));
-    }
-
-    var name_field_config = {xtype: 'textfield', itemId: 'name_field', fieldLabel: 'Name', value: mode != 'new' ? (mode == 'copy' ? 'Copy of ' : '') + record.get('name') : '' };
-    
-    if(mode === 'new'){
-      var json_store = new Ext.data.JsonStore({
-          url: '/vms/scenarios/' + this.scenarioId + '/sites/existing',
-          idProperty: 'id',
-          root: 'sites',
-          fields: ['name', 'lat', 'lng', 'id', 'address']
-      });
-      Ext.apply(name_field_config, {xtype: 'combo', queryParam: 'name',
-          mode: 'remote', triggerAction: 'query', 
-          store: json_store, displayField: 'name', valueField: 'name',
-          tpl:'<tpl for="."><div ext:qtip=\'{address}\' class="x-combo-list-item">{name}</div></tpl>',
-          minChars: 0,
-          listeners: {
-            scope: this,
-            'select': function(combo, r, index){
-              mode = 'activate';
-              record = new (this.siteGrid.getStore().recordType)({status: 'active', type: 'site'});
-              record.id = r.get('id');
-              record.set('id', r.get('id'));
-              record.set('name', r.get('name'));
-              record.set('address', r.get('address'));
-              record.set('lat', r.get('lat'));
-              record.set('lng', r.get('lng'));
-              win.getComponent('address_field').setValue(r.get('address'));
-            }
-          }});
-    }
-
-    var win = new Talho.VMS.ux.ItemDetailWindow({
-      items: [
-        name_field_config,
-        {xtype: 'textfield', itemId: 'address_field', fieldLabel: 'Address', value: original_address}
-      ],
+  addSiteToMap: function(latLng, record){    
+    var site_controller = new Talho.VMS.ux.SiteController({scenarioId: this.scenarioId, map: this.map, store: this.siteGrid.getStore()});
+    var win = new Talho.VMS.ux.CreateAndEditSite({
+      record: record,
+      latLng: latLng,
+      map: this.map,
+      scenarioId: this.scenarioId,
+      recordType: this.siteGrid.getStore().recordType,
       listeners:{
-        scope: this,
-        'save': function(win){
-          var store = this.siteGrid.getStore();
-          var addr = win.getComponent('address_field').getValue();
-          var name = win.getComponent('name_field').getRawValue();
-          
-          var rec = mode == 'activate' ? record : new store.recordType({status: 'active', type: 'site'});
-          if(mode != 'activate' || store.indexOf(rec) === -1)
-            store.add(rec);
-          else
-            rec.set('status', 'active');
-          
-          rec.set('address', addr);
-          rec.set('name', name);
-          
-          var add_marker_local = function(loc){
-            rec.set('lat', loc.lat());
-            rec.set('lng', loc.lng());
-            
-            Ext.Ajax.request({
-              method: mode == 'activate' ? 'PUT' : 'POST',
-              url: '/vms/scenarios/' + this.scenarioId + '/sites' + (mode == 'activate' ? '/' + rec.get('id') : ''),
-              scope: this,
-              params: {
-                'site[name]': rec.get('name'),
-                'site[address]': rec.get('address'),
-                'site[lat]': rec.get('lat'),
-                'site[lng]': rec.get('lng'),
-                'status': rec.get('status') === 'active' ? 2 : 1
-              },
-              success: function(response){
-                var resp = Ext.decode(response.responseText);
-                var id = resp.site.site_id;
-                rec.set('id', id);
-                rec.id = id;
-                this.map.addMarker(loc, rec.get('name'), {record: rec});
-                this.siteGrid.getStore().commitChanges();
-                win.close();                
-              },
-              failure: function(){
-                Ext.Msg.alert('There was an error saving the site');
-                win.close();
-              }
-            });
-          }.createDelegate(this);
-          
-          if(addr != original_address){
-            this.map.geocoder.geocode({address: addr}, function(results, status){
-              add_marker_local(results[0].geometry.location);
-            });
-          }
-          else {
-            add_marker_local(latLng);
-          }
-        }
+        scope: site_controller,
+        'save': site_controller.create
       }      
     });
     
@@ -488,109 +386,29 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     
     var menuConfig = [
       {text: 'Edit', scope: this, handler: function(){
-        var original_address = record.get('address');
-        
-        var win = new Talho.VMS.ux.ItemDetailWindow({
-          title: 'Edit Site',
-          items: [
-            {xtype: 'textfield', itemId: 'name_field', fieldLabel: 'Name', value: record.get('name') },
-            {xtype: 'textfield', itemId: 'address_field', fieldLabel: 'Address', value: original_address}
-          ],
+        var site_controller = new Talho.VMS.ux.SiteController({scenarioId: this.scenarioId, map: this.map, store: this.siteGrid.getStore()});
+        var win = new Talho.VMS.ux.CreateAndEditSite({
+          record: record,
+          scenarioId: this.scenarioId,
+          mode: 'edit',
+          map: this.map,
           listeners:{
-            scope: this,
-            'save': function(win){
-              var addr = win.getComponent('address_field').getValue();
-              var name = win.getComponent('name_field').getValue();
-              
-              var rec = record;
-              rec.set('address', addr);
-              rec.set('name', name);
-              
-              var update_record = function(loc){
-                rec.set('lat', loc.lat());
-                rec.set('lng', loc.lng());
-                
-                Ext.Ajax.request({
-                  method: 'PUT',
-                  url: '/vms/scenarios/' + this.scenarioId + '/sites/' + rec.get('id'),
-                  scope: this,
-                  params: {
-                    'site[name]': rec.get('name'),
-                    'site[address]': rec.get('address'),
-                    'site[lat]': rec.get('lat'),
-                    'site[lng]': rec.get('lng')
-                  },
-                  success: function(response){
-                    var marker;
-                    if(rec.get('status') == 'active' && addr != original_address && (marker = this.findMarker(rec)) ){
-                      marker.setPosition(loc);
-                    }
-                    this.siteGrid.getStore().commitChanges();
-                    win.close();                
-                  },
-                  failure: function(){
-                    Ext.Msg.alert('There was an error saving the site');
-                    win.close();
-                  }
-                });
-              }.createDelegate(this);
-              
-              if(addr != original_address){
-                this.map.geocoder.geocode({address: addr}, function(results, status){
-                  update_record(results[0].geometry.location);
-                });
-              }
-              else {
-                update_record(new google.maps.LatLng(rec.get('lat'), rec.get('lng')) );
-              }
-            }
+            'save': site_controller.edit.createDelegate(site_controller, [this.findMarker(record)], true)
           }      
         });
         
         win.show();
       }},
       {text: 'Remove', scope: this, handler: function(){
-          Ext.Ajax.request({
-          method: 'DELETE',
-          url: '/vms/scenarios/' + this.scenarioId + '/sites/' + record.id,
-          scope: this,
-          success: function(){
-            grid.getStore().remove(record);
-            var marker = null;
-            Ext.each(this.map.markers, function(m){ if(m.data.record.id === record.id){
-              marker = m;
-              return false;
-            }});
-            if(marker){
-              this.map.removeMarker(marker);
-            }
-          },
-          failure: function(){
-            Ext.Msg.alert('There was an error deleting the site');
-          }
-        });
+        var site_controller = new Talho.VMS.ux.SiteController({scenarioId: this.scenarioId, map: this.map, store: this.siteGrid.getStore()});
+        site_controller.destroy(record, this.findMarker(record));
       }}
     ];
     
     if(record.get('status') === 'active'){
       menuConfig.push({text: 'Deactivate', scope: this, handler: function(){
-        // send ajax deactivation request
-        Ext.Ajax.request({
-          method: 'PUT',
-          url: '/vms/scenarios/' + this.scenarioId + '/sites/' + record.id,
-          params: { 'status': 1 },
-          scope: this,
-          success: function(){
-            record.set('status', 1);
-            var marker = this.findMarker(record);
-            if(marker){
-              this.map.removeMarker(marker);
-            }
-          },
-          failure: function(){
-            Ext.Msg.alert('There was an error deactivating the site');
-          }
-        });
+        var site_controller = new Talho.VMS.ux.SiteController({scenarioId: this.scenarioId, map: this.map});
+        site_controller.deactivate(record, this.findMarker(record));
       }});
     }
     
