@@ -10,6 +10,7 @@ Talho.VMS.ux.SiteController = Ext.extend(Ext.util.Observable, {
   },
   
   create: function(win, record){
+    win.showMask();
     var addr = win.getComponent('address_field').getValue();
     var name = win.getComponent('name_field').getRawValue();
     
@@ -44,10 +45,12 @@ Talho.VMS.ux.SiteController = Ext.extend(Ext.util.Observable, {
           rec.id = id;
           this.map.addMarker(loc, rec.get('name'), {record: rec});
           this.store.commitChanges();
+          win.hideMask();
           win.close();                
         },
         failure: function(){
           Ext.Msg.alert('There was an error saving the site');
+          win.hideMask();
           win.close();
         }
       });
@@ -64,6 +67,7 @@ Talho.VMS.ux.SiteController = Ext.extend(Ext.util.Observable, {
   },
   
   edit: function(win, record, marker){
+    win.showMask();
     var addr = win.getComponent('address_field').getValue();
     var name = win.getComponent('name_field').getValue();
     
