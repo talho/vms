@@ -1,9 +1,11 @@
 class Vms::SitesController < ApplicationController
+  include Vms::PopulateScenario
+  
+  before_filter :initialize_scenario, :except => [:new, :edit, :show]
   before_filter :non_public_role_required, :change_include_root
   after_filter :change_include_root_back
   
   def index
-    @scenario = Vms::Scenario.find(params[:vms_scenario_id])
     @site_instances = @scenario.site_instances
     respond_to do |format|
       format.json {render :json => {:sites => @site_instances.as_json} }
@@ -22,7 +24,6 @@ class Vms::SitesController < ApplicationController
   end
   
   def create
-    @scenario = Vms::Scenario.find(params[:vms_scenario_id])
     @site = Vms::Site.new(params[:site])
     @site.scenario_instances.build(:scenario => @scenario, :status => params[:status].nil? ? Vms::ScenarioSite::STATES[:inactive] : params[:status].to_i)
     respond_to do |format|
@@ -34,12 +35,11 @@ class Vms::SitesController < ApplicationController
     end
   end
   
-  def edit    
-    
+  def edit
+
   end
   
   def update
-    @scenario = Vms::Scenario.find(params[:vms_scenario_id])
     @site = Vms::Site.find(params[:id])
     @site.update_attributes params[:site] unless params[:site].nil? || params[:site].blank?
     @scenario_instance = @site.scenario_instances.find_by_scenario_id(@scenario.id)
@@ -55,7 +55,6 @@ class Vms::SitesController < ApplicationController
   end
   
   def destroy
-    @scenario = Vms::Scenario.find(params[:vms_scenario_id])    
     @site = @scenario.sites.find(params[:id])
     permanent = params[:permanent] == 'true' && @site.scenario_instances.length == 1 && @site.scenario_instances.first.scenario == @scenario
     if permanent
@@ -75,11 +74,11 @@ class Vms::SitesController < ApplicationController
   end
   
   def existing
-    @scenario = Vms::Scenario.find(params[:vms_scenario_id])
     @sites = Vms::Site.find(:all, :conditions => ["name like ?", '%' + params[:name] + '%']) - @scenario.sites
     
     respond_to do |format|
       format.json {render :json => {:sites => @sites} }
     end    
   end
+  
 end

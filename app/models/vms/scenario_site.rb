@@ -7,6 +7,8 @@ class Vms::ScenarioSite < ActiveRecord::Base
   STATES = {:inactive => 1, :active => 2}  
   
   has_many :inventories, :class_name => "Vms::Inventory"
+  has_many :role_scenario_sites, :class_name => "Vms::RoleScenarioSite", :autosave => true
+  has_many :roles, :through => :role_scenario_sites
   
   def as_json (options = {})
     options[:include] = {} if options[:include].nil?

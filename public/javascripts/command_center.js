@@ -149,7 +149,39 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           store: new tool_store()
         },
         {title: 'Roles', xtype: 'vms-toolgrid', itemId: 'roles_grid', seed_data: {name: 'Add Role (drag to site)', type: 'role', status: 'new'},
-          store: new tool_store()
+          columns: [{xtype: 'templatecolumn', id: 'name_column', tpl: this.row_template}, {dataIndex: 'site_id', hidden: true}],
+          listeners:{
+            scope: this,
+            'rowcontextmenu': this.showRolesContextMenu,
+            'groupcontextmenu': this.showRolesGroupContextMenu
+          },
+          store: new Ext.data.GroupingStore({
+            reader: new Ext.data.JsonReader({
+              idProperty: 'id',
+              fields: [{name: 'name', mapping: 'role'}, {name: 'type', defaultValue: 'role'}, {name: 'status', defaultValue: 'active'}, 'id', 'site_id', 'site', 'role_id', {name: 'count', type: 'integer'}]
+            }),
+            type: 'role',
+            url: '/vms/scenarios/' + config.scenarioId + '/roles',
+            listeners:{
+              scope: this,
+              'load': this.applyToSite
+            },
+            groupField: 'site_id'
+          }),
+          view: new Ext.grid.GroupingView({enableGroupingMenu: false, showGroupName: 'false',
+            startGroup: new Ext.XTemplate(
+              '<div id="{groupId}" class="x-grid-group {cls}">',
+                '<div id="{groupId}-hd" class="{[this.getHDClass(values)]}" style="{style}"><div class="x-grid-group-title">', "{[this.getText(values)]}" ,'</div></div>',
+                '<div id="{groupId}-bd" class="x-grid-group-body">', {
+                  getHDClass: function(val){
+                    return Ext.isEmpty(val.group) ? 'x-grid-group-hd-empty' : 'x-grid-group-hd';
+                  },
+                  getText: function(val){
+                    return Ext.isEmpty(val.group) ? '' : val.rs[0].get('site');
+                  }
+                }
+            )
+          })
         },
         {title: 'Teams', xtype: 'vms-toolgrid', itemId: 'teams_grid', seed_data: {name: 'New Team (drag to site)', type: 'team', status: 'new'},
           store: new tool_store()
@@ -198,7 +230,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     
     this.siteGrid.getStore().load();
     this.inventoryGrid.getStore().load();
-    this.rolesGrid.getStore().loadData([]);
+    this.rolesGrid.getStore().load();
     this.teamsGrid.getStore().loadData([]);
     this.staffGrid.getStore().loadData([]);
   },
@@ -456,6 +488,75 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     menu.show(row);
   },
   
+  showRolesContextMenu: function(grid, row_index, evt){
+    evt.preventDefault();
+    
+    var row = grid.getView().getRow(row_index);
+    var record = grid.getStore().getAt(row_index);
+    
+    if(record.get('status') === 'new'){
+      return;
+    }
+
+    var role_controller = new Talho.VMS.ux.RolesController({scenarioId: this.scenarioId, siteId: record.get('site_id'), store: this.rolesGrid.getStore()});
+    var menu = new Ext.menu.Menu({
+      floating: true, defaultAlign: 'tr-br?',
+      items:[{
+        text: 'Edit', scope: this, handler: function(){
+          var win = new Talho.VMS.ux.CreateAndEditRoles({
+            scenarioId: this.scenarioId,
+            siteId: record.get('site_id'),
+            listeners: {
+              scope: role_controller,
+              'save': role_controller.save
+            }
+          });
+          win.show();
+        }
+      }, {
+        text: 'Remove', scope: this, handler: function(){          
+          var win = new Talho.VMS.ux.CreateAndEditRoles({
+            removedRecord: record,
+            scenarioId: this.scenarioId,
+            siteId: record.get('site_id'),
+            listeners: {
+              scope: role_controller,
+              'save': role_controller.save
+            }
+          });
+          win.show();
+        }
+      }]
+    });
+    
+    menu.show(row);    
+  },
+  
+  showRolesGroupContextMenu: function(grid, field, value, evt){
+    evt.preventDefault(); 
+    var elem = evt.getTarget();
+    
+    var menu = new Ext.menu.Menu({
+      floating: true, defaultAlign: 'tr-br?',
+      items:[{
+        text: 'Edit', scope: this, handler: function(){
+          var role_controller = new Talho.VMS.ux.RolesController({scenarioId: this.scenarioId, siteId: value, store: this.rolesGrid.getStore()});
+          var win = new Talho.VMS.ux.CreateAndEditRoles({
+            scenarioId: this.scenarioId,
+            siteId: value,
+            listeners: {
+              scope: role_controller,
+              'save': role_controller.save
+            }
+          });
+          win.show();
+        }
+      }]
+    });
+    
+    menu.show(elem);
+  },
+  
   findMarker: function(record){
     var marker = null;
     Ext.each(this.map.markers, function(m){ if(m.data.record.id === record.id){
@@ -548,23 +649,17 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   },
   
   addRoleToSite: function(record, site, prep_record, init_record){    
-    if(record.get('status') == 'new'){
-      var win = new Talho.VMS.ux.RoleWindow({
-        listeners: {
-          scope: this,
-          'save': function(win, role){
-            record = prep_record(record);
-            record.set('name', role);
-            init_record(record);
-            win.close();
-          }
-        }
-      });
-      win.show();
-    }
-    else{
-      init_record(record);
-    }
+    var role_controller = new Talho.VMS.ux.RolesController({scenarioId: this.scenarioId, siteId: site.id, store: this.rolesGrid.getStore()});
+    var win = new Talho.VMS.ux.CreateAndEditRoles({
+      creatingRecord: record,
+      scenarioId: this.scenarioId,
+      siteId: site.id,
+      listeners: {
+        scope: role_controller,
+        'save': role_controller.save
+      }
+    });
+    win.show();
   },
   
   addTeamToSite: function(record, site, prep_record, init_record){

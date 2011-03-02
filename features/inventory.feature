@@ -22,7 +22,7 @@ Feature: Inventory creation on sites
     When I fill in the following:
       | Inventory/POD Name | Medical Inventory |
       | Source             | DSHS              |
-    And I check "Inventory"
+    And I choose "Inventory"
     And I press "Add Item"
     Then the "Add Item" window should be open
     When I fill in the following within ".addItemWindow":
@@ -64,7 +64,7 @@ Feature: Inventory creation on sites
     When I fill in the following:
       | Inventory/POD Name | Medical POD |
       | Source             | CDC         |
-    And I check "POD"
+    And I choose "POD"
     And I press "Add Item"
     Then the "Add Item" window should be open
     When I fill in the following within ".addItemWindow":
@@ -147,7 +147,7 @@ Feature: Inventory creation on sites
     Then the "Edit POD/Inventory" window should be open
     When I fill in "Name" with "Medical Inventory"
     And I fill in "Source" with "CDC"
-    And I check "Inventory"
+    And I choose "Inventory"
     Then the "POD" checkbox should not be checked
     And the "Template" checkbox should not be checked
     And I press "Save"
@@ -228,7 +228,7 @@ Feature: Inventory creation on sites
     When I fill in the following:
       | Inventory/POD Name | Medical Inventory |
       | Source             | DSHS              |
-    And I check "Inventory"
+    And I choose "Inventory"
     And I press "Add Item"
     And I fill in "Item Name" with "Surgical Mask"
     And I select "Surgical Mask" from ext combo "Item Name"
@@ -386,7 +386,7 @@ Feature: Inventory creation on sites
     When I fill in the following:
       | Inventory/POD Name | Medical Inventory |
       | Source             | DSHS              |
-    And I check "Inventory"
+    And I choose "Inventory"
     And I check "Template"
     And I press "Add Item"
     When I fill in the following within ".addItemWindow":

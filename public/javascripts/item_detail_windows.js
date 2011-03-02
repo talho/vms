@@ -42,25 +42,6 @@ Talho.VMS.ux.ItemDetailWindow = Ext.extend(Ext.Window, {
   }
 });
 
-Talho.VMS.ux.RoleWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
-  constructor: function(config){
-    Ext.apply(config, {items: [{xtype: 'combo', fieldLabel: 'Select Role', itemId: 'role', mode: 'local', triggerAction: 'all', store: new Ext.data.JsonStore({
-      url: '/audiences/roles',
-      autoLoad: true,
-      idProperty: 'id',
-      fields: [
-          {name: 'name', mapping: 'name'},
-          {name: 'id', mapping: 'id'}
-      ]
-    }), displayField: 'name', valueField: 'name'}]});
-    Talho.VMS.ux.RoleWindow.superclass.constructor.apply(this, arguments);
-  },
-  
-  onSaveClicked: function(){
-    this.fireEvent('save', this, this.getComponent('role').getValue());
-  }
-});
-
 Talho.VMS.ux.UserWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
   constructor: function(config){
     var json_store = new Ext.data.JsonStore({

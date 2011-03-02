@@ -1,4 +1,7 @@
 class Vms::InventoriesController < ApplicationController
+  
+  include Vms::PopulateScenario
+  
   before_filter :non_public_role_required, :change_include_root
   before_filter :initialize_scenario, :except => [:sources, :items, :categories]
   after_filter :change_include_root_back
@@ -175,15 +178,15 @@ class Vms::InventoriesController < ApplicationController
     end
   end
   
-  private
-  def initialize_scenario
-    begin
-      @scenario = Vms::Scenario.find(params[:vms_scenario_id])
-    rescue Exception => e
-      respond_to do |format|
-        format.json {render :json => {:exception => e.message, :backtrace => e.backtrace, :error => "Could not find the requested scenario.", :success => false}, :status => 404}
-      end
-      false
-    end
-  end
+  # private
+  # def initialize_scenario
+  #   begin
+  #     @scenario = Vms::Scenario.find(params[:vms_scenario_id])
+  #   rescue Exception => e
+  #     respond_to do |format|
+  #       format.json {render :json => {:exception => e.message, :backtrace => e.backtrace, :error => "Could not find the requested scenario.", :success => false}, :status => 404}
+  #     end
+  #     false
+  #   end
+  # end
 end
