@@ -82,6 +82,22 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       }
     });
     
+    var tool_grouping_view = Ext.extend(Ext.grid.GroupingView, {enableGroupingMenu: false, showGroupName: 'false',
+      startGroup: new Ext.XTemplate(
+        '<div id="{groupId}" class="x-grid-group {cls}">',
+          '<div id="{groupId}-hd" class="{[this.getHDClass(values)]}" style="{style}"><div class="x-grid-group-title">', "{[this.getText(values)]}" ,'</div></div>',
+          '<div id="{groupId}-bd" class="x-grid-group-body">', {
+            compiled: true,
+            getHDClass: function(val){
+              return Ext.isEmpty(val.group) ? 'x-grid-group-hd-empty' : 'x-grid-group-hd';
+            },
+            getText: function(val){
+              return Ext.isEmpty(val.group) ? '' : val.rs[0].get('site');
+            }
+          }
+      )
+    });
+    
     Ext.reg('vms-toolgrid', vms_tool_grid);
     
     var tool_store = Ext.extend(Ext.data.Store, {
@@ -134,10 +150,13 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         },
         {title: 'PODs/Inventories', xtype: 'vms-toolgrid', cls: 'inventoryGrid', tools: tool_cfg, itemId: 'inventory_grid', seed_data: {name: 'New POD/Inventory (drag to site)', type: 'inventory', status: 'new'},
           store: new Talho.VMS.ux.InventoryController.inventory_list_store({ scenarioId: config.scenarioId, type: 'inventory',
+            groupField: 'site_id',
             listeners: {
               scope: this,
               'load': this.applyToSite
           } }),
+          columns: [{xtype: 'templatecolumn', id: 'name_column', tpl: this.row_template}, {dataIndex: 'site_id', hidden: true}],
+          view: new tool_grouping_view(),
           listeners: {
             scope: this,
             'rowcontextmenu': this.showInventoryContextMenu
@@ -168,20 +187,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
             },
             groupField: 'site_id'
           }),
-          view: new Ext.grid.GroupingView({enableGroupingMenu: false, showGroupName: 'false',
-            startGroup: new Ext.XTemplate(
-              '<div id="{groupId}" class="x-grid-group {cls}">',
-                '<div id="{groupId}-hd" class="{[this.getHDClass(values)]}" style="{style}"><div class="x-grid-group-title">', "{[this.getText(values)]}" ,'</div></div>',
-                '<div id="{groupId}-bd" class="x-grid-group-body">', {
-                  getHDClass: function(val){
-                    return Ext.isEmpty(val.group) ? 'x-grid-group-hd-empty' : 'x-grid-group-hd';
-                  },
-                  getText: function(val){
-                    return Ext.isEmpty(val.group) ? '' : val.rs[0].get('site');
-                  }
-                }
-            )
-          })
+          view:  new tool_grouping_view()
         },
         {title: 'Teams', xtype: 'vms-toolgrid', itemId: 'teams_grid', seed_data: {name: 'New Team (drag to site)', type: 'team', status: 'new'},
           store: new tool_store()

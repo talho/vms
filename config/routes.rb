@@ -8,7 +8,7 @@ ActionController::Routing::Routes.draw do |map|
     scenarios.roles 'roles', :controller => 'vms/roles', :action => 'index'
   end
   
-  map.inventory_sources 'vms/inventory_sources(.:format)', :controller => 'vms/inventories', :action => 'sources'
-  map.inventory_items 'vms/inventory_items(.:format)', :controller => 'vms/inventories', :action => 'items'
-  map.inventory_item_categories 'vms/inventory_item_categories(.:format)', :controller => 'vms/inventories', :action => 'categories'
+  map.inventory_sources 'vms/inventory_sources.:format', :controller => 'vms/inventories', :action => 'sources'
+  map.inventory_items 'vms/inventory_items.:format', :controller => 'vms/inventories', :action => 'items'
+  map.inventory_item_categories 'vms/inventory_item_categories.:format', :controller => 'vms/inventories', :action => 'categories'
 end

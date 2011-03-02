@@ -50,4 +50,13 @@ class Vms::Inventory < ActiveRecord::Base
       
       inv
     end
+    
+    def as_json(options = {})
+      json = super(options)
+      unless site.nil?
+        ( json.key?("inventory_instance") ? json["inventory_instance"] : json).merge!( 
+          {:site => site.name, :site_id => site.id })
+      end
+      json
+    end
 end

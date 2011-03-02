@@ -17,18 +17,19 @@ Ext.ns('Talho.VMS.ux');
         else return val;
       }},
       'items',
-      {name: 'site_id', mapping: 'site', type: 'int', convert: function(val){
-        if(val && val.id) return val.id;
-        else return null;
-      }}
+      'site_id',
+      'site'
     ]),
     
-    inventory_list_store: Ext.extend(Ext.data.JsonStore, {
+    inventory_list_store: Ext.extend(Ext.data.GroupingStore, {
       constructor: function(config){
         Ext.apply(config, {
           url: Talho.VMS.ux.InventoryController.build_url(config.scenarioId),
-          fields: Talho.VMS.ux.InventoryController.record,
-          idProperty: 'id'
+          reader: new Ext.data.JsonReader({
+            fields: Talho.VMS.ux.InventoryController.record,
+            idProperty: 'id'
+          }),
+          groupField: 'site_id'
         });
         Talho.VMS.ux.InventoryController.inventory_list_store.superclass.constructor.apply(this, arguments); 
       },
@@ -39,7 +40,7 @@ Ext.ns('Talho.VMS.ux');
     inventory_template_store: Ext.extend(Ext.data.JsonStore, {
       constructor: function(config){
         Ext.apply(config, {
-          url: 'vms/scenarios/' + config.scenarioId + '/inventories/templates',
+          url: '/vms/scenarios/' + config.scenarioId + '/inventories/templates',
           fields: Talho.VMS.ux.InventoryController.record,
           idProperty: 'id'
         });

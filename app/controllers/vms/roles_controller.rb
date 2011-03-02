@@ -21,7 +21,7 @@ class Vms::RolesController < ApplicationController
   end
   
   def update
-    @site_instance = @scenario.site_instances.first( {:conditions => {:site_id => 16}, :include => [:role_scenario_sites] })
+    @site_instance = @scenario.site_instances.first( {:conditions => {:site_id => params[:vms_site_id]}, :include => [:role_scenario_sites] })
     
     roles = JSON.parse(params[:roles])
     

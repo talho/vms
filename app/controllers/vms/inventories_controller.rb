@@ -9,14 +9,14 @@ class Vms::InventoriesController < ApplicationController
   def index
     @inventories = []
     if params[:site_id].nil?
-      @inventories = @scenario.inventories
+      @inventories = @scenario.inventories.all(:include => [:site])
     else
       @scenario_site = @scenario.site_instances.for_site(params[:site_id])
-      @inventories = @scenario_site.inventories unless @scenario_site.nil?
+      @inventories = @scenario_site.inventories.all(:include => [:site]) unless @scenario_site.nil?
     end
     
     respond_to do |format|
-      format.json {render :json => @inventories.map { |inv| inv.as_json(:include => {:site => {:only => [:id] }, :source => {:only => [:name]} }) } }
+      format.json {render :json => @inventories.map { |inv| inv.as_json(:include => {:source => {:only => [:name]} }) } }
     end    
   end
   
