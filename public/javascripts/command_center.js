@@ -167,7 +167,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         {title: 'Exigency Profile', xtype: 'vms-toolgrid',
           store: new tool_store()
         },
-        {title: 'Roles', xtype: 'vms-toolgrid', itemId: 'roles_grid', seed_data: {name: 'Add Role (drag to site)', type: 'role', status: 'new'},
+        {title: 'Roles', xtype: 'vms-toolgrid', itemId: 'roles_grid', cls: 'roleGrid', seed_data: {name: 'Add Role (drag to site)', type: 'role', status: 'new'},
           columns: [{xtype: 'templatecolumn', id: 'name_column', tpl: this.row_template}, {dataIndex: 'site_id', hidden: true}],
           listeners:{
             scope: this,

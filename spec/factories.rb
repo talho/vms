@@ -51,3 +51,7 @@ Factory.sequence(:item_category_name) {|n| "Category #{n}"}
 Factory.define :item_category, :class => Vms::Inventory::ItemCategory do |m|
   m.name {Factory.next(:item_category_name)}
 end
+
+Factory.define :role_scenario_site, :class => Vms::RoleScenarioSite do |m|
+  m.count 1
+end

@@ -13,5 +13,7 @@ When /^I open the "([^\"]*)" scenario$/ do |name|
     When %Q{I navigate to "Apps > VMS > Open Scenario"}
     When %Q{I select the "#{name}" grid row}
     When %Q{I press "Open"}
+    When %Q{I wait for the "Loading..." mask to go away}
+    When %Q{I wait for the "Loading..." mask to go away}
     Then %Q{I should see "New Site (drag to create)"}
 end
