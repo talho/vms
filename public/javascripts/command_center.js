@@ -18,6 +18,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         iconClass: function(values){
           var cls = '';
           switch(values.status){
+            case 'assigned':
             case 'active': cls = 'vms-tool-icon-active ';
               break;
             case 'new': cls = 'vms-tool-icon-new ';
@@ -193,7 +194,26 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           store: new tool_store()
         },
         {title: 'Staff', xtype: 'vms-toolgrid', itemId: 'staff_grid', seed_data: {name: 'Add User (drag to site)', type: 'manual_user', status: 'new'},
-          store: new tool_store()
+          columns: [{xtype: 'templatecolumn', id:'name_column', tpl: this.row_template }, {dataIndex: 'site_id', hidden: true}],
+          listeners:{
+            scope: this,
+            'rowcontextmenu': this.showStaffContextMenu,
+            'groupcontextmenu': this.showStaffGroupContextMenu
+          },
+          store: new Ext.data.GroupingStore({
+            reader: new Ext.data.JsonReader({
+              idProperty: 'id',
+              fields: [{name: 'name', mapping: 'user'}, {name: 'type', defaultValue: 'manual_user'}, {name: 'status'}, 'id', 'site_id', 'site', 'user_id']
+            }),
+            type: 'staff',
+            url: '/vms/scenarios/' + config.scenarioId + '/staff',
+            listeners:{
+              scope: this,
+              'load': this.applyToSite
+            },
+            groupField: 'site_id'
+          }),
+          view:  new tool_grouping_view()
         }
       ], plugins: ['donotcollapseactive'], width: 200, split: true }
     ];
@@ -238,7 +258,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     this.inventoryGrid.getStore().load();
     this.rolesGrid.getStore().load();
     this.teamsGrid.getStore().loadData([]);
-    this.staffGrid.getStore().loadData([]);
+    this.staffGrid.getStore().load();
   },
   
   initMapDropZone: function(){
@@ -563,6 +583,73 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     menu.show(elem);
   },
   
+  showStaffContextMenu: function(grid, row_index, evt){
+    evt.preventDefault();
+    
+    var row = grid.getView().getRow(row_index);
+    var record = grid.getStore().getAt(row_index);
+    
+    if(record.get('status') == 'new')
+      return;
+    
+    var staff_controller = new Talho.VMS.ux.StaffController({scenarioId: this.scenarioId, siteId: record.get('site_id'), store: this.staffGrid.getStore()});
+    var menu = new Ext.menu.Menu({
+      floating: true, defaultAlign: 'tr-br?',
+      items: [{
+        text: 'Edit', scope: this, handler: function(){
+            var win = new Talho.VMS.ux.CreateAndEditStaff({
+              scenarioId: this.scenarioId,
+              scenario_staff_store: this.staffGrid.getStore(),
+              siteId: record.get('site_id'),
+              listeners: {
+                scope: staff_controller,
+                'save': staff_controller.save
+              }
+            });
+            win.show();
+          }
+        },
+        {
+          text: 'Remove', scope: this, handler: function(){
+            Ext.Msg.confirm("Remove User", "Are you sure you wish to unassign this user from this site?", function(btn){
+              if(btn === "yes"){
+                staff_controller.remove(record, this.staffGrid);
+              }
+            }, this);
+          }
+        }
+      ]
+    });
+    
+    menu.show(row);
+  },
+  
+  showStaffGroupContextMenu: function(grid, field, value, evt){
+    evt.preventDefault();
+    var elem = evt.getTarget();
+    
+    var menu = new Ext.menu.Menu({
+      floating: true, defaultAlign: 'tr-br?',
+      items:[{
+        text: 'Edit', scope: this, handler: function(){
+          var staff_controller = new Talho.VMS.ux.StaffController({scenarioId: this.scenarioId, siteId: value, store: this.staffGrid.getStore()});
+          var win = new Talho.VMS.ux.CreateAndEditStaff({
+            scenarioId: this.scenarioId,
+            scenario_staff_store: this.staffGrid.getStore(),
+            siteId: value,
+            listeners: {
+              scope: staff_controller,
+              'save': staff_controller.save
+            }
+          });          
+          win.show();
+        }
+      }]
+    });
+    
+    menu.show(elem);
+  },
+  
   findMarker: function(record){
     var marker = null;
     Ext.each(this.map.markers, function(m){ if(m.data.record.id === record.id){
@@ -708,26 +795,22 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   },
   
   addManualUserToSite: function(record, site, prep_record, init_record){
+    var controller = new Talho.VMS.ux.StaffController({scenarioId: this.scenarioId, siteId: site.id, store: this.staffGrid.getStore() });
     if(record.get('status') === 'new'){
-      var win = new Talho.VMS.ux.UserWindow({
+      var win = new Talho.VMS.ux.CreateAndEditStaff({
+        creatingRecord: record,
+        scenarioId: this.scenarioId,
+        scenario_staff_store: this.staffGrid.getStore(),
+        siteId: site.id,
         listeners:{
           scope: this,
-          'save': function(win, user){
-            record = prep_record(record);
-            record.set('name', user);
-            init_record(record);
-            record.site = site;
-            win.close();
-          }
+          'save': controller.save.createDelegate(controller)
         }
       });
       win.show();
     }
     else{
-      if(record.get('status') === 'active')
-        record.site.get('manual_user').remove(record);// remove the user from his current site
-      init_record(record);
-      record.site = site;
+      controller.move(record, this.staffGrid);
     }
   },
   

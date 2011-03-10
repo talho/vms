@@ -6,8 +6,7 @@ class Vms::StaffController < ApplicationController
   after_filter :change_include_root_back
   
   def index
-    @instances = @scenario.site_instances.find(:all, :include => {:staff => [:user, :site]})
-    @staff = @instances.map(&:staff).flatten
+    @staff = @scenario.staff.find(:all, :include => [:user, :site])
     respond_to do |format|
       format.json {render :json => @staff.as_json }
     end
@@ -15,20 +14,24 @@ class Vms::StaffController < ApplicationController
   
   def show
     @site_instance = @scenario.site_instances.for_site(params[:vms_site_id])
+    @staff = @site_instance.staff.find(:all, :include => [:user , :site])
+    @staff.each do |s|
+      u = s.user
+      s[:user_detail] = {:caption => "#{u.name} #{u.email}", :name => u.name, :email => u.email, :id => u.id, :title => u.title,
+                                      :tip => render_to_string(:partial => 'searches/extra.json', :locals => {:user => u})}
+    end
     respond_to do |format|
-      format.json {render :json => @site_instance.staff.find(:all, :include => [:user , :site]).as_json }
+      format.json {render :json => @staff.as_json }
     end
   end
   
   def update
     @site_instance = @scenario.site_instances.first( {:conditions => {:site_id => params[:vms_site_id]}, :include => [:role_scenario_sites] })
     
-    staff = JSON.parse(params[:staff])
-    
     # pull out new, updated, and deleted staff from params
-    new_staff = staff.select{|s| s['status'] == 'new'}
-    updated_staff = staff.select{|s| s['status'] == 'updated'}
-    deleted_staff = staff.select{|s| s['status'] == 'deleted'}
+    new_staff = params[:added_staff].nil? ? [] : JSON.parse(params[:added_staff]) 
+    updated_staff = params[:updated_staff].nil? ? [] : JSON.parse(params[:updated_staff])
+    deleted_staff = params[:removed_staff].nil? ? [] : JSON.parse(params[:removed_staff])
     
     current_staff = @site_instance.staff
     
@@ -40,17 +43,17 @@ class Vms::StaffController < ApplicationController
     
     #create new staff
     new_staff.each do |s|
-      s.delete('status')
-      @site_instance.role_scenario_sites.build(s)
+      #first, check to see if the user is already assigned to a different site instance
+      st = @scenario.staff.find_by_user_id(s['user_id'])
+      st.destroy unless st.nil?
+      @site_instance.staff.build(s)
     end
     
     #update existing staff
     updated_staff.each do |s|
-      s.delete('status')
-      db_staff = rss[rss.index{ |ts| ts.id === s['id']}]
+      db_staff = current_staff[current_staff.index{ |ts| ts.id === s['id']}]
       db_staff.attributes = s
     end
-    
     
     respond_to do |format|
       if @site_instance.save

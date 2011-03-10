@@ -14,6 +14,7 @@ class Vms::Scenario < ActiveRecord::Base
   has_many :sites, :through => :site_instances
   
   has_many :inventories, :through => :site_instances
+  has_many :staff, :through => :site_instances
   
   STATES = {:template => 1, :unexecuted => 2, :executed => 3}
   

@@ -42,35 +42,6 @@ Talho.VMS.ux.ItemDetailWindow = Ext.extend(Ext.Window, {
   }
 });
 
-Talho.VMS.ux.UserWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
-  constructor: function(config){
-    var json_store = new Ext.data.JsonStore({
-        proxy: new Ext.data.HttpProxy({
-            url: '/search/show_clean',
-            api: {read: {url: '/search/show_clean', method:'POST'}}
-        }),
-        idProperty: 'id',
-        bodyCssClass: 'users',
-        root: 'users',
-        totalProperty: 'total',
-        restful: true,
-        fields: ['name', 'email', 'id', 'title', 'extra']
-    });
-    Ext.apply(config, {items: [{ xtype: 'combo', itemId: 'user', queryParam: 'tag',
-        mode: 'remote', forceSelection: true, fieldLabel: 'Search for User',
-        pageSize: 10,
-        store: json_store, displayField: 'name', name: 'User', valueField: 'name',
-        tpl:'<tpl for="."><div ext:qtip=\'{extra}\' class="x-combo-list-item">{name} - {email}</div></tpl>',
-        minChars: 2
-    }]});
-    Talho.VMS.ux.UserWindow.superclass.constructor.apply(this, arguments);
-  },
-  
-  onSaveClicked: function(){
-    this.fireEvent('save', this, this.getComponent('user').getValue());
-  }
-});
-
 Talho.VMS.ux.TeamWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
   height: 400,
   constructor: function(config){
