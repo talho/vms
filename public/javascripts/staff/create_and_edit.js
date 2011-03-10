@@ -16,6 +16,7 @@ Talho.VMS.ux.CreateAndEditStaff = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
         height: 350,
         itemId: 'users',
         hideLabel: true,
+        cls: 'user_selection_grid',
         listeners:{
           scope: this,
           'beforeselect': this.beforeUserSelected
@@ -81,7 +82,7 @@ Talho.VMS.ux.CreateAndEditStaff = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
   beforeUserSelected: function(record){
     var id = record.get('id');
     var index = this.scenario_staff_store.find('user_id', new RegExp("^" + id + "$"));
-    if(index !== -1){
+    if(index !== -1 && this.scenario_staff_store.getAt(index).get('site_id') != this.siteId){
       Ext.Msg.confirm("Move User", record.get('name') + " is already assigned to a site. Would you like to reassign them?", function(btn){
         if(btn === 'yes'){
           this.user_selection_grid.getStore().add(new this.user_selection_grid.record({name: record.get('name'), email: record.get('email'), id: record.get('id'), title: record.get('title'), tip: record.get('extra'), type: 'user'}));

@@ -55,3 +55,7 @@ end
 Factory.define :role_scenario_site, :class => Vms::RoleScenarioSite do |m|
   m.count 1
 end
+
+Factory.define :staff, :class => Vms::Staff do |m|
+  m.status 'assigned'
+end

@@ -193,7 +193,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         {title: 'Teams', xtype: 'vms-toolgrid', itemId: 'teams_grid', seed_data: {name: 'New Team (drag to site)', type: 'team', status: 'new'},
           store: new tool_store()
         },
-        {title: 'Staff', xtype: 'vms-toolgrid', itemId: 'staff_grid', seed_data: {name: 'Add User (drag to site)', type: 'manual_user', status: 'new'},
+        {title: 'Staff', xtype: 'vms-toolgrid', itemId: 'staff_grid', cls: 'staffGrid', seed_data: {name: 'Add User (drag to site)', type: 'manual_user', status: 'new'},
           columns: [{xtype: 'templatecolumn', id:'name_column', tpl: this.row_template }, {dataIndex: 'site_id', hidden: true}],
           listeners:{
             scope: this,
