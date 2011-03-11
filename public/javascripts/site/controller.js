@@ -130,7 +130,8 @@ Talho.VMS.ux.SiteController = Ext.extend(Ext.util.Observable, {
     });
   },
   
-  deactivate: function(record, marker){
+  deactivate: function(record, marker, grid){
+    grid.loadMask.show();
     // send ajax deactivation request
     Ext.Ajax.request({
       method: 'PUT',
@@ -138,12 +139,14 @@ Talho.VMS.ux.SiteController = Ext.extend(Ext.util.Observable, {
       params: { 'status': 1 },
       scope: this,
       success: function(){
+        grid.loadMask.hide();
         record.set('status', 1);
         if(marker){
           this.map.removeMarker(marker);
         }
       },
       failure: function(){
+        grid.loadMask.hide();
         Ext.Msg.alert('There was an error deactivating the site');
       }
     });

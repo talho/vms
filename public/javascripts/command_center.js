@@ -466,7 +466,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     if(record.get('status') === 'active'){
       menuConfig.push({text: 'Deactivate', scope: this, handler: function(){
         var site_controller = new Talho.VMS.ux.SiteController({scenarioId: this.scenarioId, map: this.map});
-        site_controller.deactivate(record, this.findMarker(record));
+        site_controller.deactivate(record, this.findMarker(record), grid);
       }});
     }
     

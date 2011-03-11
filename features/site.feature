@@ -95,6 +95,7 @@ Feature: Test site creation for scenarios
     When I open the "Test" scenario
     And I right click on site "Immunization Center"
     And I click x-menu-item "Deactivate"
+    And I wait for the "Loading..." mask to go away
     And the site "Immunization Center" should be "inactive" for scenario "Test"
 
   Scenario: Delete a site
