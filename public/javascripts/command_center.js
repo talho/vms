@@ -310,6 +310,13 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       onNodeOver: function(target, dd, e, data){
         if(data.selections && data.selections[0].get('type') == 'site')
           return this.dropNotAllowed;
+        else if(!data.selections){
+          var marker = this.parent.map.getCurrentHover();
+          if(marker && marker.data && marker.data.record && data === marker.data.record.get('id').toString())
+            return this.dropNotAllowed;
+          else
+            return this.dropAllowed;
+        }
         else
           return this.dropAllowed;
       },
@@ -331,7 +338,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         
         var marker = this.parent.map.getCurrentHover();
         
-        if(!rec){
+        if(!rec && marker && marker.data && marker.data.record){
           this.parent.copyRolesToSite(data, marker.data.record);
           return true;
         }
