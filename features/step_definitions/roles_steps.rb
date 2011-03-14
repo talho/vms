@@ -57,3 +57,17 @@ When /^right click the "([^\"]*)" role group header$/ do |role_group_name|
     command_center.showRolesGroupContextMenu(command_center.rolesGrid, 'site_id', r.get('site_id'), evt);
   ")
 end
+
+When /^I drag role group "([^\"]*)" to "([^\"]*)"$/ do |role_group_name, site_name|
+  page.execute_script("
+    var command_center = Ext.getCmp(Ext.getBody().first().id).findComponent('vms_command_center');
+    var i = command_center.siteGrid.getStore().find('name', new RegExp('#{site_name}'));
+    var site = command_center.siteGrid.getStore().getAt(i);
+    var marker = command_center.findMarker(site);
+    command_center.map.current_hover = marker;
+    i = command_center.rolesGrid.getStore().find('site', new RegExp('#{role_group_name}'));
+    var r = command_center.rolesGrid.getStore().getAt(i);
+    var data = r.get('site_id');
+    command_center.map.dropZone.onNodeDrop(null, null, null, data);
+  ")
+end

@@ -65,6 +65,7 @@ Talho.VMS.ux.CreateAndEditRoles = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
           this.hideMask();
           var result = Ext.decode(resp.responseText);
           this.role_grid.getStore().loadData(result);
+          this.loadSeededData();
           if(this.removedRecord){            
             var r = this.role_grid.getStore().getById(this.removedRecord.id);
             this.role_grid.getStore().remove(r);
@@ -78,6 +79,17 @@ Talho.VMS.ux.CreateAndEditRoles = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
       },
       scope: this
     });
+  },
+  
+  loadSeededData: function(){
+    if(this.seededRolesCollection){
+      var role_store = this.role_grid.getStore();
+      this.seededRolesCollection.each(function(r){
+        if(role_store.find('role_id', new RegExp('^' + r.get('role_id') + '$')) === -1){
+          role_store.add(new role_store.recordType({role: r.get('name'), role_id: r.get('role_id'), count: r.get('count')}));
+        }
+      }, this);
+    }
   },
   
   showAddNewRole: function(){

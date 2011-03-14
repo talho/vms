@@ -84,8 +84,39 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     });
     
     var tool_grouping_view = Ext.extend(Ext.grid.GroupingView, {enableGroupingMenu: false, showGroupName: 'false',
+      processEvent: function(name, e){
+        Ext.grid.GroupingView.superclass.processEvent.call(this, name, e);
+        var hd = e.getTarget('.x-grid-group-hd', this.mainBody);
+        if(hd){
+            // group value is at the end of the string
+            var field = this.getGroupField(),
+                prefix = this.getPrefix(field),
+                groupValue = hd.id.substring(prefix.length),
+                emptyRe = new RegExp('gp-' + Ext.escapeRe(field) + '--hd'),
+                s, dd;
+
+            // remove trailing '-hd'
+            groupValue = groupValue.substr(0, groupValue.length - 3);
+            
+            // also need to check for empty groups
+            if(groupValue || emptyRe.test(hd.id)){
+                this.grid.fireEvent('group' + name, this.grid, field, groupValue, e);
+            }
+            if(name == 'click' && e.button == 0){
+                this.toggleGroup(hd.parentNode);
+            }
+            else if(name == 'mousedown' && e.button == 0){
+              s = Ext.get(hd).down('.x-grid-group-title');
+              if(!Ext.dd.DDM.isDragDrop(s.id)){
+                dd = new Ext.dd.DragSource(s, {ddGroup: 'vms', dragData: groupValue});
+                dd.handleMouseDown(e);
+              }
+            }
+        }
+      },
+    
       startGroup: new Ext.XTemplate(
-        '<div id="{groupId}" class="x-grid-group {cls}">',
+        '<div id="{groupId}" class="x-grid-group {cls}" unselectable="on" style="-moz-user-select:none;user-select:none;">',
           '<div id="{groupId}-hd" class="{[this.getHDClass(values)]}" style="{style}"><div class="x-grid-group-title">', "{[this.getText(values)]}" ,'</div></div>',
           '<div id="{groupId}-bd" class="x-grid-group-body">', {
             compiled: true,
@@ -277,26 +308,34 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       },
       
       onNodeOver: function(target, dd, e, data){
-        if(data.selections[0].get('type') == 'site')
+        if(data.selections && data.selections[0].get('type') == 'site')
           return this.dropNotAllowed;
         else
           return this.dropAllowed;
       },
             
       onContainerOver: function(dd, e, data){ 
-        if(data.selections[0].get('type') == 'site')
+        if(data.selections && data.selections[0].get('type') == 'site')
           return this.dropAllowed;
         else
           return this.dropNotAllowed;
       },
       
       onNodeDrop: function(target, dd, e, data){
-        var rec = data.selections[0];
-        if(rec.get('type') == 'site'){
+        var rec = data.selections ? data.selections[0] : null;
+        
+        
+        if(rec && rec.get('type') == 'site'){
           return false;
         }
         
         var marker = this.parent.map.getCurrentHover();
+        
+        if(!rec){
+          this.parent.copyRolesToSite(data, marker.data.record);
+          return true;
+        }
+        
         if(marker && marker.data && marker.data.record){
           this.parent.addItemToSite(marker.data.record, rec);
           return true;
@@ -306,7 +345,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       },
       
       onContainerDrop: function(dd, e, data, forceLatLng){
-        if(data.selections[0].get('type') == 'site'){
+        if(data.selections && data.selections[0].get('type') == 'site'){
           this.parent.addSiteToMap((forceLatLng && forceLatLng.lat) ? new google.maps.LatLng(forceLatLng.lat, forceLatLng.lng) : this.parent.map.getCurrentLatLng(), data.selections[0]);
           return true;
         }
@@ -747,6 +786,24 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       creatingRecord: record,
       scenarioId: this.scenarioId,
       siteId: site.id,
+      listeners: {
+        scope: role_controller,
+        'save': role_controller.save
+      }
+    });
+    win.show();
+  },
+  
+  copyRolesToSite: function(source_site_id, destination_record){
+    // Go get the roles for the source site
+    // launch the create and edit role window with those roles pre-set (or added)
+    var role_controller = new Talho.VMS.ux.RolesController({scenarioId: this.scenarioId, siteId: destination_record.id, store: this.rolesGrid.getStore()});
+    var role_store = this.rolesGrid.getStore();
+    var roles = role_store.query('site_id', new RegExp('^' + source_site_id + '$'));
+    var win = new Talho.VMS.ux.CreateAndEditRoles({
+      seededRolesCollection: roles,
+      scenarioId: this.scenarioId,
+      siteId: destination_record.id,
       listeners: {
         scope: role_controller,
         'save': role_controller.save

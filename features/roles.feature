@@ -152,3 +152,44 @@ Feature: Modify Roles for VMS Sites
     And I wait for the "Loading..." mask to go away
     And the "Immunization Center" site for scenario "Test" should have 2 "Border Health Director" role
     And the "Immunization Center" site for scenario "Test" should not have the "Chief Veterinarian" role
+
+  Scenario: Copy all the roles from a site by dragging that site to another site with no other roles
+    Given the following sites exist:
+      | name                | address                                 | lat       | lng       | status | scenario |
+      | Immunization Center | 1303 Atkinson Dr, Lufkin, TX 75901, USA | 31.347573 | -94.71391 | active | Test     |
+      | Malawi Center       | Kenyatta, Lilongwe, Malawi              | -13.962475513490757 | 33.7866090623169 | active | Test     |
+    Given the site "Malawi Center" for scenario "Test" has the role "Border Health Director"
+    When I open the "Test" scenario
+    And I click x-accordion-hd "Roles"
+    And I drag role group "Malawi Center" to "Immunization Center"
+    Then the "Modify Roles" window should be open
+    When I wait for the "Loading..." mask to go away
+    Then I should see "Border Health Director" in grid row 1 within ".modifyRoleGrid"
+    When I press "Save"
+    And I wait for the "Saving..." mask to go away
+    And I wait for the "Loading..." mask to go away
+    Then I should see "Border Health Director" in grid row 2 within ".roleGrid"
+    Then I should see "Border Health Director" in grid row 3 within ".roleGrid"
+    And the "Malawi Center" site for scenario "Test" should have 1 "Border Health Director" role
+    And the "Immunization Center" site for scenario "Test" should have 1 "Border Health Director" role
+
+  Scenario: Copy all the roles from a site by dragging that site to another site with an existing role
+    Given the following sites exist:
+      | name                | address                                 | lat       | lng       | status | scenario |
+      | Immunization Center | 1303 Atkinson Dr, Lufkin, TX 75901, USA | 31.347573 | -94.71391 | active | Test     |
+      | Malawi Center       | Kenyatta, Lilongwe, Malawi              | -13.962475513490757 | 33.7866090623169 | active | Test     |
+    Given the site "Malawi Center" for scenario "Test" has the role "Border Health Director"
+    Given the site "Immunization Center" for scenario "Test" has the role "Chief Veterinarian"
+    When I open the "Test" scenario
+    And I click x-accordion-hd "Roles"
+    And I drag role group "Malawi Center" to "Immunization Center"
+    Then the "Modify Roles" window should be open
+    When I wait for the "Loading..." mask to go away
+    Then I should see "Chief Veterinarian" in grid row 1 within ".modifyRoleGrid"
+    Then I should see "Border Health Director" in grid row 2 within ".modifyRoleGrid"
+    When I press "Save"
+    And I wait for the "Saving..." mask to go away
+    And I wait for the "Loading..." mask to go away
+    And the "Malawi Center" site for scenario "Test" should have 1 "Border Health Director" role
+    And the "Immunization Center" site for scenario "Test" should have 1 "Border Health Director" role
+    And the "Immunization Center" site for scenario "Test" should have 1 "Chief Veterinarian" role
