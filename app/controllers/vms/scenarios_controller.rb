@@ -4,7 +4,7 @@ class Vms::ScenariosController < ApplicationController
   after_filter :change_include_root_back
   
   def index
-    @scenarios = User.find(current_user.id).scenarios
+    @scenarios = User.find(current_user.id).scenarios.find(:all, :order=> 'created_at')
     respond_to do |format|
       format.json {render :json => {:scenarios => @scenarios.as_json(:only => [:id, :name] ) } }
     end

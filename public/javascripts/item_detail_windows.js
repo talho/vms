@@ -41,34 +41,3 @@ Talho.VMS.ux.ItemDetailWindow = Ext.extend(Ext.Window, {
     Ext.each(this.buttons, function(button){button.enable();});
   }
 });
-
-Talho.VMS.ux.TeamWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
-  height: 400,
-  constructor: function(config){
-    Ext.apply(config, {items: [
-      {xtype: 'textfield', fieldLabel: 'Team Name', itemId: 'name'},
-      {xtype: 'label', hideLabel: true, text: 'Select Users:'},
-      new Talho.ux.UserSelectionGrid({
-        height: 350,
-        itemId: 'users',
-        hideLabel: true
-      })
-    ]});
-    Talho.VMS.ux.TeamWindow.superclass.constructor.apply(this, arguments);
-  },
-  initComponent: function(){
-    Talho.VMS.ux.TeamWindow.superclass.initComponent.apply(this, arguments);
-    if(!Ext.isEmpty(this.record)){
-      this.getComponent('name').setValue(this.record.get('status') === 'new' ?  'New Team' : this.record.get('name'));
-      if(!Ext.isEmpty(this.record.users)){
-        var store = this.getComponent('users').getStore();
-        Ext.each(this.record.users, function(user){
-          store.add(new (store.recordType)({name: user.get('name'), id: user.id}) );
-        },this);
-      }
-    }
-  },
-  onSaveClicked: function(){
-    this.fireEvent('save', this, this.getComponent('name').getValue(), this.getComponent('users').getStore().getRange())
-  }
-});

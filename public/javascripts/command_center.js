@@ -222,7 +222,25 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           view:  new tool_grouping_view()
         },
         {title: 'Teams', xtype: 'vms-toolgrid', itemId: 'teams_grid', seed_data: {name: 'New Team (drag to site)', type: 'team', status: 'new'},
-          store: new tool_store()
+          columns: [{xtype: 'templatecolumn', id: 'name_column', tpl: this.row_template}, {dataIndex: 'site_id', hidden: true}],
+          listeners: {
+            scope: this,
+            'rowcontextmenu': this.showTeamContextMenu
+          },
+          store: new Ext.data.GroupingStore({
+            reader: new Ext.data.JsonReader({
+              idProperty: 'id', 
+              fields: ['name', {name: 'type', defaultValue: 'team'}, {name: 'status', defaultValue: 'active'}, 'id', 'site_id', 'site', {name: 'user_count', type: 'integer'}]
+            }),
+            type: 'team',
+            url: '/vms/scenarios/' + config.scenarioId + '/teams',
+            listeners: {
+              scope: this,
+              'load': this.applyToSite
+            },
+            groupField: 'site_id'
+          }),
+          view: new tool_grouping_view()
         },
         {title: 'Staff', xtype: 'vms-toolgrid', itemId: 'staff_grid', cls: 'staffGrid', seed_data: {name: 'Add User (drag to site)', type: 'manual_user', status: 'new'},
           columns: [{xtype: 'templatecolumn', id:'name_column', tpl: this.row_template }, {dataIndex: 'site_id', hidden: true}],
@@ -288,7 +306,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     this.siteGrid.getStore().load();
     this.inventoryGrid.getStore().load();
     this.rolesGrid.getStore().load();
-    this.teamsGrid.getStore().loadData([]);
+    this.teamsGrid.getStore().load();
     this.staffGrid.getStore().load();
   },
   
@@ -629,6 +647,48 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     menu.show(elem);
   },
   
+  showTeamContextMenu: function(grid, row_index, evt){
+    evt.preventDefault();
+    
+    var row = grid.getView().getRow(row_index);
+    var record = grid.getStore().getAt(row_index);
+    
+    if(record.get('status') == 'new')
+      return;
+      
+    var team_controller = new Talho.VMS.ux.TeamController({scenarioId: this.scenarioId, siteId: record.get('site_id'), grid: grid});
+    
+    var menu = new Ext.menu.Menu({
+      floating: true, defaultAlighn: 'tr-br?',
+      items: [{
+        text: 'Edit', scope: this, handler: function(){
+          var win = new Talho.VMS.ux.CreateAndEditTeam({
+            mode: 'edit',
+            scenarioId: this.scenarioId,
+            siteId: record.get('site_id'),
+            creatingRecord: record,
+            listeners: {
+              scope: team_controller,
+              'save': team_controller.edit
+            }
+          });
+          
+          win.show();
+        }
+      },{
+        text: 'Remove', scope: this, handler: function(){
+          Ext.Msg.confirm("Remove Team", "Are you sure you want to remove this team from the site? This action cannot be undone", function(btn){
+            if(btn == 'yes'){
+              team_controller.remove(record.id);
+            }
+          });
+        }
+      }]
+    });
+    
+    menu.show(row);
+  },
+  
   showStaffContextMenu: function(grid, row_index, evt){
     evt.preventDefault();
     
@@ -820,39 +880,12 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   },
   
   addTeamToSite: function(record, site, prep_record, init_record){
-    var win = new Talho.VMS.ux.TeamWindow({
+    var controller = new Talho.VMS.ux.TeamController({scenarioId: this.scenarioId, siteId: site.id, grid: this.teamsGrid});
+    var win = new Talho.VMS.ux.CreateAndEditTeam({
       record: record,
       listeners: {
-        scope: this,
-        'save': function(win, name, users){
-          if(record.get('status') === 'new')
-            record = prep_record(record);
-          if(record.get('status') === 'active' && record.site)
-            record.site.get('team').remove(record);
-          record.set('name', name);
-          record.site = site;
-          init_record(record);
-          
-          var manual_users = [];
-          Ext.each(users, function(user){
-            var u = this.staffGrid.getStore().find('name', user.get('name'));
-            if(u !== -1){
-              u = this.staffGrid.getStore().getAt(u);
-              if(u.get('status') === 'active' && record.site)
-                u.site.get('auto_user').remove(u);// remove the user from his current site
-            }
-            else{
-              u = new (this.staffGrid.getStore().recordType)({name: user.get('name'), status: 'new', type: 'auto_user'});
-              this.addItemToTypeStore(u);                
-            }
-            manual_users.push(u);
-            init_record(u);
-            u.site = site;
-          }, this);
-          
-          record.users = manual_users;
-          win.close();
-        }
+        scope: controller,
+        'save': controller.save
       }
     });
     win.show();

@@ -5,10 +5,12 @@ ActionController::Routing::Routes.draw do |map|
       sites.roles_update 'roles.:format', :controller => 'vms/roles', :action => 'update', :conditions => { :method => [:put, :post] }
       sites.staff_show 'staff.:format', :controller => 'vms/staff', :action => 'show', :conditions => { :method => :get }
       sites.staff_update 'staff.:format', :controller => 'vms/staff', :action => 'update', :conditions => { :method => [:put, :post] }
+      sites.resources :vms_teams, :controller => 'vms/teams', :as => 'teams', :except => [:index]
     end
     scenarios.resources :vms_inventories, :controller => 'vms/inventories', :as => 'inventories', :collection => [:templates]
     scenarios.roles 'roles', :controller => 'vms/roles', :action => 'index'
     scenarios.roles 'staff', :controller => 'vms/staff', :action => 'index'
+    scenarios.roles 'teams', :controller => 'vms/teams', :action => 'index'
   end
   
   map.inventory_sources 'vms/inventory_sources.:format', :controller => 'vms/inventories', :action => 'sources'

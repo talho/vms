@@ -109,5 +109,5 @@ Then /^I should have a "([^\"]*)" template with the following items:$/ do |inven
 end
 
 Then /^the site "([^\"]*)" for scenario "([^\"]*)" should have no inventories$/ do |site_name, scenario_name|
-  Vms::Scenario.find_by_name(hash[:scenario]).site_instances.for_site(Vms::Site.find_by_name(hash[:site])).inventories.should be_empty
+  Vms::Scenario.find_by_name(scenario_name).site_instances.for_site(Vms::Site.find_by_name(site_name)).inventories.should be_empty
 end
