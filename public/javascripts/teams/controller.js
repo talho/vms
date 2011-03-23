@@ -86,5 +86,28 @@ Talho.VMS.ux.TeamController = Ext.extend(function(){}, {
       },
       scope: this
     });
+  },
+  
+  move: function(record, site){
+    this.grid.loadMask.show();
+    
+    Ext.Ajax.request({
+      url: '/vms/scenarios/' + this.scenarioId + '/sites/' + record.get('site_id') + '/teams/' + record.id + '.json',
+      method: 'PUT',
+      params: {
+        'site_id': site.id
+      },
+      callback: function(options, success, response){
+        var result = Ext.decode(response.responseText);
+        if(success && result.success != false){
+        }
+        else{
+          Ext.Msg.alert('Save Error', 'There was a problem saving the team.');
+          this.grid.loadMask.hide();
+        }
+        this.grid.getStore().load();
+      },
+      scope: this
+    });
   }
 });

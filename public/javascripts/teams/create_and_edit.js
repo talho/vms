@@ -19,6 +19,7 @@ Talho.VMS.ux.CreateAndEditTeam = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
       new Talho.ux.UserSelectionGrid({
         region: 'center',
         itemId: 'users',
+        cls: 'user_selection_grid',
         hideLabel: true
       })
     ]
@@ -55,6 +56,10 @@ Talho.VMS.ux.CreateAndEditTeam = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
       this.on('afterrender', function(){
         this.showMask('Loading...');
       }, this, {delay: 1});
+      this.setTitle('Modify Team');
+    }
+    else{
+      this.setTitle('Create Team');
     }
   },
   
@@ -85,10 +90,11 @@ Talho.VMS.ux.CreateAndEditTeam = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
     var win = new Ext.Window({
       title: 'Select Group',
       layout: 'hbox',
+      cls: 'import_group_window',
       layoutConfig: {align: 'stretch'},
       width: 300,
       height: 400,
-      items: [{xtype: 'grid', title: 'Groups', itemId: 'group_grid', flex:1, bodyCssClass: 'groups', autoExpandColumn: 'name_column',
+      items: [{xtype: 'grid', title: 'Groups', itemId: 'group_grid', cls: 'vms_group_import_selection_grid', flex:1, bodyCssClass: 'groups', autoExpandColumn: 'name_column',
         columns:[{id:'name_column', header:'Name', dataIndex:'name'}, {header: 'Group Type', dataIndex:'grouptype', hidden:true, groupRenderer: Ext.util.Format.capitalize, groupable: true}],
         store: new Ext.data.GroupingStore({
             url: '/audiences/groups',
@@ -113,7 +119,7 @@ Talho.VMS.ux.CreateAndEditTeam = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
             groupTextTpl: '{group}s',
             enableGroupingMenu: false
         }),
-      }, {xtype: 'grid', itemId: 'user_grid', title: 'Users', flex:1, autoExpandColumn: 'name_column', loadMask: true, hideHeaders: true,
+      }, {xtype: 'grid', itemId: 'user_grid', cls: 'vms_import_teams_preview', title: 'Users', flex:1, autoExpandColumn: 'name_column', loadMask: true, hideHeaders: true,
         columns: [{id:'name_column', dataIndex: 'name'}],
         plugins: [new Ext.ux.DataTip({tpl:'<tpl for="."><div>{tip}</div></tpl>'})],
         store: userStore

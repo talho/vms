@@ -59,3 +59,8 @@ end
 Factory.define :staff, :class => Vms::Staff do |m|
   m.status 'assigned'
 end
+
+Factory.sequence(:team_name) {|n| "Team #{n}"}
+Factory.define :team, :class => Vms::Team do |m|
+  m.association :audience
+end

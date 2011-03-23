@@ -49,6 +49,7 @@ class Vms::TeamsController < ApplicationController
     aud = nil
     if params[:save_template] == "true" && (par_aud.nil? || Group::SCOPE.include?(par_aud.scope)) #do this if we're saving a template and the parent template is null or the parent audience is a group (and not a team)
       aud = Audience.new team.audience.attributes
+      aud.user_ids = team.audience.user_ids
       aud.type = "Group"
       aud.sub_audiences = [team.audience]
     elsif params[:save_template] == "false" && !par_aud.nil?
@@ -72,19 +73,16 @@ class Vms::TeamsController < ApplicationController
   def update
     @team = @scenario.site_instances.for_site(params[:vms_site_id]).teams.find(params[:id])
     
-    #build team. params[:team] should contain team[audience][name] and team[audience][users]
-    if params[:team][:audience][:user_ids].nil?
-      params[:team][:audience][:user_ids] = []
+    unless params[:team].nil? || params[:team][:audience].nil?
+      #build team. params[:team] should contain team[audience][name] and team[audience][users]
+      if params[:team][:audience][:user_ids].nil?
+        params[:team][:audience][:user_ids] = []
+      end    
+      @team.audience.attributes = params[:team][:audience]
     end
     
-    debugger
-    aud = @team.audience
-    aud.attributes = params[:team][:audience]
-    
-    #wokay, so here we want to see what the parent is, then we're going to see if it's a "team" and if it's a team, we'll go ahead and update it.
-    par_aud = @team.audience.parent_audiences.first
-    if !par_aud.nil? && par_aud.scope == 'Team'
-      par_aud.attributes = params[:team][:audience]
+    unless params[:site_id].nil?
+      @team.scenario_site = @scenario.site_instances.for_site(Vms::Site.find(params[:site_id]))
     end
     
     respond_to do |format|

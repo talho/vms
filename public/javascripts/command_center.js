@@ -221,7 +221,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           }),
           view:  new tool_grouping_view()
         },
-        {title: 'Teams', xtype: 'vms-toolgrid', itemId: 'teams_grid', seed_data: {name: 'New Team (drag to site)', type: 'team', status: 'new'},
+        {title: 'Teams', xtype: 'vms-toolgrid', cls: 'vms_teams_grid', itemId: 'teams_grid', seed_data: {name: 'New Team (drag to site)', type: 'team', status: 'new'},
           columns: [{xtype: 'templatecolumn', id: 'name_column', tpl: this.row_template}, {dataIndex: 'site_id', hidden: true}],
           listeners: {
             scope: this,
@@ -879,16 +879,31 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     win.show();
   },
   
+  /*
+   * Add team to the site. Determine if the dragged record is the 'new' record or an existing one. If it's new, show the window. If it's existing,
+   * confirm reassignment of team.
+   * @param {Ext.data.Record} record  The record that was dragged to the site
+   * @param {Ext.data.Record} site    The site that was dragged onto
+   */
   addTeamToSite: function(record, site, prep_record, init_record){
     var controller = new Talho.VMS.ux.TeamController({scenarioId: this.scenarioId, siteId: site.id, grid: this.teamsGrid});
-    var win = new Talho.VMS.ux.CreateAndEditTeam({
-      record: record,
-      listeners: {
-        scope: controller,
-        'save': controller.save
-      }
-    });
-    win.show();
+    if(record.get('status') === 'new'){
+      var win = new Talho.VMS.ux.CreateAndEditTeam({
+        record: record,
+        listeners: {
+          scope: controller,
+          'save': controller.save
+        }
+      });
+      win.show();
+    }
+    else if(record.get('site_id') !== site.id){
+      Ext.Msg.confirm("Move Team", "Performing this action will reassign the " + record.get('name') + " team to the " + site.get('name') + " site.", function(btn){
+        if(btn === 'yes'){
+          controller.move(record, site);
+        }
+      }, this);
+    }
   },
   
   addManualUserToSite: function(record, site, prep_record, init_record){
