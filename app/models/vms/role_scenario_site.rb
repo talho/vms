@@ -2,6 +2,8 @@
 class Vms::RoleScenarioSite < ActiveRecord::Base  
   set_table_name "vms_roles_scenario_sites"
   
+  acts_as_taggable_on :qualifications
+  
   belongs_to :role
   belongs_to :scenario_site, :class_name => "Vms::ScenarioSite"
   has_one :site, :through => :scenario_site, :class_name => "Vms::Site"

@@ -38,6 +38,8 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
               break;
             case 'role': cls += 'vms-role';
               break;
+            case 'qual': cls += 'vms-qual';
+              break;
             case 'team': cls += 'vms-team';
               break;
             case 'auto_user': cls += 'vms-auto-user';
@@ -221,6 +223,25 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           }),
           view:  new tool_grouping_view()
         },
+        {title: 'Qualifications', xtype: 'vms-toolgrid', itemId: 'quals_grid', cls: 'qualGrid', seed_data: {name: 'Add Qualification (drag to site)', type: 'qual', status: 'new'},
+          columns: [{xtype: 'templatecolumn', id: 'name_column', tpl: this.row_template}, {dataIndex: 'site_id', hidden: true}],
+          listeners:{
+            scope: this
+          },
+          store: new Ext.data.GroupingStore({
+            reader: new Ext.data.JsonReader({
+              fields: ['name', {name: 'type', defaultValue: 'qual'}, {name: 'status', defaultValue: 'active'}, 'role', 'site_id', 'site']
+            }),
+            type: 'role',
+            url: '/vms/scenarios/' + config.scenarioId + '/qualifications',
+            listeners:{
+              scope: this,
+              'load': this.applyToSite
+            },
+            groupField: 'site_id'
+          }),
+          view:  new tool_grouping_view()
+        },
         {title: 'Teams', xtype: 'vms-toolgrid', cls: 'vms_teams_grid', itemId: 'teams_grid', seed_data: {name: 'New Team (drag to site)', type: 'team', status: 'new'},
           columns: [{xtype: 'templatecolumn', id: 'name_column', tpl: this.row_template}, {dataIndex: 'site_id', hidden: true}],
           listeners: {
@@ -278,6 +299,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     this.inventoryGrid = this.westRegion.getComponent('inventory_grid');
     this.eastRegion = this.getComponent('eastRegion');
     this.rolesGrid = this.eastRegion.getComponent('roles_grid');
+    this.qualsGrid = this.eastRegion.getComponent('quals_grid');
     this.teamsGrid = this.eastRegion.getComponent('teams_grid');
     this.staffGrid = this.eastRegion.getComponent('staff_grid');
     this.map = this.getComponent('map');
@@ -306,6 +328,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     this.siteGrid.getStore().load();
     this.inventoryGrid.getStore().load();
     this.rolesGrid.getStore().load();
+    this.qualsGrid.getStore().load();
     this.teamsGrid.getStore().load();
     this.staffGrid.getStore().load();
   },
@@ -436,6 +459,8 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       case 'manual_user': this.addManualUserToSite(record, site, prep_record, init_record);
         break;
       case 'auto_user': this.addAutoUserToSite(record, site, prep_record, init_record);
+        break;
+      case 'qual': this.addQualificationToSite(record, site);
         break;
       default: record = prep_record(record);
         if(record.status != 'inactive') 
@@ -931,6 +956,20 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       record.site.get('auto_user').remove(record);// remove the user from his current site
     init_record(record);
     record.site = site;
+  },
+  
+  addQualificationToSite: function(record, site){
+    var controller = new Talho.VMS.ux.QualificationController({scenarioId: this.scenarioId, siteId: site.id, grid: this.qualsGrid});
+    var win = new Talho.VMS.ux.CreateAndEditQualifications({
+      creatingRecord: record,
+      scenarioId: this.scenarioId,
+      siteId: site.id,
+      listeners: {
+        scope: controller,
+        'save': controller.save
+      }
+    });
+    win.show();
   }
 });
 

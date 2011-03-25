@@ -2,6 +2,8 @@
 class Vms::ScenarioSite < ActiveRecord::Base  
   set_table_name "vms_scenario_site"
 
+  acts_as_taggable_on :qualifications
+
   belongs_to :site, :class_name => "Vms::Site"
   belongs_to :scenario, :class_name => "Vms::Scenario"
   STATES = {:inactive => 1, :active => 2}  

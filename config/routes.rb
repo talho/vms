@@ -9,11 +9,13 @@ ActionController::Routing::Routes.draw do |map|
     end
     scenarios.resources :vms_inventories, :controller => 'vms/inventories', :as => 'inventories', :collection => [:templates]
     scenarios.roles 'roles', :controller => 'vms/roles', :action => 'index'
-    scenarios.roles 'staff', :controller => 'vms/staff', :action => 'index'
-    scenarios.roles 'teams', :controller => 'vms/teams', :action => 'index'
+    scenarios.staff 'staff', :controller => 'vms/staff', :action => 'index'
+    scenarios.teams 'teams', :controller => 'vms/teams', :action => 'index'
+    scenarios.quals 'qualifications', :controller => 'vms/qualifications', :action => 'index'
   end
   
   map.inventory_sources 'vms/inventory_sources.:format', :controller => 'vms/inventories', :action => 'sources'
   map.inventory_items 'vms/inventory_items.:format', :controller => 'vms/inventories', :action => 'items'
   map.inventory_item_categories 'vms/inventory_item_categories.:format', :controller => 'vms/inventories', :action => 'categories'
+  map.qualification_list 'vms/qualifications.:format', :controller => 'vms/qualifications', :action => 'list'
 end
