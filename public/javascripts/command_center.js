@@ -960,7 +960,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   
   addQualificationToSite: function(record, site){
     var controller = new Talho.VMS.ux.QualificationController({scenarioId: this.scenarioId, siteId: site.id, grid: this.qualsGrid});
-    var win = new Talho.VMS.ux.CreateAndEditQualifications({
+    var win = new Talho.VMS.ux.CreateAndEditQualification({
       creatingRecord: record,
       scenarioId: this.scenarioId,
       siteId: site.id,
