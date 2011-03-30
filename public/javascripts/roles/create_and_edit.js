@@ -119,7 +119,9 @@ Talho.VMS.ux.CreateAndEditRoles = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
     
     var name = this.role_select_box.getStore().getById(id).get('name');
     var store = this.role_grid.getStore();
-    store.insert(0, [new store.recordType({role: name, role_id: id, count: 1, status: 'new' })]);
+    var rec = new store.recordType({role: name, role_id: id, count: 1, status: 'new' });
+    rec.markDirty();
+    store.insert(0, [rec]);
   },
   
   incrementQuantity: function(grid, row){
