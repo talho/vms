@@ -224,13 +224,30 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           view:  new tool_grouping_view()
         },
         {title: 'Qualifications', xtype: 'vms-toolgrid', itemId: 'quals_grid', cls: 'qualGrid', seed_data: {name: 'Add Qualification (drag to site)', type: 'qual', status: 'new'},
-          columns: [{xtype: 'templatecolumn', id: 'name_column', tpl: this.row_template}, {dataIndex: 'site_id', hidden: true}],
+          columns: [{xtype: 'templatecolumn', id: 'name_column', tpl: new Ext.XTemplate(
+            '<div class="vms-tool-row">',
+              '<div class="vms-row-icon {[this.iconClass(values)]}"></div>',
+              '<div class="vms-row-text">{[this.val(values)]}</div>',
+              '<div style="clear:both;"></div>',
+            '</div>',
+            {
+              compiled: true,
+              iconClass: this.row_template.iconClass,
+              val: function(values){
+                var ret = values.name;
+                if(values.role) ret += " - " + values.role;
+                return ret;
+              }
+            }
+        )}, 
+        {dataIndex: 'site_id', hidden: true}],
           listeners:{
-            scope: this
+            scope: this,
+            'rowcontextmenu': this.showQualsContextMenu
           },
           store: new Ext.data.GroupingStore({
             reader: new Ext.data.JsonReader({
-              fields: ['name', {name: 'type', defaultValue: 'qual'}, {name: 'status', defaultValue: 'active'}, 'role', 'site_id', 'site']
+              fields: ['name', {name: 'type', defaultValue: 'qual'}, {name: 'status', defaultValue: 'active'}, 'role', 'role_id', 'site_id', 'site']
             }),
             type: 'role',
             url: '/vms/scenarios/' + config.scenarioId + '/qualifications',
@@ -672,6 +689,42 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     menu.show(elem);
   },
   
+  showQualsContextMenu: function(grid, row_index, evt){
+    evt.preventDefault();
+    
+    var row = grid.getView().getRow(row_index);
+    var record = grid.getStore().getAt(row_index);
+    
+    var qual_controller = new Talho.VMS.ux.QualificationController({scenarioId: this.scenarioId, siteId: record.get('site_id'), grid: grid});
+    var menu = new Ext.menu.Menu({
+      floating: true, defaultAlign: 'tr-br?',
+      items:[{
+        text: 'Edit', scope: this, handler: function(){
+          var win = new Talho.VMS.ux.CreateAndEditQualification({
+            creatingRecord: record,
+            scenarioId: this.scenarioId,
+            siteId: record.get('site_id'),
+            listeners: {
+              scope: qual_controller,
+              'save': qual_controller.edit
+            }
+          });
+          win.show();
+        }
+      },{
+        text: 'Remove', handler: function(){
+          Ext.Msg.confirm("Confirm Removal", "Are you sure you would like to remove this qualification requirement from the role/site?", function(btn){
+            if(btn === 'yes'){
+              qual_controller.remove(record);
+            }
+          });
+        }
+      }]
+    });
+    
+    menu.show(row);
+  },
+  
   showTeamContextMenu: function(grid, row_index, evt){
     evt.preventDefault();
     
@@ -960,13 +1013,17 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   
   addQualificationToSite: function(record, site){
     var controller = new Talho.VMS.ux.QualificationController({scenarioId: this.scenarioId, siteId: site.id, grid: this.qualsGrid});
+    var save_fn = controller.create;
+    if(site.id === record.get('site_id')) save_fn = controller.edit;
+    
     var win = new Talho.VMS.ux.CreateAndEditQualification({
       creatingRecord: record,
       scenarioId: this.scenarioId,
       siteId: site.id,
+      grid: this.qualsGrid,
       listeners: {
         scope: controller,
-        'save': controller.save
+        'save': save_fn
       }
     });
     win.show();

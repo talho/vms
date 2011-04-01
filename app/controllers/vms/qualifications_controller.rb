@@ -11,7 +11,7 @@ class Vms::QualificationsController < ApplicationController
     
     @si.each do |si|
       tags << si.qualification_list.map { |q| {:name => q, :site_id => si.site_id, :site => si.site.name} }
-      tags << si.role_scenario_sites.map { |r| r.qualification_list.map { |q| {:name => q, :role => r.role.name, :site_id => si.site_id, :site => si.site.name} } }
+      tags << si.role_scenario_sites.map { |r| r.qualification_list.map { |q| {:name => q, :role => r.role.name, :role_id => r.role_id, :site_id => si.site_id, :site => si.site.name} } }
     end
     
     tags.flatten!
@@ -20,21 +20,71 @@ class Vms::QualificationsController < ApplicationController
       format.json {render :json => tags.as_json}
     end
   end
-  
-  def show
     
-  end
-  
   def create
+    @si = @scenario.site_instances.for_site(Vms::Site.find(params[:vms_site_id]))
+    if params[:role_id].nil?
+      v = @si
+    else
+      v = @si.role_scenario_sites.find_by_role_id(params[:role_id])      
+    end
     
+    v.qualification_list << params[:qualification]
+    
+    respond_to do |format|
+      if v.save
+        format.json { render :json => {:success => true} }
+      else
+        format.json { render :json => {:success => false, :errors => v.errors }, :status => 400 }
+      end
+    end    
   end
   
   def update
+    @si = @scenario.site_instances.for_site(Vms::Site.find(params[:vms_site_id]))
+    if params[:original_role_id].nil?
+      v = @si
+    else
+      v = @si.role_scenario_sites.find_by_role_id(params[:original_role_id])
+    end
+    v.qualification_list.remove(params[:original_qualification])
+        
+    if params[:role_id].nil?
+      @si.qualification_list << params[:qualification]
+    else
+      @rss = @si.role_scenario_sites.find_by_role_id(params[:role_id])
+      @rss.qualification_list << params[:qualification]
+    end
     
+    respond_to do |format|
+      if v.save && @si.save && (@rss.nil? || @rss.save )
+        format.json { render :json => {:success => true} }
+      else
+        format.json { render :json => {:success => false, :errors => @si.errors, :original_errors => v.errors, :role_errors => @rss.nil? ? [] : @rss.errors }, :status => 400 }
+      end
+    end    
+  end
+  
+  def destroy
+    @si = @scenario.site_instances.for_site(Vms::Site.find(params[:vms_site_id]))
+    if params[:role_id].nil?
+      v = @si
+    else
+      v = @si.role_scenario_sites.find_by_role_id(params[:role_id])
+    end
+    v.qualification_list.remove(params[:qualification])
+        
+    respond_to do |format|
+      if v.save
+        format.json { render :json => {:success => true} }
+      else
+        format.json { render :json => {:success => false, :errors => v.errors }, :status => 400 }
+      end
+    end
   end
   
   def list
-    tags = User.tag_counts_on(:qualifications)
+    tags = (User.tag_counts_on(:qualifications) + Vms::ScenarioSite.tag_counts_on(:qualifications) + Vms::RoleScenarioSite.tag_counts_on(:qualifications)).uniq
     
     respond_to do |format|
       format.json { render :json => tags.as_json }

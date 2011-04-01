@@ -6,6 +6,9 @@ ActionController::Routing::Routes.draw do |map|
       sites.staff_show 'staff.:format', :controller => 'vms/staff', :action => 'show', :conditions => { :method => :get }
       sites.staff_update 'staff.:format', :controller => 'vms/staff', :action => 'update', :conditions => { :method => [:put, :post] }
       sites.resources :vms_teams, :controller => 'vms/teams', :as => 'teams', :except => [:index]
+      sites.qualifications_create 'qualifications.:format', :controller => 'vms/qualifications', :action => 'create', :conditions => { :method => :post }
+      sites.qualifications_update 'qualifications.:format', :controller => 'vms/qualifications', :action => 'update', :conditions => { :method => :put }
+      sites.qualifications_destroy 'qualifications.:format', :controller => 'vms/qualifications', :action => 'destroy', :conditions => { :method => :delete }
     end
     scenarios.resources :vms_inventories, :controller => 'vms/inventories', :as => 'inventories', :collection => [:templates]
     scenarios.roles 'roles', :controller => 'vms/roles', :action => 'index'

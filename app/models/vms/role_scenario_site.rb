@@ -11,7 +11,7 @@ class Vms::RoleScenarioSite < ActiveRecord::Base
   def as_json(options = {})
     json = super(options)
     ( json.key?("role_scenarios_site_instance") ? json["role_scenarios_site_instance"] : json).merge!( 
-      {:site => site.name, :site_id => site.id, :role => role.name })
+      {:site => site.name, :site_id => site.id, :role => role.name, :role_id => role_id })
     json
   end
 end
