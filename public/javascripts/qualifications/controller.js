@@ -43,7 +43,7 @@ Talho.VMS.ux.QualificationController = Ext.extend(function(){}, {
       original_qualification: win.creatingRecord.get('name')
     }
     if(!Ext.isEmpty(win.creatingRecord.get('role_id'))){
-      params['original_orle_id'] = win.creatingRecord.get('role_id');
+      params['original_role_id'] = win.creatingRecord.get('role_id');
     }
     if(role_id){
       params['role_id'] = role_id;

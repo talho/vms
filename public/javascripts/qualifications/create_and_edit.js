@@ -5,6 +5,7 @@ Ext.ns('Talho.VMS.ux');
 
 Talho.VMS.ux.CreateAndEditQualification = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
   layout: 'form',
+  title: 'Add Qualification',
   initComponent: function(){
     this.items = [
       {xtype: 'combo', fieldLabel: 'Qualification', itemId: 'qual_selection', anchor: '100%', mode: 'local', store: new Ext.data.JsonStore({
@@ -20,7 +21,7 @@ Talho.VMS.ux.CreateAndEditQualification = Ext.extend(Talho.VMS.ux.ItemDetailWind
           this.roleSelection.setDisabled(!checked);
         }
       }},
-      {xtype: 'combo', fieldLabel: 'Role', lazyInit: false, itemId: 'role_selection', anchor: '100%', mode:'local', triggerAction: 'all', minChars: 0, editable: false, store: new Ext.data.JsonStore({
+      {xtype: 'combo', fieldLabel: 'Apply to Role', lazyInit: false, itemId: 'role_selection', cls: 'qual-role-selection', anchor: '100%', mode:'local', triggerAction: 'all', minChars: 0, editable: false, store: new Ext.data.JsonStore({
         fields: ['role', 'role_id'],
         url: '/vms/scenarios/' + this.scenarioId + '/sites/' + this.siteId + '/roles.json',
         restful: true,
@@ -35,6 +36,13 @@ Talho.VMS.ux.CreateAndEditQualification = Ext.extend(Talho.VMS.ux.ItemDetailWind
     this.roleRadio = this.getComponent('radio_role');
     
     if(this.creatingRecord && this.creatingRecord.get('status') !== 'new'){
+      if(this.creatingRecord.get('site_id') == this.siteId){
+        this.setTitle('Modify Qualification');
+      }
+      else{
+        this.setTitle('Copy Qualification');
+      }
+      
       this.qualSelection.setValue(this.creatingRecord.get('name'));
       var role_id = this.creatingRecord.get('role_id');
       if(role_id){
@@ -49,7 +57,7 @@ Talho.VMS.ux.CreateAndEditQualification = Ext.extend(Talho.VMS.ux.ItemDetailWind
           }, this, {once: true});
         this.roleRadio.setValue(true);
       }
-    }
+    } 
   },
   
   onSaveClicked: function(){
