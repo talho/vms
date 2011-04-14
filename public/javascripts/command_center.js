@@ -704,9 +704,9 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     var menu = new Ext.menu.Menu({
       floating: true, defaultAlign: 'tr-br?',
       items:[{
-        text: 'Edit', handler: show_win_fn.createDelegate(this, null)
+        text: 'Edit', handler: show_win_fn.createDelegate(this, [null])
       }, {
-        text: 'Remove', handler: show_win_fn.createDelegate(this, null)
+        text: 'Remove', handler: show_win_fn.createDelegate(this, [record])
       }]
     });
     

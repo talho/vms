@@ -61,7 +61,7 @@ Talho.VMS.ux.InventoryController = Ext.extend(Ext.util.Observable, {
         Ext.Msg.alert("Error", "There was an error deleting the POD/inventory. " + resp_obj.error);
       }
       this.fireEvent('afterdestroy', this);
-    });
+    }, this);
   },
   
   move: function(record, scenarioId, site){

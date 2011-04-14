@@ -11,7 +11,7 @@ Talho.VMS.ux.InventoryWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
     
     var name_config = {xtype: 'textfield', itemId: 'name', fieldLabel: 'Inventory/POD Name', anchor: '100%'}
     if(this.mode === 'create') {
-      Ext.apply(name_config, {xtype: 'combo', store: new Talho.VMS.ux.InventoryController.inventory_template_store({scenarioId: config.scenarioId}), displayField: 'name', queryParam: 'name',
+      Ext.apply(name_config, {xtype: 'combo', store: new Talho.VMS.ux.InventoryController.inventory_template_store({scenarioId: this.scenarioId}), displayField: 'name', queryParam: 'name',
         mode: 'remote', triggerAction: 'query', minChars: 0, listeners: {
         scope: this,
         'select': this.templateSelected
