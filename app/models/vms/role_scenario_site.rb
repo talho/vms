@@ -14,4 +14,8 @@ class Vms::RoleScenarioSite < ActiveRecord::Base
       {:site => site.name, :site_id => site.id, :role => role.name, :role_id => role_id })
     json
   end
+  
+  def calculate_assignment(staff)
+    self[:assigned] = staff.count { |s| s.roles.exists?(self.role_id) }
+  end
 end

@@ -1,5 +1,15 @@
 
 /* -------------- Grid row tool display ---------- */
+
+/* ---- IE HACKS ----------- */
+* html .vms-tool-grid .x-grid3-cell-inner{
+  height: 30px;
+}
+.vms-tool-grid .x-grid3-cell-inner{
+  _height: 30px;
+}
+/* ----- END IE HACKS -------- */
+
 .vms-tool-row{
   position: relative;
   min-height: 27px;
@@ -106,4 +116,24 @@
 }
 .vms-tool-icon-inactive.vms-auto-user{
   background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-available-auto.png);
+}
+
+/* ----------- VMS Site Info Window */
+.vms-site-info-attendance-danger{
+  color: #f22;
+  font-weight: bolder;
+}
+.vms-site-info-attendance-warning{
+  color: #fc0;
+  font-weight: bolder;
+}
+
+.vms-site-info-item{
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+  background-image: url(/stylesheets/vms/images/bullet-green-alt.png)
+}
+.vms-site-info-item-danger{
+  background-image: url(/stylesheets/vms/images/bullet-red-alt.png)
 }

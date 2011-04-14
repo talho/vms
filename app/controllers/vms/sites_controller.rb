@@ -1,7 +1,7 @@
 class Vms::SitesController < ApplicationController
   include Vms::PopulateScenario
   
-  before_filter :initialize_scenario, :except => [:new, :edit, :show]
+  before_filter :initialize_scenario, :except => [:new, :edit]
   before_filter :non_public_role_required, :change_include_root
   after_filter :change_include_root_back
   
@@ -13,9 +13,16 @@ class Vms::SitesController < ApplicationController
   end  
   
   def show
-    @site = Vms::Site.find(params[:id])
+    @site = @scenario.site_instances.find_by_site_id(params[:id], :include => {:teams => [:audience], :staff => {:user => [:roles]}, :role_scenario_sites => [:role], :inventories => {:item_instances => {:item => :item_category} } })
+    # here we need to work with calculating full lists of 1) the staff assigned to the site, both manually and automatically (automatic assignment in progress)
+    staff = (@site.staff.map {|s| s.user[:source] = 'manual'; s.user[:staff_id] = s.id; s.user } + @site.teams.map(&:users).map {|u| u.map {|ui| ui[:source] = 'team'; ui} }).flatten.uniq
+    # 2) the roles assigned to the site and which staff members are filling those roles. this could become interesting because, when a user is manually assigned, we have to decide if he's filling 1 or many roles
+    @site.role_scenario_sites.each { |r| r.calculate_assignment(staff) }
+    # 3) any calculations that need to be done on inventory items
+    # I think that it is best to push the calculations back to the models so we can reuse them elsewhere
     respond_to do |format|
-      format.json {render :json => {:site => @site.as_json } }
+      format.json {render :json => { :site => @site.as_json, :roles => @site.role_scenario_sites.as_json,
+                                     :items => @site.inventories.map(&:item_instances).flatten.as_json, :staff => Vms::Staff.users_as_staff_json(staff) } }
     end
   end
   
@@ -36,7 +43,10 @@ class Vms::SitesController < ApplicationController
   end
   
   def edit
-
+    @site = Vms::Site.find(params[:id])
+    respond_to do |format|
+      format.json {render :json => {:site => @site.as_json } }
+    end
   end
   
   def update

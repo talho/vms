@@ -6,6 +6,7 @@ Ext.ns("Talho.VMS.ux");
 Talho.VMS.ux.StaffController = Ext.extend(Ext.util.Observable, {
   constructor: function(config){
     Ext.apply(this, config);
+    this.addEvents('aftersave', 'afterremove', 'aftermove');
     Talho.VMS.ux.StaffController.superclass.constructor.apply(this, arguments);
   },
   
@@ -23,8 +24,7 @@ Talho.VMS.ux.StaffController = Ext.extend(Ext.util.Observable, {
     }, this)
     
     if(Ext.isEmpty(add) && Ext.isEmpty(del)){
-      win.close();
-      this.store.load();
+      this.fireEvent('aftersave', this, win);
       return;
     }
     
@@ -44,17 +44,14 @@ Talho.VMS.ux.StaffController = Ext.extend(Ext.util.Observable, {
         else{
           Ext.Msg.alert("There was a problem saving the staff");
         }
-        win.close();
-        this.store.load();
+        this.fireEvent('aftersave', this, win);
       },
       scope: this
     });
   },
   
-  remove: function(record, grid){
+  remove: function(record){
     var rm = [this.buildStaffObject(record)];
-    if(grid)
-      grid.loadMask.show();
       
     Ext.Ajax.request({
       url: this.getUrl(),
@@ -70,16 +67,14 @@ Talho.VMS.ux.StaffController = Ext.extend(Ext.util.Observable, {
         else{
           Ext.Msg.alert("There was a problem saving the staff");
         }
-        this.store.load();
+        this.fireEvent('afterremove', this);
       },
       scope: this
     })
   },
   
-  move: function(record, grid){
+  move: function(record){
     var ad = [this.buildStaffObject(record)];
-    if(grid)
-      grid.loadMask.show();
      
     Ext.Ajax.request({
       url: this.getUrl(),
@@ -95,7 +90,7 @@ Talho.VMS.ux.StaffController = Ext.extend(Ext.util.Observable, {
         else{
           Ext.Msg.alert("There was a problem saving the staff");
         }
-        this.store.load();
+        this.fireEvent('aftermove', this);
       },
       scope: this
     });

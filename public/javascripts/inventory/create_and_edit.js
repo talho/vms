@@ -3,8 +3,11 @@ Ext.ns('Talho.VMS.ux');
 Talho.VMS.ux.InventoryWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {  
   modal: true,
   padding: '5',
-  constructor: function(config){
-    this.mode = config.mode || (config.record && config.record.get('status') !== 'new' ? 'copy' : 'create');
+  autoHeight: true,
+  initComponent: function(){
+    this.mode = this.mode || (this.record && this.record.get('status') !== 'new' ? 'copy' : 'create');
+    
+    this.setTitle(this.mode === 'edit' ? 'Edit POD/Inventory' : (this.mode === 'copy' ? 'Copy POD/Inventory' : 'Create POD/Inventory'));
     
     var name_config = {xtype: 'textfield', itemId: 'name', fieldLabel: 'Inventory/POD Name', anchor: '100%'}
     if(this.mode === 'create') {
@@ -15,48 +18,43 @@ Talho.VMS.ux.InventoryWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
       }});
     }
     
-    Ext.apply(config, {
-      title: this.mode === 'edit' ? 'Edit POD/Inventory' : (this.mode === 'copy' ? 'Copy POD/Inventory' : 'Create POD/Inventory'),
-      items: [
-        name_config,
-        {xtype: 'combo', itemId: 'source', anchor: '100%', fieldLabel: 'Source', displayField: 'name', queryParam: 'name', mode: 'remote', triggerAction: 'query', minChars: 0, store: new Ext.data.JsonStore({
-        	url: '/vms/inventory_sources',
-        	restful: true,
-        	fields: ['name', 'id']
-        })},
-        {xtype:'radiogroup', itemId: 'type', anchor: '100%', hideLabel: true, items: [{boxLabel: 'Inventory', checked: true, inputValue: 'inventory', name: 'inventory_type'}, {boxLabel: 'POD', inputValue: 'pod', name: 'inventory_type'}]},
-        {xtype: 'grid', itemId: 'items', cls: 'itemGrid', anchor: '100%', height: 150, hideLabel: true, tbar: ['Items', '->', {text: 'Add Item', scope: this, handler: function(){this.showItemDetailWindow();} }], store: new Ext.data.JsonStore({
-            fields: ['name', {name: 'quantity', type: 'int'}, 'category', 'consumable']
-          }),
-          columns: [
-            {header: 'Name', dataIndex: 'name', id: 'name_column'},
-            {header: 'Quantity', dataIndex: 'quantity', width: 60},
-            {xtype: 'xactioncolumn', items: [
-              {icon: '/stylesheets/vms/images/list-remove-2.png', iconCls: 'decreaseItem', handler: this.decrementQuantity, scope: this},
-              {icon: '/stylesheets/vms/images/list-add-2.png', iconCls: 'increaseItem', handler: this.incrementQuantity, scope: this}
-            ]}
-          ],
-          autoExpandColumn: 'name_column',
-          listeners:{
-            scope: this,
-            'rowcontextmenu': this.showItemMenu
-          }
-        },
-        {xtype: 'checkbox', boxLabel: 'Save as a Template', anchor: '100%', itemId: 'template', checked: false, name: 'inventory_template', hideLabel: true}
-    ]});
+    this.items = [
+      name_config,
+      {xtype: 'combo', itemId: 'source', anchor: '100%', fieldLabel: 'Source', displayField: 'name', queryParam: 'name', mode: 'remote', triggerAction: 'query', minChars: 0, store: new Ext.data.JsonStore({
+      	url: '/vms/inventory_sources',
+      	restful: true,
+      	fields: ['name', 'id']
+      })},
+      {xtype:'radiogroup', itemId: 'type', anchor: '100%', hideLabel: true, items: [{boxLabel: 'Inventory', checked: true, inputValue: 'inventory', name: 'inventory_type'}, {boxLabel: 'POD', inputValue: 'pod', name: 'inventory_type'}]},
+      {xtype: 'grid', itemId: 'items', cls: 'itemGrid', anchor: '100%', height: 150, hideLabel: true, tbar: ['Items', '->', {text: 'Add Item', scope: this, handler: function(){this.showItemDetailWindow();} }], store: new Ext.data.JsonStore({
+          fields: ['name', {name: 'quantity', type: 'int'}, 'category', 'consumable']
+        }),
+        columns: [
+          {header: 'Name', dataIndex: 'name', id: 'name_column'},
+          {header: 'Quantity', dataIndex: 'quantity', width: 60},
+          {xtype: 'xactioncolumn', items: [
+            {icon: '/stylesheets/vms/images/list-remove-2.png', iconCls: 'decreaseItem', handler: this.decrementQuantity, scope: this},
+            {icon: '/stylesheets/vms/images/list-add-2.png', iconCls: 'increaseItem', handler: this.incrementQuantity, scope: this}
+          ]}
+        ],
+        autoExpandColumn: 'name_column',
+        listeners:{
+          scope: this,
+          'rowcontextmenu': this.showItemMenu
+        }
+      },
+      {xtype: 'checkbox', boxLabel: 'Save as a Template', anchor: '100%', itemId: 'template', checked: false, name: 'inventory_template', hideLabel: true}
+    ]
     
-    Talho.VMS.ux.InventoryWindow.superclass.constructor.call(this, config);
-  },
-  
-  initComponent: function(){
     Talho.VMS.ux.InventoryWindow.superclass.initComponent.apply(this, arguments);
     
     this.itemGrid = this.getComponent('items');
     
-    if(this.mode !== 'create' && !Ext.isEmpty(this.record)){       
+    if(this.mode !== 'create' && (!Ext.isEmpty(this.record) || !Ext.isEmpty(this.inventoryId))){
+      var id = !Ext.isEmpty(this.record) ? this.record.get('id') : this.inventoryId;
       this.on('afterrender', function(){this.loadMask = new Ext.LoadMask(this.getLayoutTarget()); this.loadMask.show();}, this, {delay: 1});
       Ext.Ajax.request({
-        url: '/vms/scenarios/' + this.scenarioId + '/inventories/' + this.record.get('id') + (this.mode === 'edit' ? '/edit.json' : '.json'),
+        url: '/vms/scenarios/' + this.scenarioId + '/inventories/' + id + (this.mode === 'edit' ? '/edit.json' : '.json'),
         method: 'GET',
         scope: this,
         success: this.loadComplete

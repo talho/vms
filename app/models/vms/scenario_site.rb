@@ -18,6 +18,9 @@ class Vms::ScenarioSite < ActiveRecord::Base
   def as_json (options = {})
     options[:include] = {} if options[:include].nil?
     options[:include].merge! :site => {}
-    super(options)    
+    json = super(options)    
+    ( json.key?("scenario_site") ? json["scenario_site"] : json).merge!( 
+      {:qualifications => qualification_list.map(&:titleize).join(', ')})
+    json   
   end
 end

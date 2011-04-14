@@ -12,4 +12,8 @@ class Vms::Staff < ActiveRecord::Base
       {:site => site.name, :site_id => site.id, :user => user.display_name, :user_id => user.id })
     json
   end
+  
+  def self.users_as_staff_json(users)
+    users.map { |u| {:user => u.display_name, :user_id => u.id, :satus => 'assigned', :source => u[:source], :id => u[:staff_id] } }
+  end
 end

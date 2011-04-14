@@ -22,4 +22,8 @@ class Vms::Team < ActiveRecord::Base
       {:site => site.name, :site_id => site.id, :user_count => audience.users.count})
     json
   end
+  
+  def users
+    audience.recipients
+  end
 end

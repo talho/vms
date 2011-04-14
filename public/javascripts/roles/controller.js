@@ -5,14 +5,12 @@ Ext.ns("Talho.VMS.ux");
 
 Talho.VMS.ux.RolesController = Ext.extend(Ext.util.Observable, {
   constructor: function(config){
+    this.addEvents('aftersave');
     Ext.apply(this, config);
     Talho.VMS.ux.RolesController.superclass.constructor.apply(this, arguments);
   },
   
-  save: function(win, updated_records, deleted_records){
-    // Mask the window
-    win.showMask();
-    
+  save: function(win, updated_records, deleted_records){    
     var roles = [];
     Ext.each(updated_records, function(r){
       roles.push(this.buildRoleObject(r));
@@ -23,8 +21,7 @@ Talho.VMS.ux.RolesController = Ext.extend(Ext.util.Observable, {
     }, this)
     
     if(Ext.isEmpty(roles)){
-      win.close();
-      this.store.load();
+      this.fireEvent('aftersave', this, win);
       return;
     }
     
@@ -43,8 +40,7 @@ Talho.VMS.ux.RolesController = Ext.extend(Ext.util.Observable, {
         else{
           Ext.Msg.alert("There was a problem saving the roles");
         }
-        win.close();
-        this.store.load();
+        this.fireEvent('aftersave', this, win);
       },
       scope: this
     });
