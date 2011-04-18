@@ -559,6 +559,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   showSiteMarkerInfo: function(marker){  
     this.current_site_info_window = new Talho.VMS.ux.SiteInfoWindow({
       marker: marker,
+      cls: 'site_info_window',
       scenarioId: this.scenarioId,
       ext_rolesGrid: this.rolesGrid,
       ext_staffGrid: this.staffGrid,

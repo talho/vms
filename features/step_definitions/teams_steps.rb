@@ -83,3 +83,12 @@ Given /^team "([^\"]*)" was derived from group "([^\"]*)"$/ do |team, group|
   te = Audience.find_by_name(team, :conditions => {:type => nil})
   te.parent_audiences << Group.find_by_name(group, :conditions => {:scope => ['Personal', 'Jurisdiction', 'Global']})
 end
+
+When /^team "([^\"]*)" is assigned to "([^\"]*)" for scenario "([^\"]*)"$/ do |team_name, site_name, scenario_name|
+  case team_name
+    when "Bart Team"
+      Given %{a team "#{team_name}" assigned to site "#{site_name}" scenario "#{scenario_name}" with}, table(%{
+        | Bartleby Scrivener |
+      })
+  end
+end

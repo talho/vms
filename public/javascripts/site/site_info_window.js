@@ -12,7 +12,7 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
       {xtype: 'box', html: this.record.get('address'), fieldLabel: 'Address'},
       {xtype: 'box', html: this.record.get('qualifications'), fieldLabel: 'Qualifications'},
       {xtype: 'container', height: 300, itemId: 'accordion', layout: 'accordion', hideLabel: true, items: [
-        {xtype: 'grid', title: 'Staff', tools: [{id: 'gear', scope: this, handler: this.editStaff}], itemId: 'staff', store: new Ext.data.JsonStore({
+        {xtype: 'grid', title: 'Staff', tools: [{id: 'gear', scope: this, handler: this.editStaff}], cls: 'staff_grid', itemId: 'staff', store: new Ext.data.JsonStore({
             fields: ['user', 'role_filled', 'roles', 'qualifications', 'user_id', 'id', 'source']
           }),
           columns: [{header: 'Name', dataIndex: 'user'}, {header: 'Role Filled', dataIndex: 'role_filled'}, {header: 'Roles', dataIndex: 'roles'}, {header: 'Qualifications', dataIndex: 'qualifications'},
@@ -23,7 +23,7 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
             'rowcontextmenu': this.showStaffContextMenu
           }
         },
-        {xtype: 'grid', title: 'Roles', tools: [{id: 'gear', scope: this, handler: this.editRoles}], itemId: 'roles', store: new Ext.data.JsonStore({
+        {xtype: 'grid', title: 'Roles', tools: [{id: 'gear', scope: this, handler: this.editRoles}], itemId: 'roles', cls: 'roles_grid', store: new Ext.data.JsonStore({
             fields: ['role', 'count', 'assigned', 'present', 'qualifications']
           }),
           columns: [{header: 'Name', dataIndex: 'role', id: 'name'}, {header: 'Required', dataIndex: 'count', width: 65}, {header: 'Assigned', dataIndex: 'assigned', width: 65}, {header: 'Present', dataIndex: 'present', width: 60}, 
@@ -34,7 +34,7 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
             'rowcontextmenu': this.showRoleContextMenu
           }
         },
-        {xtype: 'grid', title: 'Inventory', itemId: 'items', store: new Ext.data.JsonStore({
+        {xtype: 'grid', title: 'Inventory', itemId: 'items', cls: 'inv_grid', store: new Ext.data.JsonStore({
             fields: ['name', 'quantity', 'original_quantity', 'inventory_id']
           }),
           columns: [{header: 'Item', dataIndex: 'name'}, {header: 'Quantity', dataIndex: 'quantity'}, {header: 'Starting Quantity', dataIndex: 'original_quantity'}],

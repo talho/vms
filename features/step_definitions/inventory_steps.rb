@@ -111,3 +111,51 @@ end
 Then /^the site "([^\"]*)" for scenario "([^\"]*)" should have no inventories$/ do |site_name, scenario_name|
   Vms::Scenario.find_by_name(scenario_name).site_instances.for_site(Vms::Site.find_by_name(site_name)).inventories.should be_empty
 end
+
+When /^inventories "([^\"]*)" are assigned to "([^\"]*)" for scenario "([^\"]*)"$/ do |inventory_name, site_name, scenario_name|
+  case inventory_name
+    when "One Item"
+      Given "the following inventories exist:", table(%{
+        | name        | site         | scenario         | source | type      | template |
+        | Inventory 1 | #{site_name} | #{scenario_name} | source | inventory | false    |
+      })
+      Given %{the "Inventory 1" inventory has the following items:}, table(%{
+        | name   | category | quantity | consumable |
+        | Item 1 | supplies | 10       | false      |
+      })
+    when "Many Items"
+      Given "the following inventories exist:", table(%{
+        | name        | site         | scenario         | source | type      | template |
+        | Inventory 1 | #{site_name} | #{scenario_name} | source | inventory | false    |
+      })
+      Given %{the "Inventory 1" inventory has the following items:}, table(%{
+        | name   | category | quantity | consumable |
+        | Item 1 | supplies | 10       | false      |
+        | Item 2 | supplies | 10       | false      |
+      })
+    when "Many Inventories"
+      Given "the following inventories exist:", table(%{
+        | name        | site         | scenario         | source | type      | template |
+        | Inventory 1 | #{site_name} | #{scenario_name} | source | inventory | false    |
+        | Inventory 2 | #{site_name} | #{scenario_name} | source | inventory | false    |
+      })
+      Given %{the "Inventory 1" inventory has the following items:}, table(%{
+        | name   | category | quantity | consumable |
+        | Item 1 | supplies | 10       | false      |
+      })
+      Given %{the "Inventory 2" inventory has the following items:}, table(%{
+        | name   | category | quantity | consumable |
+        | Item 1 | supplies | 10       | false      |
+      })
+    when "Out of Items"
+      Given "the following inventories exist:", table(%{
+        | name        | site         | scenario         | source | type      | template |
+        | Inventory 1 | #{site_name} | #{scenario_name} | source | inventory | false    |
+      })
+      Given %{the "Inventory 1" inventory has the following items:}, table(%{
+        | name   | category | quantity | consumable |
+        | Item 1 | supplies | 10       | false      |
+        | Item 2 | supplies | 0        | false      |
+      })
+  end
+end

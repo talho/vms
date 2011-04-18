@@ -48,3 +48,19 @@ Then /^the site "([^\"]*)" should be "([^\"]*)" for scenario "([^\"]*)"$/ do |si
   site_instance = Vms::Scenario.find_by_name(scenario_name).site_instances.for_site(Vms::Site.find_by_name(site_name)[:id])
   site_instance.status.should == Vms::ScenarioSite::STATES[status.to_sym]
 end
+
+# allow for site templates, using other step definitions
+Given /^the site "([^\"]*)" exists for scenario "([^\"]*)"$/ do |site_name, scenario_name|
+  case site_name
+    when "Malawi"
+      When "the following sites exist:", table(%{
+        | name                | address                                 | lat                 | lng              | status | scenario     |
+        | Malawi              | Kenyatta, Lilongwe, Malawi              | -13.962475513490757 | 33.7866090623169 | active | #{scenario_name} |
+      })
+    when "Immunization Center"
+      When "the following sites exist:", table(%{
+        | name                | address                                 | lat       | lng       | status | scenario     |
+        | Immunization Center | 1303 Atkinson Dr, Lufkin, TX 75901, USA | 31.347573 | -94.71391 | active | #{scenario_name} |
+      })
+  end
+end

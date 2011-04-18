@@ -71,3 +71,15 @@ When /^I drag role group "([^\"]*)" to "([^\"]*)"$/ do |role_group_name, site_na
     command_center.map.dropZone.onNodeDrop(null, null, null, data);
   ")
 end
+
+When /^roles "([^\"]*)" are assigned to "([^\"]*)" for scenario "([^\"]*)"$/ do |role_name, site_name, scenario_name|
+  case role_name
+    when "Chief Vet", "Filled Vet", "Unfilled Vet"
+      Given %{the site "#{site_name}" for scenario "#{scenario_name}" has the role "Chief Veterinarian"}
+    when "Unfilled BHD"
+      Given %{the site "#{site_name}" for scenario "#{scenario_name}" has the role "Border Health Director"}
+    when "Vet & BHD", "Filled Vet & BHD", "Mixed Fill Vet & BHD"
+      Given %{the site "#{site_name}" for scenario "#{scenario_name}" has the role "Chief Veterinarian"}
+      Given %{the site "#{site_name}" for scenario "#{scenario_name}" has the role "Border Health Director"}
+  end
+end

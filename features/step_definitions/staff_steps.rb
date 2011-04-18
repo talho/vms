@@ -53,3 +53,13 @@ When /^I right click on staff member "([^\"]*)"$/ do |staff_name|
     command_center.showStaffContextMenu(command_center.staffGrid, i, evt);
   ")
 end
+
+When /^staff "([^\"]*)" are assigned to "([^\"]*)" for scenario "([^\"]*)"$/ do |staff_name, site_name, scenario_name|
+  case staff_name
+    when "Just Atticus", "Atticus & Team"
+      Given %{"Atticus Finch" is assigned to "#{site_name}" for scenario "#{scenario_name}"}
+    when "Atticus & Bart"
+      Given %{"Bartleby Scrivener" is assigned to "#{site_name}" for scenario "#{scenario_name}"}
+      Given %{"Atticus Finch" is assigned to "#{site_name}" for scenario "#{scenario_name}"}
+  end
+end
