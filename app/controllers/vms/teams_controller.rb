@@ -13,7 +13,6 @@ class Vms::TeamsController < ApplicationController
   end
   
   def show
-    debugger
     @team = @scenario.site_instances.for_site(params[:vms_site_id]).teams.find(params[:id], :include => {:audience => [:users]})
     
     @team[:users] = []

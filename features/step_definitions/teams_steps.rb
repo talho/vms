@@ -33,7 +33,7 @@ When /^"([^\"]*)" should( not)? be a member of the "([^\"]*)" (audience|team|gro
   else
     te = Audience.find_by_name(audience, :conditions => {:type => nil})
   end
-  debugger
+
   user = te.users.find_by_display_name(user)
 
   if neg.nil?
