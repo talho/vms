@@ -6,9 +6,15 @@ class CreateTeams < ActiveRecord::Migration
       t.integer :scenario_site_id
       t.index :scenario_site_id
     end
+    
+    add_index :vms_teams, :audience_id
+    add_index :vms_teams, :scenario_site_id
   end
 
   def self.down
+    remove_index :vms_teams, :audience_id
+    remove_index :vms_teams, :scenario_site_id
+    
     drop_table :vms_staff
   end
 end

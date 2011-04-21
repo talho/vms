@@ -28,7 +28,8 @@ class Vms::ScenariosController < ApplicationController
   end
   
   def create
-    @scenario = current_user.scenarios.build(params[:scenario])
+    @scenario = Vms::Scenario.new(params[:scenario])
+    @scenario.user_rights.build(:user_id => current_user.id, :permission_level => Vms::UserRight::PERMISSIONS[:owner])
     if @scenario.save
       respond_to do |format|
         format.json {render :json => {:scenario => @scenario.as_json, :success => true} }
@@ -41,7 +42,7 @@ class Vms::ScenariosController < ApplicationController
   end
   
   def edit    
-    @scenario = current_user.scenarios.find(params[:id])
+    @scenario = current_user.scenarios.editable.find(params[:id])
     respond_to do |format|
       unless @scenario.nil?
         format.json {render :json => @scenario.as_json}
@@ -52,7 +53,7 @@ class Vms::ScenariosController < ApplicationController
   end
   
   def update
-    @scenario = current_user.scenarios.find(params[:id])
+    @scenario = current_user.scenarios.editable.find(params[:id])
     if @scenario.update_attributes(params[:scenario])
       respond_to do |format|
         format.json {render :json => {:scenario => @scenario.as_json, :success => true} }
@@ -65,7 +66,7 @@ class Vms::ScenariosController < ApplicationController
   end
   
   def destroy
-    @scenario = current_user.scenarios.find(params[:id])
+    @scenario = current_user.scenarios.editable.find(params[:id])
     respond_to do |format|
       if @scenario.destroy
         format.json {render :json => {:success => true} }
