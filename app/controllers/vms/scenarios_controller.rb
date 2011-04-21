@@ -42,10 +42,10 @@ class Vms::ScenariosController < ApplicationController
   end
   
   def edit    
-    @scenario = current_user.scenarios.editable.find(params[:id])
+    @scenario = current_user.scenarios.editable.find(params[:id], :include => {:user_rights => [:user]})
     respond_to do |format|
       unless @scenario.nil?
-        format.json {render :json => @scenario.as_json}
+        format.json {render :json => {:scenario => @scenario.as_json, :user_rights => @scenario.user_rights.non_owners.as_json }}
       else
         format.json {render :json => {:msg => 'You do not have permission to edit this scenario'}, :status => 404 }
       end

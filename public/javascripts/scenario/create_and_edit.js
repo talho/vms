@@ -11,8 +11,9 @@ Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
     if(!Ext.isEmpty(config.scenarioId)){
       this.edit_mode = true;
     }
-    
+    this.masks = {};
     Talho.VMS.CreateAndEditScenario.superclass.constructor.apply(this, arguments);
+    this.removed_records = [];
   },
   
   initComponent: function(){
@@ -63,17 +64,40 @@ Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
       scope: this,
       'add': this.userAdded,
       'remove': this.userRemoved
-    })
-    this.on('afterrender', function(){this.getComponent('tab_panel').getComponent('form_panel').getForm().waitMsgTarget = this.getLayoutTarget();}, this);
+    });
+    
+    if(this.edit_mode){
+      this.on('afterrender', function(){this.showMask("Loading...");}, this, {delay: 1});
+      Ext.Ajax.request({
+        url: '/vms/scenarios/' + this.scenarioId + '/edit.json',
+        method: 'GET',
+        scope: this,
+        callback: this.loadComplete
+      });
+    }
+  },
+  
+  loadComplete: function(opts, success, response){
+    this.hideMask();
+    var resp_obj = Ext.decode(response.responseText);
+    
+    this.permission_grid.getStore().loadData(resp_obj.user_rights);
+    
+    var users = resp_obj.user_rights;
+    Ext.each(users, function(user){user.id = user.user_id});
+    var user_selection_store = this.selection_grid.getStore();
+    
+    user_selection_store.loadData(users);
   },
   
   save: function(b){    
+    this.showMask();
     this.main_form.getForm().submit({
       scope: this,
-      waitMsg: 'Saving...',
       url: '/vms/scenarios' + (this.edit_mode ? '/' + this.scenarioId : ''),
       method: this.edit_mode ? 'PUT' : 'POST',
       success: function(form, action){
+        this.hideMask();
         if(b.mode == 'list'){
           Application.fireEvent('openwindow', {id: 'vms_open_scenario', title:'Open Scenario', initializer: 'Talho.VMS.OpenScenario'});
         }
@@ -100,7 +124,25 @@ Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
   userRemoved: function(store, record){
     var store = this.permission_grid.getStore();
     var i = store.find('user_id', new RegExp('^' + record.get('id') + '$'));
-    store.removeAt(i);
+    var rec = store.getAt(i);
+    store.remove(rec);
+    this.removed_records.push(rec);
+  },
+  
+  showMask: function(label){
+    if(Ext.isEmpty(label)) label = 'Saving...';
+    var mask = this.masks[label];
+    if(!mask){
+      this.masks[label] = new Ext.LoadMask(this.getLayoutTarget(), {msg: label});
+    }
+    this.current_mask = this.masks[label];
+    this.current_mask.show();
+    Ext.each(this.buttons, function(button){button.disable();});
+  },
+  
+  hideMask: function(){
+    if(this.current_mask) this.current_mask.hide();
+    Ext.each(this.buttons, function(button){button.enable();});
   }
 });
 

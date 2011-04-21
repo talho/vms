@@ -2,7 +2,12 @@
 class Vms::Scenario < ActiveRecord::Base  
   set_table_name "vms_scenarios"
     
-  has_many :user_rights, :class_name => 'Vms::UserRight'
+  has_many :user_rights, :class_name => 'Vms::UserRight' do
+    def non_owners
+      scoped :conditions => {'permission_level' => [Vms::UserRight::PERMISSIONS[:reader], Vms::UserRight::PERMISSIONS[:admin]]}
+    end
+  end
+  
   has_many :users, :through => :user_rights do
     def owner
       find(:first, :conditions => {'vms_user_rights.permission_level' => Vms::UserRight::PERMISSIONS[:owner] })
