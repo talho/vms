@@ -35,15 +35,33 @@ Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
     }
     
     this.items = {xtype: 'tabpanel', itemId: 'tab_panel', activeItem: 0, border: false, items: [
-      {xtype: 'form', title: "Scenario Info", border: false, padding: '5', itemId: 'form_panel', items:[
-        {xtype: 'textfield', fieldLabel: 'Scenario Name', name: 'scenario[name]', value: this.edit_mode ? this.scenarioName : '', anchor: '100%'},
-        {xtype: 'label', hideLabel: true, text: 'Select Scenario Managers:', cls: 'x-form-item'},
+      { title: "Scenario Info", border: false, itemId: 'info_panel', items: [
+        {xtype: 'form', border: false, padding: '5', itemId: 'form_panel',
+          listeners: {
+            scope: this,
+            'beforeaction': function(form, action){
+              if(action.type == 'submit')
+              {
+                action.options.params = action.options.params || {};
+                var user_rights = this.getUserResults();
+                Ext.each(user_rights, function(ur, i){
+                  for(attr in ur){
+                   action.options.params['scenario[user_rights_attributes][' + i + '][' + attr + ']'] = ur[attr]; 
+                  }                  
+                });
+              }
+              return true;
+            }
+          }, items:[
+          {xtype: 'textfield', fieldLabel: 'Scenario Name', name: 'scenario[name]', value: this.edit_mode ? this.scenarioName : '', anchor: '100%'},
+          {xtype: 'label', hideLabel: true, text: 'Select Scenario Managers:', cls: 'x-form-item'}
+        ]},
         new Talho.ux.UserSelectionGrid({height: 205, anchor: '100%', itemId: 'users', hideLabel: true, cls: 'user_selection_grid'})
       ]},
       {title: 'Permissions', itemId: 'per', xtype: 'editorgrid', clicksToEdit: 1, border: false, enableColumnMove: false, enableHdMenu: false, enableColumnHide: false,
         viewConfig: {emptyText: '<h2><p>This scenario has not been shared with any other users. Please select users to share with in the Scenario Info tab.</p></h2>', deferEmptyText: false},
         store: new Ext.data.JsonStore({
-          fields: ['name', {name: 'permission_level', defaultValue: 1}, 'user_id']
+          fields: ['name', {name: 'permission_level', defaultValue: 1}, 'user_id', 'id']
         }),
         columns: [{header: 'User Name', dataIndex: 'name', editable: false}, 
           {header: 'Permission Level', id: 'per', dataIndex: 'permission_level', renderer: function(value){switch(value){case 1: return 'Reader'; case 2: return 'Admin'; case 3: return 'Owner'; default: return '';}}, 
@@ -56,8 +74,8 @@ Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
     
     Talho.VMS.CreateAndEditScenario.superclass.initComponent.apply(this, arguments);
     
-    this.main_form = this.getComponent('tab_panel').getComponent('form_panel');
-    this.selection_grid = this.main_form.getComponent('users');
+    this.main_form = this.getComponent('tab_panel').getComponent('info_panel').getComponent('form_panel');
+    this.selection_grid = this.getComponent('tab_panel').getComponent('info_panel').getComponent('users');
     this.permission_grid = this.getComponent('tab_panel').getComponent('per');
         
     this.selection_grid.getStore().on({
@@ -127,6 +145,22 @@ Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
     var rec = store.getAt(i);
     store.remove(rec);
     this.removed_records.push(rec);
+  },
+  
+  getUserResults: function(){
+    var res = []
+    
+    this.permission_grid.getStore().each(function(r){
+      var val = {user_id: r.get('user_id'), permission_level: r.get('permission_level')};
+      if(!r.phantom) val['id'] = r.get('id');
+      res.push(val);
+    }, this);
+    
+    Ext.each(this.removed_records, function(r){
+      if(!r.phantom) res.push({id: r.get('id'), _destroy: true});
+    }, this)
+    
+    return res;
   },
   
   showMask: function(label){

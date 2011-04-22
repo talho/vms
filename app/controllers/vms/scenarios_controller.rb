@@ -4,9 +4,14 @@ class Vms::ScenariosController < ApplicationController
   after_filter :change_include_root_back
   
   def index
-    @scenarios = User.find(current_user.id).scenarios.find(:all, :order=> 'created_at')
+    @scenarios = current_user.scenarios.find(:all, :order=> 'created_at', :include => [:user_rights])
+    @scenarios.each do |sc|
+      perm_lvl = sc.user_rights.find_by_user_id(current_user).permission_level
+      sc[:can_admin] =  perm_lvl == Vms::UserRight::PERMISSIONS[:owner] || perm_lvl == Vms::UserRight::PERMISSIONS[:admin]
+      sc[:is_owner] = perm_lvl == Vms::UserRight::PERMISSIONS[:owner]
+    end
     respond_to do |format|
-      format.json {render :json => {:scenarios => @scenarios.as_json(:only => [:id, :name] ) } }
+      format.json {render :json => {:scenarios => @scenarios.as_json(:only => [:id, :name, :can_admin] ) } }
     end
   end  
   

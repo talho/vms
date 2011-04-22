@@ -16,15 +16,15 @@ Talho.VMS.ManageScenarios = Ext.extend(Ext.Window, {
           root: 'scenarios',
           restful: true,
           idProperty: 'id',
-          fields: ['name', 'id'],
+          fields: ['name', 'id', 'can_admin', 'is_owner'],
           autoLoad: true,
           autoSave: false,
           writer: new Ext.data.JsonWriter({ })
         }),
         columns:[
           {dataIndex: 'name', id: 'name_column'},
-          {xtype: 'xactioncolumn', tooltip: 'edit', icon: '/stylesheets/images/pencil.png', iconCls: 'edit', scope: this, handler: this.edit_click },
-          {xtype: 'xactioncolumn', tooltip: 'delete', icon: '/stylesheets/images/cross-circle.png', iconCls: 'delete', scope: this, handler: this.delete_click }
+          {xtype: 'xactioncolumn', tooltip: 'edit', icon: '/stylesheets/images/pencil.png', iconCls: 'edit', scope: this, handler: this.edit_click, showField: 'can_admin' },
+          {xtype: 'xactioncolumn', tooltip: 'delete', icon: '/stylesheets/images/cross-circle.png', iconCls: 'delete', scope: this, handler: this.delete_click, showField: 'is_owner' }
         ], autoExpandColumn: 'name_column',
         sm: new Ext.grid.RowSelectionModel({singleSelect: true}) }
       ],
