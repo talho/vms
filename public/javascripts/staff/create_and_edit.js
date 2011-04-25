@@ -28,6 +28,10 @@ Talho.VMS.ux.CreateAndEditStaff = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
       fields: ['user', {name: 'type', defaultValue: 'manual_user'}, {name: 'status', defaultValue: 'active'}, 'id', 'site_id', 'site', 'user_id']
     });
     
+    if(this.readOnly){
+      this.buttons = [{text: 'Close', scope: this, handler: function(){this.close();}}];
+    }
+    
     Talho.VMS.ux.CreateAndEditStaff.superclass.initComponent.apply(this, arguments);
     
     this.user_selection_grid = this.getComponent('users');

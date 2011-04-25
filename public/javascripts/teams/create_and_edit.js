@@ -27,7 +27,10 @@ Talho.VMS.ux.CreateAndEditTeam = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
       this.items.push({xtype: 'checkbox', itemId: 'template', region: 'south', boxLabel: 'Save as template', hideLabel: true});
     }
     
-    if(this.mode !== 'edit'){
+    if(this.mode === 'show'){
+      this.buttons = [{text: 'Close', scope: this, handler: function(){this.close();}}];
+    }
+    else if(this.mode !== 'edit'){
       this.fbar = {
         buttonAlign: 'left',
         items: Ext.flatten([{xtype: 'button', text: 'Import Team', handler: this.onImportTeamClicked, scope: this}, '->', this.buttons])
@@ -51,12 +54,12 @@ Talho.VMS.ux.CreateAndEditTeam = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
       }
     }
     
-    if(this.mode === 'edit'){
+    if(this.mode === 'edit' || this.mode === 'show'){
       this.loadData();
       this.on('afterrender', function(){
         this.showMask('Loading...');
       }, this, {delay: 1});
-      this.setTitle('Modify Team');
+      this.setTitle(this.mode === 'edit' ? 'Modify Team' : 'Team Details');
     }
     else{
       this.setTitle('Create Team');

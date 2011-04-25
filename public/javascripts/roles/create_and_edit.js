@@ -7,16 +7,29 @@ Talho.VMS.ux.CreateAndEditRoles = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
   title: "Modify Roles",
   initComponent: function(){
     this.deleted_records = [];
-    var start_editing = Ext.isDefined(this.creatingRecord);
-  
-    // Now create the grid and the stuff to add new rows
-    this.layout = 'fit';
-    this.items = [{xtype: 'panel', itemId: 'container_panel', border: false, autoScroll: true, layout: 'anchor', items:[
+    var start_editing = Ext.isDefined(this.creatingRecord),
+        columns = [{dataIndex: 'role', id: 'role_name'}, 
+          {xtype: 'xactioncolumn', icon: '/stylesheets/vms/images/list-remove-2.png', iconCls: 'decrease_count', handler: this.decrementQuantity, scope: this},
+          {dataIndex: 'count', width: 20},
+          {xtype: 'xactioncolumn', icon: '/stylesheets/vms/images/list-add-2.png', iconCls: 'increase_count', handler: this.incrementQuantity, scope: this},
+          {xtype: 'xactioncolumn', icon: '/stylesheets/vms/images/action_delete.png', iconCls: 'remove_role', handler: this.removeRole, scope: this}
+        ],
+        body = [];
+        
+    if(this.readOnly){
+      columns = [{dataIndex: 'role', id: 'role_name'}, 
+        {dataIndex: 'count', width: 20}
+      ];
+    }
+    else{
+      body = [
         {xtype: 'button', itemId: 'new_role_button', text: 'Add New Role', anchor: '100%', hidden: start_editing, scope: this, handler: this.showAddNewRole},
         {xtype: 'panel', itemId: 'new_role_panel', cls: 'addRolePanel', layout: 'form', border: false, hidden: !start_editing, style: {
           'border': '1px solid',
           'border-color': '#FFFFFF #EDEDED #EDEDED'
-        }, buttons: [{text: 'Add Role', scope: this, handler: this.addRoleToGrid}, {text: 'Cancel', scope: this, handler: this.hideAddNewRole}], items:[
+        }, 
+        buttons: [{text: 'Add Role', scope: this, handler: this.addRoleToGrid}, {text: 'Cancel', scope: this, handler: this.hideAddNewRole}], 
+        items:[
           {xtype: 'combo', itemId: 'role_select_box', anchor: '100%', fieldLabel: 'Select Role', mode: 'local', triggerAction: 'all', store: new Ext.data.JsonStore({
             url: '/audiences/roles',
             autoLoad: true,
@@ -32,24 +45,39 @@ Talho.VMS.ux.CreateAndEditRoles = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
               }
             }
           }), displayField: 'name', valueField: 'id'}
-          ]},
-        {xtype: 'grid', itemId: 'role_grid', cls: 'modifyRoleGrid', border: false, autoHeight: true, store: new Ext.data.JsonStore({ pruneModifiedRecords: true,
+        ]}
+      ];
+    }
+    
+    body.push({xtype: 'grid', itemId: 'role_grid', cls: 'modifyRoleGrid', border: false, autoHeight: true, 
+        store: new Ext.data.JsonStore({ 
+          pruneModifiedRecords: true,
           fields: ['role', {name: 'type', defaultValue: 'role'}, {name: 'status', defaultValue: 'active'}, 'id', 'site_id', 'site', 'role_id', {name: 'count', type: 'integer'}]
-        }), columns: [{dataIndex: 'role', id: 'role_name'}, 
-              {xtype: 'xactioncolumn', icon: '/stylesheets/vms/images/list-remove-2.png', iconCls: 'decrease_count', handler: this.decrementQuantity, scope: this},
-              {dataIndex: 'count', width: 20},
-              {xtype: 'xactioncolumn', icon: '/stylesheets/vms/images/list-add-2.png', iconCls: 'increase_count', handler: this.incrementQuantity, scope: this},
-              {xtype: 'xactioncolumn', icon: '/stylesheets/vms/images/action_delete.png', iconCls: 'remove_role', handler: this.removeRole, scope: this}], autoExpandColumn: 'role_name', hideHeaders: true}]
-      }
-    ];
+        }), 
+        columns: columns, autoExpandColumn: 'role_name', hideHeaders: true
+    })
+    
+    // Now create the grid and the stuff to add new rows
+    this.layout = 'fit';
+    this.items = [{xtype: 'panel', itemId: 'container_panel', border: false, autoScroll: true, layout: 'anchor', items: body }];
+    
+    if(this.readOnly){
+      this.buttons = [{text: 'Close', scope: this, handler: function(){this.close();}}];
+    }
     
     Talho.VMS.ux.CreateAndEditRoles.superclass.initComponent.apply(this, arguments);
     
     var container_panel = this.getComponent('container_panel');
-    this.new_role_button = container_panel.getComponent('new_role_button');
-    this.new_role_panel = container_panel.getComponent('new_role_panel');
     this.role_grid = container_panel.getComponent('role_grid');
-    this.role_select_box = this.new_role_panel.getComponent('role_select_box');
+    
+    if(!this.readOnly){
+      this.new_role_button = container_panel.getComponent('new_role_button');
+      this.new_role_panel = container_panel.getComponent('new_role_panel');
+      this.role_select_box = this.new_role_panel.getComponent('role_select_box');
+    }
+    else{
+      this.setTitle('View Role Details');
+    }
     
     this.on('afterrender', this.loadData, this, {delay: 1});
   },

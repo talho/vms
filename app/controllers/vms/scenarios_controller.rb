@@ -16,7 +16,9 @@ class Vms::ScenariosController < ApplicationController
   end  
   
   def show
-    @scenario = current_user.scenarios.find(params[:id])
+    @scenario = current_user.scenarios.find(params[:id], :include => [:user_rights])
+    perm_lvl = @scenario.user_rights.find_by_user_id(current_user).permission_level
+    @scenario[:can_admin] = perm_lvl == Vms::UserRight::PERMISSIONS[:owner] || perm_lvl == Vms::UserRight::PERMISSIONS[:admin]
     respond_to do |format|
       unless @scenario.nil?
         format.json {render :json => @scenario.as_json}
