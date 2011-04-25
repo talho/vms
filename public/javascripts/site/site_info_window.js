@@ -8,11 +8,14 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
   initComponent: function(){     
     this.record = this.record || this.marker.data.record;
     
+    var staff_tools = this.can_edit ? [{id: 'gear', scope: this, handler: this.editStaff}] : [],
+        roles_tools = this.can_edit ? [{id: 'gear', scope: this, handler: this.editRoles}] : [];
+   
     this.items = [{xtype: 'box', html: this.marker.data.record.get('name'), hideLabel:true},
       {xtype: 'box', html: this.record.get('address'), fieldLabel: 'Address'},
       {xtype: 'box', html: this.record.get('qualifications'), fieldLabel: 'Qualifications'},
       {xtype: 'container', height: 300, itemId: 'accordion', layout: 'accordion', hideLabel: true, items: [
-        {xtype: 'grid', title: 'Staff', tools: [{id: 'gear', scope: this, handler: this.editStaff}], cls: 'staff_grid', itemId: 'staff', store: new Ext.data.JsonStore({
+        {xtype: 'grid', title: 'Staff', tools: staff_tools, cls: 'staff_grid', itemId: 'staff', store: new Ext.data.JsonStore({
             fields: ['user', 'role_filled', 'roles', 'qualifications', 'user_id', 'id', 'source']
           }),
           columns: [{header: 'Name', dataIndex: 'user'}, {header: 'Role Filled', dataIndex: 'role_filled'}, {header: 'Roles', dataIndex: 'roles'}, {header: 'Qualifications', dataIndex: 'qualifications'},
@@ -23,7 +26,7 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
             'rowcontextmenu': this.showStaffContextMenu
           }
         },
-        {xtype: 'grid', title: 'Roles', tools: [{id: 'gear', scope: this, handler: this.editRoles}], itemId: 'roles', cls: 'roles_grid', store: new Ext.data.JsonStore({
+        {xtype: 'grid', title: 'Roles', tools: roles_tools, itemId: 'roles', cls: 'roles_grid', store: new Ext.data.JsonStore({
             fields: ['role', 'count', 'assigned', 'present', 'qualifications']
           }),
           columns: [{header: 'Name', dataIndex: 'role', id: 'name'}, {header: 'Required', dataIndex: 'count', width: 65}, {header: 'Assigned', dataIndex: 'assigned', width: 65}, {header: 'Present', dataIndex: 'present', width: 60}, 
@@ -99,7 +102,7 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
     var row = grid.getView().getRow(row_index);
     var record = grid.getStore().getAt(row_index);
     
-    if(record.get('source') !== 'manual'){
+    if(!this.can_edit || record.get('source') !== 'manual'){
       return;
     }
     
@@ -151,6 +154,10 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
   
   showRoleContextMenu: function(grid, row_index, evt){
     evt.preventDefault();
+    
+    if(!this.can_edit){
+      return;
+    }
     
     var loc = evt.getXY();
     var row = grid.getView().getRow(row_index);
@@ -217,6 +224,10 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
   
   showInventoryContextMenu: function(grid, row_index, evt){
     evt.preventDefault();
+    
+    if(!this.can_edit){
+      return;
+    }
     
     var loc = evt.getXY();
     var row = grid.getView().getRow(row_index);
