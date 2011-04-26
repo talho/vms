@@ -30,8 +30,8 @@ Then /^I should see staff information for "([^\"]*)"$/ do |staff_or_team_name|
       Then %{I should see "Bartleby Scrivener" in grid row 2 within ".site_info_window .staff_grid"}
     when "Atticus & Bart"
       Then %{I should see "Staff - 0/2" within ".site_info_window .staff_grid"}
-      Then %{I should see "Atticus Finch" in grid row 2 within ".site_info_window .staff_grid"}
-      Then %{I should see "Bartleby Scrivener" in grid row 1 within ".site_info_window .staff_grid"}
+      Then %{I should see "Atticus Finch" in grid row 1 within ".site_info_window .staff_grid"}
+      Then %{I should see "Bartleby Scrivener" in grid row 2 within ".site_info_window .staff_grid"}
   end
 end
 

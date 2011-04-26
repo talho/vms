@@ -22,7 +22,7 @@ Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
         {text: 'Save', handler: this.save, scope: this, mode: 'list'},
         {text: 'Save and Open Scenario', handler: this.save, scope: this},
         {text: 'Cancel', handler: function(){
-          Application.fireEvent('openwindow', {id: 'vms_open_scenario', title:'Open Scenario', initializer: 'Talho.VMS.OpenScenario'});
+          Application.fireEvent('openwindow', {id: 'vms_open_scenario', title:'Manage Scenarios', initializer: 'Talho.VMS.ManageScenarios'});
           this.close();
         }, scope: this}
       ];
@@ -117,7 +117,7 @@ Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
       success: function(form, action){
         this.hideMask();
         if(b.mode == 'list'){
-          Application.fireEvent('openwindow', {id: 'vms_open_scenario', title:'Open Scenario', initializer: 'Talho.VMS.OpenScenario'});
+          Application.fireEvent('openwindow', {id: 'vms_open_scenario', title:'Manage Scenarios', initializer: 'Talho.VMS.ManageScenarios'});
         }
         else{
           var scenario = action.result.scenario;

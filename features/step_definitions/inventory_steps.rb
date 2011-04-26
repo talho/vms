@@ -45,7 +45,7 @@ Given /^the following inventories exist:$/ do |table|
   table.hashes.each do |hash|
     scenario_site = hash[:site].blank? ? nil : Vms::Scenario.find_by_name(hash[:scenario]).site_instances.for_site(Vms::Site.find_by_name(hash[:site]))
     Factory.create(:inventory, {:name => hash[:name], :pod => hash[:type] == "pod", :template => hash[:template] == "true",
-        :source => Factory.build(:inventory_source, {:name => hash[:source]}),
+        :source => Vms::Inventory::Source.find_or_create_by_name(hash[:source]),
         :scenario_site => scenario_site
     })
   end

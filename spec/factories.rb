@@ -3,7 +3,6 @@ require 'factory_girl'
 Factory.sequence(:scenario_name) {|jn| "Scenario #{jn}"}
 Factory.define :scenario, :class => Vms::Scenario do |m|
   m.name {Factory.next(:scenario_name)}
-  m.association :creator, :factory => :user
   m.state Vms::Scenario::STATES[:unexecuted]
 end
 

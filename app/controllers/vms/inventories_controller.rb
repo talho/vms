@@ -23,7 +23,7 @@ class Vms::InventoriesController < ApplicationController
   
   def show
     begin
-      inventory = @scenario.inventories.find(params[:id], :include => {:item_instances => {:item => :item_category}, :source => {} } )
+      inventory = Vms::Inventory.find(params[:id], :include => {:item_instances => {:item => :item_category}, :source => {} } )
       @inventory_json = inventory.as_json(:include => {:source => {:only => [:name] }}).merge(:items => inventory.item_instances.as_json)
     rescue
       @inventory_json = {}
