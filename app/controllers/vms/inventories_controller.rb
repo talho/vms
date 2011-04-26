@@ -3,7 +3,8 @@ class Vms::InventoriesController < ApplicationController
   include Vms::PopulateScenario
   
   before_filter :non_public_role_required, :change_include_root
-  before_filter :initialize_scenario, :except => [:sources, :items, :categories]
+  before_filter :initialize_scenario, :only => [:index, :show]
+  before_filter :initialize_protected_scenario, :only => [:create, :edit, :update, :destroy]
   after_filter :change_include_root_back
   
   def index
@@ -22,7 +23,7 @@ class Vms::InventoriesController < ApplicationController
   
   def show
     begin
-      inventory = Vms::Inventory.find(params[:id], :include => {:item_instances => {:item => :item_category}, :source => {} } )
+      inventory = @scenario.inventories.find(params[:id], :include => {:item_instances => {:item => :item_category}, :source => {} } )
       @inventory_json = inventory.as_json(:include => {:source => {:only => [:name] }}).merge(:items => inventory.item_instances.as_json)
     rescue
       @inventory_json = {}
@@ -177,16 +178,4 @@ class Vms::InventoriesController < ApplicationController
       format.json { render :json => Vms::Inventory::ItemCategory.find(:all, :conditions => "name LIKE '%#{params[:name]}%'") }
     end
   end
-  
-  # private
-  # def initialize_scenario
-  #   begin
-  #     @scenario = Vms::Scenario.find(params[:vms_scenario_id])
-  #   rescue Exception => e
-  #     respond_to do |format|
-  #       format.json {render :json => {:exception => e.message, :backtrace => e.backtrace, :error => "Could not find the requested scenario.", :success => false}, :status => 404}
-  #     end
-  #     false
-  #   end
-  # end
 end

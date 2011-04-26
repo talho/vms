@@ -1,7 +1,8 @@
 class Vms::SitesController < ApplicationController
   include Vms::PopulateScenario
   
-  before_filter :initialize_scenario, :except => [:new, :edit]
+  before_filter :initialize_scenario, :only => [:index, :show, :existing]
+  before_filter :initialize_protected_scenario, :only => [:create, :edit, :update, :destroy]
   before_filter :non_public_role_required, :change_include_root
   after_filter :change_include_root_back
   
