@@ -34,6 +34,9 @@ Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
       ];
     }
     
+    var combo_config = {mode: 'local', triggerAction: 'all', editable: false, store: [[1, 'Reader'], [2, 'Admin']]};
+    if(Application.rails_environment == 'cucumber') combo_config['id'] = 'vms-scenario-permission-level-combo'
+    
     this.items = {xtype: 'tabpanel', itemId: 'tab_panel', activeItem: 0, border: false, items: [
       { title: "Scenario Info", border: false, itemId: 'info_panel', items: [
         {xtype: 'form', border: false, padding: '5', itemId: 'form_panel',
@@ -64,8 +67,8 @@ Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
           fields: ['name', {name: 'permission_level', defaultValue: 1}, 'user_id', 'id']
         }),
         columns: [{header: 'User Name', dataIndex: 'name', editable: false}, 
-          {header: 'Permission Level', id: 'per', dataIndex: 'permission_level', renderer: function(value){switch(value){case 1: return 'Reader'; case 2: return 'Admin'; case 3: return 'Owner'; default: return '';}}, 
-           editor: new Ext.form.ComboBox({mode: 'local', triggerAction: 'all', editable: false, store: [[1, 'Reader'], [2, 'Admin']]})}
+          {header: 'Permission Level', css: 'vms-permission-level', id: 'per', dataIndex: 'permission_level', renderer: function(value){switch(value){case 1: return 'Reader'; case 2: return 'Admin'; case 3: return 'Owner'; default: return '';}}, 
+           editor: new Ext.form.ComboBox(combo_config)}
         ],
         autoExpandColumn: 'per' 
       }

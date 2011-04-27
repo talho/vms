@@ -18,3 +18,17 @@ When /^I open the "([^\"]*)" scenario$/ do |name|
     When %Q{I wait for the "Loading..." mask to go away}
     Then %Q{I should see "New Site (drag to create)"}
 end
+
+Then /^"([^\"]*)" should be an? ([a-zA-Z0-9\-_]*) for scenario "([^\"]*)"$/ do |user_name, role, scenario|
+  user = User.find_by_display_name(user_name)
+  scen = Vms::Scenario.find_by_name(scenario)
+  ur = scen.user_rights.find_by_user_id(user)
+  ur.should_not be_nil
+  ur.permission_level.should == Vms::UserRight::PERMISSIONS[role.to_sym]
+end
+
+Given /^"([^\"]*)" is an? ([a-zA-Z0-9\-_]*) for scenario "([^\"]*)"$/ do |user_name, role_name, scenario_name|
+  user = User.find_by_display_name(user_name)
+  scen = Vms::Scenario.find_by_name(scenario_name)
+  scen.user_rights.create :user => user, :permission_level => Vms::UserRight::PERMISSIONS[role_name.to_sym]
+end
