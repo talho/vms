@@ -30,6 +30,7 @@ Talho.VMS.ux.CreateAndEditStaff = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
     
     if(this.readOnly){
       this.buttons = [{text: 'Close', scope: this, handler: function(){this.close();}}];
+      this.setTitle('View Staff Details');
     }
     
     Talho.VMS.ux.CreateAndEditStaff.superclass.initComponent.apply(this, arguments);

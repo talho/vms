@@ -126,3 +126,11 @@ When /^I right click on the info window item "([^\"]*)"$/ do |item_name|
     siw.showInventoryContextMenu(siw.itemsGrid, i, evt);
   ")
 end
+
+When /^I close the open site info window$/ do
+  page.execute_script("
+    var command_center = Ext.getCmp(Ext.getBody().first().id).findComponent('vms_command_center');
+    var siw = command_center.current_site_info_window;
+    siw.close();
+  ")
+end
