@@ -23,4 +23,11 @@ class Vms::ScenarioSite < ActiveRecord::Base
       {:qualifications => qualification_list.map(&:titleize).join(', ')})
     json   
   end
+  
+  def complete_qualification_list
+    tags = []
+    tags << qualification_list.map { |q| {:name => q, :site_id => site_id, :site => site.name} }
+    tags << role_scenario_sites.map { |r| r.qualification_list.map { |q| {:name => q, :role => r.role.name, :role_id => r.role_id, :site_id => site_id, :site => site.name} } }
+    tags
+  end
 end

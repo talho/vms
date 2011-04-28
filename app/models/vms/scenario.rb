@@ -27,6 +27,7 @@ class Vms::Scenario < ActiveRecord::Base
   has_many :inventories, :through => :site_instances
   has_many :staff, :through => :site_instances
   has_many :teams, :through => :site_instances
+  has_many :role_scenario_sites, :through => :site_instances
   
   accepts_nested_attributes_for :user_rights, :allow_destroy => true, :reject_if => proc {|ur| ur[:permission_level]  == Vms::UserRight::PERMISSIONS[:owner]}
   

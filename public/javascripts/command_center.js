@@ -409,12 +409,12 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       this.staffGrid.getView().dragZone.lock();
     }
     
-    this.siteGrid.getStore().load();
-    this.inventoryGrid.getStore().load();
-    this.rolesGrid.getStore().load();
-    this.qualsGrid.getStore().load();
-    this.teamsGrid.getStore().load();
-    this.staffGrid.getStore().load();
+    this.siteGrid.getStore().loadData({sites: result.site_instances});
+    this.inventoryGrid.getStore().loadData(result.inventories);
+    this.rolesGrid.getStore().loadData(result.roles);
+    this.qualsGrid.getStore().loadData(result.qualifications);
+    this.teamsGrid.getStore().loadData(result.teams);
+    this.staffGrid.getStore().loadData(result.staff);
   },
   
   initMapDropZone: function(){

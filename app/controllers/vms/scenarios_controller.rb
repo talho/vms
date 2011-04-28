@@ -16,9 +16,15 @@ class Vms::ScenariosController < ApplicationController
   end  
   
   def show
-    @scenario = current_user.scenarios.find(params[:id], :include => [:user_rights])
+    @scenario = current_user.scenarios.find(params[:id], :include => {:user_rights => [], :site_instances => [:site], :inventories => [], :staff => [], :teams => [], :role_scenario_sites => []})
     perm_lvl = @scenario.user_rights.find_by_user_id(current_user).permission_level
     @scenario[:can_admin] = perm_lvl == Vms::UserRight::PERMISSIONS[:owner] || perm_lvl == Vms::UserRight::PERMISSIONS[:admin]
+    @scenario[:site_instances] = @scenario.site_instances.as_json
+    @scenario[:inventories] = @scenario.inventories.as_json
+    @scenario[:staff] = @scenario.staff.as_json
+    @scenario[:teams] = @scenario.teams.as_json
+    @scenario[:roles] = @scenario.role_scenario_sites.as_json
+    @scenario[:qualifications] = @scenario.site_instances.map(&:complete_qualification_list).flatten
     respond_to do |format|
       unless @scenario.nil?
         format.json {render :json => @scenario.as_json}
