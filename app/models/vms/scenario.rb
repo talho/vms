@@ -99,27 +99,57 @@ class Vms::Scenario < ActiveRecord::Base
   end
   handle_asynchronously :execute
   
-  def pause(alert = false, custom_alert = nil)
+  def pause(alert = false, custom_alert = nil, custom_audience = nil)
     if alert
-      users = all_staff.map(&:user)
+      users = []
+      if custom_audience
+        custom_audience.each { |a| users << User.find(a.to_i) }
+      else
+        users = all_staff.map(&:user)
+      end
+      
+      users.each {|u| p u.display_name}
       # Alert users for the scenario that the execution has been paused.
     end
   end
   handle_asynchronously :pause
   
-  def resume(alert = false, custom_alert = nil)
+  def resume(alert = false, custom_alert = nil, custom_audience = nil)
     if alert
+      users = []
+      if custom_audience
+        custom_audience.each { |a| users << User.find(a.to_i)}
+      else
+        users = all_staff.map(&:user)
+      end
+      
+      users.each {|u| p u.display_name}
       # Alert users for the scenario that the execution has been resumed.
     end
   end
   handle_asynchronously :resume
   
-  def stop(custom_alert = nil)
+  def stop(custom_alert = nil, custom_audience = nil)
+    users = []
+    if custom_audience
+      custom_audience.each { |a| users << User.find(a.to_i) }
+    else
+      users = all_staff.map(&:user)
+    end
+    
+    users.each {|u| p u.display_name}
     # Alert users that the scenario execution is complete and they can go home
   end
   handle_asynchronously :stop
   
-  def alert(audience, custom_alert = nil)
+  def alert(custom_alert = nil, custom_audience = nil)
+    users = []
+    if custom_audience
+      custom_audience.each { |a| users << User.find(a.to_i) }
+    else
+      users = all_staff.map(&:user)
+    end
+    users.each {|u| p u.display_name}
     # Send a custom alert to all volunteers or a subset thereof for a certain scenario.
   end
   handle_asynchronously :alert

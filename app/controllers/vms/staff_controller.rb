@@ -8,6 +8,11 @@ class Vms::StaffController < ApplicationController
   
   def index
     @staff = @scenario.all_staff
+    @staff.each do |s|
+      u = s.user
+      s[:user_detail] = {:caption => "#{u.name} #{u.email}", :name => u.name, :email => u.email, :id => u.id, :title => u.title,
+                                      :tip => render_to_string(:partial => 'searches/extra.json', :locals => {:user => u})}
+    end if params[:with_detail]
     respond_to do |format|
       format.json {render :json => @staff.as_json }
     end

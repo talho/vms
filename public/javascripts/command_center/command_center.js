@@ -592,11 +592,12 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     if(this.scenario_state === 'paused'){
       var win = new Talho.VMS.ux.ScenarioStatusChange({
         action: 'resume',
+        scenarioId: this.scenarioId,
         scope: this,
-        handler: function(btn, msg){
+        handler: function(btn, msg, custom_aud){
           var params = {};
           if(btn === 'yes'){
-            params = {send_msg: true, custom_msg: msg};
+            params = {send_msg: true, custom_msg: msg, 'custom_aud[]': custom_aud};
           }
           this.changeScenarioState('execute', params, function(){
             this.scenario_state = 'executing';
@@ -609,6 +610,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     else{
       var win = new Talho.VMS.ux.ScenarioStatusChange({
         action: 'execute',
+        scenarioId: this.scenarioId,
         scope: this,
         handler: function(btn){
           if(btn === 'yes'){
@@ -626,11 +628,12 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   pauseExecution: function(){
     var win = new Talho.VMS.ux.ScenarioStatusChange({
       action: 'pause', 
+      scenarioId: this.scenarioId,
       scope: this,
-      handler: function(btn, msg){
+      handler: function(btn, msg, custom_aud){
         var params = {};
         if(btn === 'yes'){
-          params = {send_msg: true, custom_msg: msg};
+          params = {send_msg: true, custom_msg: msg, 'custom_aud[]': custom_aud};
         }
         this.changeScenarioState('pause', params, function(){
           this.scenario_state = 'paused';
@@ -644,10 +647,11 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   endExecution: function(){
     var win = new Talho.VMS.ux.ScenarioStatusChange({
       action: 'stop',
+      scenarioId: this.scenarioId,
       scope: this,
-      handler: function(btn, msg){
+      handler: function(btn, msg, custom_aud){
         if(btn === 'yes'){
-          this.changeScenarioState('stop', {custom_msg: msg}, function(){
+          this.changeScenarioState('stop', {custom_msg: msg, 'custom_aud[]': custom_aud}, function(){
             this.scenario_state = 'ended';
             this.updateStateButtons();
           });

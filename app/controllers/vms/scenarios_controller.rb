@@ -108,7 +108,8 @@ class Vms::ScenariosController < ApplicationController
     
     if current_state == Vms::Scenario::STATES[:paused]
       custom_msg = params[:custom_msg].blank? ? nil : params[:custom_msg]
-      @scenario.resume(params[:send_msg], custom_msg)
+      aud = (params[:custom_aud] && !params[:custom_aud].nil?) ? params[:custom_aud] : nil
+      @scenario.resume(params[:send_msg], custom_msg, aud)
     else
       @scenario.execute
     end
@@ -129,7 +130,8 @@ class Vms::ScenariosController < ApplicationController
     @scenario.update_attributes :state => Vms::Scenario::STATES[:paused]
     
     custom_msg = params[:custom_msg].blank? ? nil : params[:custom_msg]
-    @scenario.pause(params[:send_msg], custom_msg)
+    aud = (params[:custom_aud] && !params[:custom_aud].nil?) ? params[:custom_aud] : nil 
+    @scenario.pause(params[:send_msg], custom_msg, aud)
     
     respond_to do |format|
       format.json {render :json => {:success => true} }
@@ -148,7 +150,8 @@ class Vms::ScenariosController < ApplicationController
     @scenario.update_attributes :state => Vms::Scenario::STATES[:complete]
     
     custom_msg = params[:custom_msg].blank? ? nil : params[:custom_msg]
-    @scenario.stop(custom_msg)
+    aud = (params[:custom_aud] && !params[:custom_aud].nil?) ? params[:custom_aud] : nil
+    @scenario.stop(aud, custom_msg)
     
     respond_to do |format|
       format.json {render :json => {:success => true} }

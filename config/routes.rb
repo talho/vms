@@ -11,10 +11,10 @@ ActionController::Routing::Routes.draw do |map|
       sites.qualifications_destroy 'qualifications.:format', :controller => 'vms/qualifications', :action => 'destroy', :conditions => { :method => :delete }
     end
     scenarios.resources :vms_inventories, :controller => 'vms/inventories', :as => 'inventories', :collection => [:templates]
-    scenarios.roles 'roles', :controller => 'vms/roles', :action => 'index'
-    scenarios.staff 'staff', :controller => 'vms/staff', :action => 'index'
-    scenarios.teams 'teams', :controller => 'vms/teams', :action => 'index'
-    scenarios.quals 'qualifications', :controller => 'vms/qualifications', :action => 'index'
+    scenarios.roles 'roles.:format', :controller => 'vms/roles', :action => 'index'
+    scenarios.staff 'staff.:format', :controller => 'vms/staff', :action => 'index'
+    scenarios.teams 'teams.:format', :controller => 'vms/teams', :action => 'index'
+    scenarios.quals 'qualifications.:format', :controller => 'vms/qualifications', :action => 'index'
   end
   
   map.inventory_sources 'vms/inventory_sources.:format', :controller => 'vms/inventories', :action => 'sources'
