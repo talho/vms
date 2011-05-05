@@ -3,7 +3,7 @@ class CreateScenario < ActiveRecord::Migration
     create_table :vms_scenarios do |t|
       t.string :name
       t.integer :creator_id
-      t.integer :state
+      t.integer :state, :default => 2
     end
     
     add_index :vms_scenarios, :creator_id

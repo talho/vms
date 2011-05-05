@@ -169,6 +169,14 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           }
       },
       { xtype: 'container', itemId: 'westRegion', region: 'west', layout: 'accordion', items:[
+        { title: 'Controls', itemId: 'controlPanel', cls: 'controlPanel', layout: 'anchor', defaults: {anchor: '100%'}, items: [
+            {xtype: 'button', itemId: 'executeBtn', text: 'Execute', scope: this, handler: this.beginExecution},
+            {xtype: 'button', itemId: 'pauseBtn', text: 'Pause Execution', hidden: true, scope: this, handler: this.pauseExecution},
+            {xtype: 'button', itemId: 'endBtn', text: 'End Scenario', hidden: true, scope: this, handler: this.endExecution},
+            {xtype: 'button', text: 'Edit Scenario', scope: this, handler: this.editScenario},
+            {xtype: 'button', text: 'Alert Staff', scope: this, handler: this.alertStaff }
+          ]
+        },
         { title: 'Sites', itemId: 'siteGrid', cls: 'siteGrid', xtype: 'vms-toolgrid', tools: tool_cfg, seed_data: {name: 'New Site (drag to create)', status: 'new', type: 'site'},
           store: new tool_store({
             reader: new Ext.data.JsonReader({
@@ -191,10 +199,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         {title: 'PODs/Inventories', xtype: 'vms-toolgrid', cls: 'inventoryGrid', tools: tool_cfg, itemId: 'inventory_grid', seed_data: {name: 'New POD/Inventory (drag to site)', type: 'inventory', status: 'new'},
           store: new Talho.VMS.ux.InventoryController.inventory_list_store({ scenarioId: config.scenarioId, type: 'inventory',
             groupField: 'site_id',
-            listeners: {
-              scope: this,
-              'load': this.applyToSite
-          } }),
+          }),
           columns: [{xtype: 'templatecolumn', id: 'name_column', tpl: this.row_template}, {dataIndex: 'site_id', hidden: true}],
           view: new tool_grouping_view(),
           listeners: {
@@ -221,10 +226,6 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
             }),
             type: 'role',
             url: '/vms/scenarios/' + config.scenarioId + '/roles',
-            listeners:{
-              scope: this,
-              'load': this.applyToSite
-            },
             groupField: 'site_id'
           }),
           view:  new tool_grouping_view()
@@ -257,10 +258,6 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
             }),
             type: 'role',
             url: '/vms/scenarios/' + config.scenarioId + '/qualifications',
-            listeners:{
-              scope: this,
-              'load': this.applyToSite
-            },
             groupField: 'site_id'
           }),
           view:  new tool_grouping_view()
@@ -278,10 +275,6 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
             }),
             type: 'team',
             url: '/vms/scenarios/' + config.scenarioId + '/teams',
-            listeners: {
-              scope: this,
-              'load': this.applyToSite
-            },
             groupField: 'site_id'
           }),
           view: new tool_grouping_view()
@@ -296,14 +289,17 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           store: new Ext.data.GroupingStore({
             reader: new Ext.data.JsonReader({
               idProperty: 'id',
-              fields: [{name: 'name', mapping: 'user'}, {name: 'type', defaultValue: 'manual_user'}, {name: 'status'}, 'id', 'site_id', 'site', 'user_id']
+              fields: [{name: 'name', mapping: 'user'}, {name: 'type', defaultValue: 'manual_user', convert: function(v, r){
+                switch(r.source){
+                  case 'team':
+                  case 'auto': return 'auto_user';
+                  case 'manual':
+                  default: return 'manual_user';
+                }
+              }}, {name: 'status'}, 'source', 'id', 'site_id', 'site', 'user_id']
             }),
             type: 'staff',
             url: '/vms/scenarios/' + config.scenarioId + '/staff',
-            listeners:{
-              scope: this,
-              'load': this.applyToSite
-            },
             groupField: 'site_id'
           }),
           view:  new tool_grouping_view()
@@ -326,6 +322,10 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     this.teamsGrid = this.eastRegion.getComponent('teams_grid');
     this.staffGrid = this.eastRegion.getComponent('staff_grid');
     this.map = this.getComponent('map');
+    this.controlPanel = this.westRegion.getComponent('controlPanel');
+    this.executeBtn = this.controlPanel.getComponent('executeBtn');
+    this.pauseBtn = this.controlPanel.getComponent('pauseBtn');
+    this.endBtn = this.controlPanel.getComponent('endBtn');
     
     this.initControllers();
     
@@ -397,7 +397,24 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     
     var result = Ext.decode(response.responseText);
     
-    this.can_edit = result.can_admin;
+    this.scenarioName = result.name;
+    this.setTitle('Command Center - ' + this.scenarioName);
+    
+    switch(result.state){
+      case 1: this.scenario_state = 'template';
+        break;
+      case 2: this.scenario_state = 'unexecuted';
+        break;
+      case 3: this.scenario_state = 'executing';
+        break;
+      case 4: this.scenario_state = 'paused';
+        break;
+      case 5: this.scenario_state = 'ended';
+        break;
+    }
+    this.updateStateButtons();
+    
+    this.can_edit = result.can_admin && this.scenario_state !== 'ended';
     // If the user cannot edit the scenario, lock the map and all of the toolset grids from allowing drag/drop
     if(!this.can_edit){
       this.map.dropZone.lock();
@@ -407,6 +424,8 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       this.qualsGrid.getView().dragZone.lock();
       this.teamsGrid.getView().dragZone.lock();
       this.staffGrid.getView().dragZone.lock();
+      this.controlPanel.hide();
+      this.westRegion.getLayout().setActiveItem(1);
     }
     
     this.siteGrid.getStore().loadData({sites: result.site_instances});
@@ -414,7 +433,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     this.rolesGrid.getStore().loadData(result.roles);
     this.qualsGrid.getStore().loadData(result.qualifications);
     this.teamsGrid.getStore().loadData(result.teams);
-    this.staffGrid.getStore().loadData(result.staff);
+    this.staffGrid.getStore().loadData(result.all_staff);
   },
   
   initMapDropZone: function(){
@@ -511,66 +530,21 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   },
   
   addItemToSite: function(site, record){
-    var init_record = function(rec){
-      rec.set('status', 'active');
-      
-      if(!site.get(rec.get('type')))
-        site.set(rec.get('type'), []); // initialize an empty array for the type that we just dragged onto this site
-      var arr = site.get(rec.get('type'));
-      
-      if(arr.indexOf(rec) == -1){ // only add if the item does not exist in that site already
-        arr.push(rec);
-      }
-    };
-    
-    var prep_record = function(rec){
-      if(record.get('status') != 'inactive'){
-        var rec = record.copy();
-        rec.id = Ext.data.Record.id(rec);
-        this.addItemToTypeStore(rec);
-      }
-      return rec;
-    }.createDelegate(this);
-    
     switch(record.get('type')){
       case 'inventory':
       case 'pod': this.addInventoryToSite(record, site);
         break;
-      case 'role': this.addRoleToSite(record, site, prep_record, init_record);
+      case 'role': this.addRoleToSite(record, site);
         break;
-      case 'team': this.addTeamToSite(record, site, prep_record, init_record);
+      case 'team': this.addTeamToSite(record, site);
         break;
-      case 'manual_user': this.addManualUserToSite(record, site, prep_record, init_record);
+      case 'manual_user': this.addManualUserToSite(record, site);
         break;
-      case 'auto_user': this.addAutoUserToSite(record, site, prep_record, init_record);
+      case 'auto_user': this.addAutoUserToSite(record, site);
         break;
       case 'qual': this.addQualificationToSite(record, site);
         break;
-      default: record = prep_record(record);
-        if(record.status != 'inactive') 
-          record.set('name', record.get('status') == 'new' ? ('New ' + Ext.util.Format.capitalize(record.get('type')) ) : ('Copy of ' + record.get('name') ) );        
-        init_record(record);
-        record.site = site;
     }    
-  },
-  
-  addItemToTypeStore: function(record){
-    switch(record.get('type')){
-      case 'inventory':
-      case 'pod':
-        this.inventoryGrid.getStore().add(record);
-        break;
-      case 'team':
-        this.teamsGrid.getStore().add(record);
-        break;
-      case 'role':
-        this.rolesGrid.getStore().add(record);
-        break;
-      case 'manual_user':
-      case 'auto_user':
-        this.staffGrid.getStore().add(record);
-        break;
-    }
   },
   
   showSiteMarkerInfo: function(marker){  
@@ -603,406 +577,6 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         }
       }
     }, this)
-    
-    this.applyToSite(this.inventoryGrid.getStore(), this.inventoryGrid.getStore().getRange(), {});
-  },
-  
-  showSiteContextMenu: function(grid, row_index, evt){
-    evt.preventDefault();
-
-    var row = grid.getView().getRow(row_index),
-        record = grid.getStore().getAt(row_index),
-        menuConfig = [];
-    
-    if(record.get('status') === 'new'){
-      return;
-    }
-    
-    if(this.can_edit){
-      menuConfig = [
-        {text: 'Edit', scope: this, handler: function(){
-          var site_controller = new Talho.VMS.ux.SiteController({scenarioId: this.scenarioId, map: this.map, store: this.siteGrid.getStore()});
-          var win = new Talho.VMS.ux.CreateAndEditSite({
-            record: record,
-            scenarioId: this.scenarioId,
-            mode: 'edit',
-            map: this.map,
-            listeners:{
-              'save': site_controller.edit.createDelegate(site_controller, [this.findMarker(record)], true)
-            }      
-          });
-          
-          win.show();
-        }},
-        {text: 'Remove', scope: this, handler: function(){
-          var site_controller = new Talho.VMS.ux.SiteController({scenarioId: this.scenarioId, map: this.map, store: this.siteGrid.getStore()});
-          site_controller.destroy(record, this.findMarker(record));
-        }}
-      ];
-      
-      if(record.get('status') === 'active'){
-        menuConfig.push({text: 'Deactivate', scope: this, handler: function(){
-          var site_controller = new Talho.VMS.ux.SiteController({scenarioId: this.scenarioId, map: this.map});
-          site_controller.deactivate(record, this.findMarker(record), grid);
-        }});
-      }
-    }
-    
-    menuConfig.push({
-      text: 'Show Site Information', scope: this, handler: function(){
-        var marker = this.findMarker(record);
-        this.showSiteMarkerInfo(marker);
-      }
-    })
-    
-    var menu = new Ext.menu.Menu({
-      floating: true, defaultAlign: 'tr-br?',
-      items: menuConfig
-    });
-    
-    menu.show(row);
-  },
-  
-  showInventoryContextMenu: function(grid, row_index, evt){
-    evt.preventDefault();
-    
-    var row = grid.getView().getRow(row_index),
-        record = grid.getStore().getAt(row_index),
-        menuConfig = [];
-    
-    if(record.get('status') === 'new'){
-      return;
-    }
-    
-    if(this.can_edit){
-      menuConfig = [
-        {text: 'Edit', scope: this, handler: function(){
-          var win = new Talho.VMS.ux.InventoryWindow({
-            scenarioId: this.scenarioId,
-            record: record,
-            mode: 'edit',
-            listeners: {
-              scope: this,
-              'save': function(win, values){
-                win.showMask();
-                this.inventory_controller.edit(win, values, record, this.scenarioId);
-              }
-            }
-          });
-          
-          win.show();
-        }},
-        {text: 'Delete', scope: this, handler: function(){
-          Ext.Msg.confirm('Confirm Deletion', 'Are you sure you wish to delete the ' + record.get('name') + ' POD/Inventory? This action cannot be undone.', function(btn){
-            if(btn === 'yes'){
-              grid.loadMask.show();
-              this.inventory_controller.destroy(record, this.scenarioId);
-            }
-          }, this)
-        }}
-      ];
-      // later add in the ability to have inactive inventories already assigned to sites
-    }
-    else{
-      menuConfig = { text: 'View Details', scope: this, handler: function(){
-        var win = new Talho.VMS.ux.InventoryWindow({
-            scenarioId: this.scenarioId,
-            record: record,
-            can_edit: false,
-            mode: 'show'
-          });
-          
-          win.show();
-      }}
-    }
-    
-    var menu = new Ext.menu.Menu({
-      floating: true, defaultAlign: 'tr-br?',
-      items: menuConfig
-    });
-    
-    menu.show(row);
-  },
-  
-  showRolesContextMenu: function(grid, row_index, evt){
-    evt.preventDefault();
-    
-    var row = grid.getView().getRow(row_index),
-        record = grid.getStore().getAt(row_index),
-        menuConfig = [];
-        
-    if(record.get('status') === 'new'){
-      return;
-    }
-    this.role_controller.siteId = record.get('site_id');
-  
-    var save_fn = function(win, u, r){
-      win.showMask();
-      this.role_controller.save(win, u, r);
-    };
-    
-    var show_win_fn = function(removedRecord){
-      var win = new Talho.VMS.ux.CreateAndEditRoles({
-        removedRecord: removedRecord,
-        scenarioId: this.scenarioId,
-        readOnly: !this.can_edit,
-        siteId: record.get('site_id'),
-        listeners: {
-          scope: this,
-          'save': save_fn
-        }
-      });
-      win.show();
-    }
-    
-    if(this.can_edit){
-      menuConfig = [{
-        text: 'Edit', handler: show_win_fn.createDelegate(this, [null])
-      }, {
-        text: 'Remove', handler: show_win_fn.createDelegate(this, [record])
-      }];
-    }
-    else
-    {
-      menuConfig = [{text: 'Show Details', handler: show_win_fn.createDelegate(this, [null])}]
-    }
-    
-    var menu = new Ext.menu.Menu({
-      floating: true, defaultAlign: 'tr-br?',
-      items: menuConfig
-    });
-    menu.show(row);    
-  },
-  
-  showRolesGroupContextMenu: function(grid, field, value, evt){
-    evt.preventDefault(); 
-    
-    if(!this.can_edit){
-      return;
-    }
-    
-    var elem = evt.getTarget();
-    this.role_controller.siteId = value;
-    
-    var menu = new Ext.menu.Menu({
-      floating: true, defaultAlign: 'tr-br?',
-      items:[{
-        text: 'Edit', scope: this, handler: function(){
-          var win = new Talho.VMS.ux.CreateAndEditRoles({
-            scenarioId: this.scenarioId,
-            siteId: value,
-            listeners: {
-              scope: this,
-              'save': function(win, u, r){
-                win.showMask();
-                this.role_controller.save(win, u, r);
-              }
-            }
-          });
-          win.show();
-        }
-      }]
-    });
-    
-    menu.show(elem);
-  },
-  
-  showQualsContextMenu: function(grid, row_index, evt){
-    evt.preventDefault();
-        
-    var row = grid.getView().getRow(row_index),
-        record = grid.getStore().getAt(row_index),
-        menuConfig = [];
-    
-    if(!this.can_edit || record.get('status') === 'new'){
-      return;
-    }
-    
-    var qual_controller = new Talho.VMS.ux.QualificationController({scenarioId: this.scenarioId, siteId: record.get('site_id'), grid: grid});
-    var menu = new Ext.menu.Menu({
-      floating: true, defaultAlign: 'tr-br?',
-      items:[{
-        text: 'Edit', scope: this, handler: function(){
-          var win = new Talho.VMS.ux.CreateAndEditQualification({
-            creatingRecord: record,
-            scenarioId: this.scenarioId,
-            siteId: record.get('site_id'),
-            listeners: {
-              scope: qual_controller,
-              'save': qual_controller.edit
-            }
-          });
-          win.show();
-        }
-      },{
-        text: 'Remove', handler: function(){
-          Ext.Msg.confirm("Confirm Removal", "Are you sure you would like to remove this qualification requirement from the role/site?", function(btn){
-            if(btn === 'yes'){
-              qual_controller.remove(record);
-            }
-          });
-        }
-      }]
-    });
-    
-    menu.show(row);
-  },
-  
-  showTeamContextMenu: function(grid, row_index, evt){
-    evt.preventDefault();
-    
-    var row = grid.getView().getRow(row_index),
-        record = grid.getStore().getAt(row_index),
-        menuConfig = [];
-    
-    if(record.get('status') == 'new')
-      return;
-    
-    if(this.can_edit){  
-      var team_controller = new Talho.VMS.ux.TeamController({scenarioId: this.scenarioId, siteId: record.get('site_id'), grid: grid});
-      
-      menuConfig = [{
-        text: 'Edit', scope: this, handler: function(){
-          var win = new Talho.VMS.ux.CreateAndEditTeam({
-            mode: 'edit',
-            scenarioId: this.scenarioId,
-            siteId: record.get('site_id'),
-            creatingRecord: record,
-            listeners: {
-              scope: team_controller,
-              'save': team_controller.edit
-            }
-          });
-          
-          win.show();
-        }
-      },{
-        text: 'Remove', scope: this, handler: function(){
-          Ext.Msg.confirm("Remove Team", "Are you sure you want to remove this team from the site? This action cannot be undone", function(btn){
-            if(btn == 'yes'){
-              team_controller.remove(record.id);
-            }
-          });
-        }
-      }];
-    }
-    else{
-      menuConfig = [{text: 'Show Team Details', scope: this, handler: function(){
-          var win = new Talho.VMS.ux.CreateAndEditTeam({
-            mode: 'show',
-            scenarioId: this.scenarioId,
-            siteId: record.get('site_id'),
-            creatingRecord: record
-          });
-          
-          win.show();
-        }
-      }]
-    }
-    
-    var menu = new Ext.menu.Menu({
-      floating: true, defaultAlighn: 'tr-br?',
-      items: menuConfig
-    });
-      
-    menu.show(row);
-  },
-  
-  showStaffContextMenu: function(grid, row_index, evt){
-    evt.preventDefault();
-    
-    var row = grid.getView().getRow(row_index),
-        record = grid.getStore().getAt(row_index),
-        menuConfig = [];
-    
-    if(record.get('status') == 'new')
-      return;
-    
-    if(this.can_edit){
-      this.staff_controller.siteId = record.get('site_id');
-      menuConfig = [{
-        text: 'Edit', scope: this, handler: function(){
-            var win = new Talho.VMS.ux.CreateAndEditStaff({
-              scenarioId: this.scenarioId,
-              scenario_staff_store: this.staffGrid.getStore(),
-              siteId: record.get('site_id'),
-              listeners: {
-                scope: this,
-                'save': function(win, add, del){
-                  win.showMask();
-                  this.staff_controller.save(win, add, del);
-                }
-              }
-            });
-            win.show();
-          }
-        },
-        {
-          text: 'Remove', scope: this, handler: function(){
-            Ext.Msg.confirm("Remove User", "Are you sure you wish to unassign this user from this site?", function(btn){
-              if(btn === "yes"){
-                this.staffGrid.loadMask.show();
-                this.staff_controller.remove(record);
-              }
-            }, this);
-          }
-        }
-      ];
-    }
-    else{
-      menuConfig = [{
-        text: 'Staff Details', scope: this, handler: function(){
-            var win = new Talho.VMS.ux.CreateAndEditStaff({
-              scenarioId: this.scenarioId,
-              scenario_staff_store: this.staffGrid.getStore(),
-              siteId: record.get('site_id'),
-              readOnly: true
-            });
-            win.show();
-          }
-        }
-      ]
-    }
-    
-    var menu = new Ext.menu.Menu({
-      floating: true, defaultAlign: 'tr-br?',
-      items: menuConfig 
-    });
-    
-    menu.show(row);
-  },
-  
-  showStaffGroupContextMenu: function(grid, field, value, evt){
-    evt.preventDefault();
-    var elem = evt.getTarget();
-    
-    if(!this.can_edit){
-      return;
-    }
-    
-    this.staff_controller.siteId = value;
-    var menu = new Ext.menu.Menu({
-      floating: true, defaultAlign: 'tr-br?',
-      items:[{
-        text: 'Edit', scope: this, handler: function(){
-          var win = new Talho.VMS.ux.CreateAndEditStaff({
-            scenarioId: this.scenarioId,
-            scenario_staff_store: this.staffGrid.getStore(),
-            siteId: value,
-            listeners: {
-              scope: this,
-              'save': function(win, add, del){
-                win.showMask();
-                this.staff_controller.save(win, add, del);
-              }
-            }
-          });          
-          win.show();
-        }
-      }]
-    });
-    
-    menu.show(elem);
   },
   
   findMarker: function(record){
@@ -1014,205 +588,119 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     return marker;
   },
   
-  /**
-   * Applies the records in the record array to the sites already loaded in the site grid
-   * @param {Ext.data.Store}  store   The source store of the records. Checks for a property, "type" on the store to determine if it should clear the current sites
-   * @param {Array}           records The records that were loaded into the store
-   * @param {Object}          opts    The options for the load command. What we're looking for here is the 'keepExisting' option, which will let us determine if we really want to clear off the records
-   */
-  applyToSite: function(store, records, opts){
-    if(!opts.keepExisting && store.type) this.clearOldAppliedRecords(store.type);
-    Ext.each(records, function(record){      
-      var site = this.siteGrid.getStore().getById(record.get('site_id'));
-      if(site){
-        var type = record.get('type');
-        type = type === 'pod' ? 'inventory' : type; // show inventory and pod as the same thing
-        
-        if(!site.get(type))
-          site.set(type, []); // initialize an empty array for the type that we just dragged onto this site
-        var arr = site.get(type);
-        
-        var mc = new Ext.util.MixedCollection();
-        mc.addAll(arr);
-        if(arr.indexOf(record) == -1){ // only add if the item does not exist in that site already
-          var rec = mc.find(function(i){return i.id === record.id;});
-          if(rec){
-            arr.remove(rec);
-          }
-          arr.push(record);
-        }
-        record.site = site;
-      }
-    }, this);
-  },
-  
-  /**
-   * Clears records that were applied to the array of the given type. This is used to reapply the records to the sites after that record's grid has been reloaded
-   * @param   {String}  type  The type of record that we want to clear from the site
-   * @return                  NOTHING
-   */
-  clearOldAppliedRecords: function(type){
-    var siteStore = this.siteGrid.getStore();
-    siteStore.each(function(site){
-      var typeArr = site.get(type);
-      while(typeArr && typeArr.length > 0){
-        var tObj = typeArr.pop();
-        delete tObj.site;
-      }
-    }, this);
-  },
-  
-  addInventoryToSite: function(record, site){
-    var inv_win_fn = function(){        
-      var win = new Talho.VMS.ux.InventoryWindow({
-        scenarioId: this.scenarioId,
-        record: record,
-        listeners: {
-          scope: this,
-          'save': function(win, values){
-            win.showMask();
-            this.inventory_controller.create(win, values, record, this.scenarioId, site);
-           } 
-        }
-      });
-      win.show();
-    }.createDelegate(this);
-    
-    if(record.get('status') === 'new'){
-      inv_win_fn();
-    }
-    else{
-      Ext.Msg.show({
-        title: 'Move or Copy POD/Inventory',
-        msg: 'Would you like to move this POD/Inventory or copy it to the location?',
-        buttons: {yes: 'Move', no: 'Copy'},
+  beginExecution: function(){
+    if(this.scenario_state === 'paused'){
+      var win = new Talho.VMS.ux.ScenarioStatusChange({
+        action: 'resume',
         scope: this,
-        fn: function(btn){
+        handler: function(btn, msg){
+          var params = {};
           if(btn === 'yes'){
-            this.inventoryGrid.loadMask.show();
-            this.inventory_controller.move(record, this.scenarioId, site);
+            params = {send_msg: true, custom_msg: msg};
           }
-          else if(btn === 'no'){
-            inv_win_fn();
-          }
-        }        
-      });
-    }
-  },
-  
-  addRoleToSite: function(record, site, prep_record, init_record){ 
-    this.role_controller.siteId = site.id; 
-    var win = new Talho.VMS.ux.CreateAndEditRoles({
-      creatingRecord: record,
-      scenarioId: this.scenarioId,
-      siteId: site.id,
-      listeners: {
-        scope: this,
-        'save': function(win, u, r){
-          win.showMask();
-          this.role_controller.save(win, u, r);
-        }
-      }
-    });
-    win.show();
-  },
-  
-  copyRolesToSite: function(source_site_id, destination_record){
-    // Go get the roles for the source site
-    // launch the create and edit role window with those roles pre-set (or added)
-    this.role_controller.siteId = destination_record.id;
-    var role_store = this.rolesGrid.getStore();
-    var roles = role_store.query('site_id', new RegExp('^' + source_site_id + '$'));
-    var win = new Talho.VMS.ux.CreateAndEditRoles({
-      seededRolesCollection: roles,
-      scenarioId: this.scenarioId,
-      siteId: destination_record.id,
-      listeners: {
-        scope: this,
-        'save': function(win, u, r){
-          win.showMask();
-          this.role_controller.save(win, u, r);
-        }
-      }
-    });
-    win.show();
-  },
-  
-  /*
-   * Add team to the site. Determine if the dragged record is the 'new' record or an existing one. If it's new, show the window. If it's existing,
-   * confirm reassignment of team.
-   * @param {Ext.data.Record} record  The record that was dragged to the site
-   * @param {Ext.data.Record} site    The site that was dragged onto
-   */
-  addTeamToSite: function(record, site, prep_record, init_record){
-    var controller = new Talho.VMS.ux.TeamController({scenarioId: this.scenarioId, siteId: site.id, grid: this.teamsGrid});
-    if(record.get('status') === 'new'){
-      var win = new Talho.VMS.ux.CreateAndEditTeam({
-        record: record,
-        listeners: {
-          scope: controller,
-          'save': controller.save
-        }
-      });
-      win.show();
-    }
-    else if(record.get('site_id') !== site.id){
-      Ext.Msg.confirm("Move Team", "Performing this action will reassign the " + record.get('name') + " team to the " + site.get('name') + " site.", function(btn){
-        if(btn === 'yes'){
-          controller.move(record, site);
-        }
-      }, this);
-    }
-  },
-  
-  addManualUserToSite: function(record, site, prep_record, init_record){
-    this.staff_controller.siteId = site.id;
-    if(record.get('status') === 'new'){
-      var win = new Talho.VMS.ux.CreateAndEditStaff({
-        creatingRecord: record,
-        scenarioId: this.scenarioId,
-        scenario_staff_store: this.staffGrid.getStore(),
-        siteId: site.id,
-        listeners:{
-          scope: this,
-          'save': function(win, add, del){
-            win.showMask();
-            this.staff_controller.save(win, add, del);
-          }
-        }
+          this.changeScenarioState('execute', params, function(){
+            this.scenario_state = 'executing';
+            this.updateStateButtons();
+          });
+        }  
       });
       win.show();
     }
     else{
-      this.staffGrid.loadMask.show();
-      this.staff_controller.move(record);
+      var win = new Talho.VMS.ux.ScenarioStatusChange({
+        action: 'execute',
+        scope: this,
+        handler: function(btn){
+          if(btn === 'yes'){
+            this.changeScenarioState('execute', {}, function(){
+              this.scenario_state = 'executing';
+              this.updateStateButtons();
+            });
+          }
+        }
+      });
+      win.show();
     }
   },
   
-  addAutoUserToSite: function(record, site, prep_record, init_record){
-    if(record.get('status') === 'active' && record.site)
-      record.site.get('auto_user').remove(record);// remove the user from his current site
-    init_record(record);
-    record.site = site;
-  },
-  
-  addQualificationToSite: function(record, site){
-    var controller = new Talho.VMS.ux.QualificationController({scenarioId: this.scenarioId, siteId: site.id, grid: this.qualsGrid});
-    var save_fn = controller.create;
-    if(site.id === record.get('site_id')) save_fn = controller.edit;
-    
-    var win = new Talho.VMS.ux.CreateAndEditQualification({
-      creatingRecord: record,
-      scenarioId: this.scenarioId,
-      siteId: site.id,
-      grid: this.qualsGrid,
-      listeners: {
-        scope: controller,
-        'save': save_fn
+  pauseExecution: function(){
+    var win = new Talho.VMS.ux.ScenarioStatusChange({
+      action: 'pause', 
+      scope: this,
+      handler: function(btn, msg){
+        var params = {};
+        if(btn === 'yes'){
+          params = {send_msg: true, custom_msg: msg};
+        }
+        this.changeScenarioState('pause', params, function(){
+          this.scenario_state = 'paused';
+          this.updateStateButtons();
+        });
       }
     });
     win.show();
+  },
+  
+  endExecution: function(){
+    var win = new Talho.VMS.ux.ScenarioStatusChange({
+      action: 'stop',
+      scope: this,
+      handler: function(btn, msg){
+        if(btn === 'yes'){
+          this.changeScenarioState('stop', {custom_msg: msg}, function(){
+            this.scenario_state = 'ended';
+            this.updateStateButtons();
+          });
+        }
+      }
+    });
+    win.show();
+  },
+  
+  changeScenarioState: function (to_state, additional_params, success, failure){
+    failure = failure || function(resp){
+      var result = Ext.decode(resp.responseText),
+          msg = '';
+      msg = "Could not change the state of the current scenario" + (Ext.isEmpty(result['msg']) ? '.' : (":<br/>" + result['msg']) );
+      Ext.Msg.alert("Error", msg);
+    }
+    
+    Ext.Ajax.request({
+      url: '/vms/scenarios/' + this.scenarioId + '/' + to_state + '.json',
+      method: 'PUT',
+      params: additional_params,
+      success: success,
+      failure: failure,
+      scope: this
+    });
+  },
+  
+  updateStateButtons: function(){
+    (['paused', 'unexecuted'].indexOf(this.scenario_state) !== -1) ? this.executeBtn.show() : this.executeBtn.hide();
+    (['executing'].indexOf(this.scenario_state) !== -1) ? this.pauseBtn.show() : this.pauseBtn.hide();
+    (['executing', 'paused'].indexOf(this.scenario_state) !== -1) ? this.endBtn.show() : this.endBtn.hide();
+  },
+  
+  editScenario: function(){
+    Application.on('vms-editscenarioclose', function(){
+      if(this.loadMask) this.loadMask.show();
+      Ext.Ajax.request({
+        url: '/vms/scenarios/' + this.scenarioId,
+        method: 'GET',
+        success: this.loadScenario_success,
+        scope: this
+      });
+    }, this, {single: true});
+    
+    Application.fireEvent('openwindow', {title:'Modify ' + this.scenarioName, scenarioId: this.scenarioId, scenarioName: this.scenarioName, source: 'command_center', initializer: 'Talho.VMS.CreateAndEditScenario'});
+  },
+  
+  alertStaff: function(){
+    
   }
 });
+
+Ext.override(Talho.VMS.CommandCenter, Talho.VMS.ux.CommandCenter.ContextMenus);
+Ext.override(Talho.VMS.CommandCenter, Talho.VMS.ux.CommandCenter.SiteApplications);
 
 Talho.ScriptManager.reg('Talho.VMS.CommandCenter', Talho.VMS.CommandCenter, function(config){return new Talho.VMS.CommandCenter(config);});

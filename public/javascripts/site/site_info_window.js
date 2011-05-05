@@ -19,7 +19,13 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
             fields: ['user', 'role_filled', 'roles', 'qualifications', 'user_id', 'id', 'source']
           }),
           columns: [{header: 'Name', dataIndex: 'user'}, {header: 'Role Filled', dataIndex: 'role_filled'}, {header: 'Roles', dataIndex: 'roles'}, {header: 'Qualifications', dataIndex: 'qualifications'},
-                    {header: 'Source', dataIndex: 'source', renderer: function(val){switch(val){case 'manual': return 'Manually Assigned'; break; case 'team': return 'Assigned Via Team'; break; default: return 'Automatically Assigned';} } }
+                    {header: 'Source', dataIndex: 'source', renderer: function(val){
+                      switch(val){
+                        case 'manual': return 'Manually Assigned'; 
+                        case 'team': return 'Assigned Via Team'; 
+                        case 'auto': return 'Automatically Assigned';
+                      } 
+                    } }
           ],
           listeners: {
             scope: this,

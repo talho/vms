@@ -7,7 +7,7 @@ class Vms::StaffController < ApplicationController
   after_filter :change_include_root_back
   
   def index
-    @staff = @scenario.staff.find(:all, :include => [:user, :site])
+    @staff = @scenario.all_staff
     respond_to do |format|
       format.json {render :json => @staff.as_json }
     end

@@ -21,7 +21,7 @@ class Vms::ScenariosController < ApplicationController
     @scenario[:can_admin] = perm_lvl == Vms::UserRight::PERMISSIONS[:owner] || perm_lvl == Vms::UserRight::PERMISSIONS[:admin]
     @scenario[:site_instances] = @scenario.site_instances.as_json
     @scenario[:inventories] = @scenario.inventories.as_json
-    @scenario[:staff] = @scenario.staff.as_json
+    @scenario[:all_staff] = @scenario.all_staff.as_json
     @scenario[:teams] = @scenario.teams.as_json
     @scenario[:roles] = @scenario.role_scenario_sites.as_json
     @scenario[:qualifications] = @scenario.site_instances.map(&:complete_qualification_list).flatten
@@ -41,6 +41,9 @@ class Vms::ScenariosController < ApplicationController
   end
   
   def create
+    tmpl = params[:template] || false
+    
+    params[:scenario][:state] = tmpl ? Vms::Scenario::STATES[:template] : Vms::Scenario::STATES[:unexecuted]
     @scenario = Vms::Scenario.new(params[:scenario])
     @scenario.user_rights.build(:user_id => current_user.id, :permission_level => Vms::UserRight::PERMISSIONS[:owner])
     if @scenario.save
@@ -86,6 +89,69 @@ class Vms::ScenariosController < ApplicationController
       else
         format.json {render :json => {:success => false, :errors => @scenario.errors}, :status => 406}
       end
+    end
+  end
+  
+  ## Split the execute action off into its own space because of the specialized logic that will need to go into running the first execution,
+  #  though most of that specialized logic will go into delayed jobs
+  def execute
+    @scenario = current_user.scenarios.editable.find(params[:id])
+    
+    current_state = @scenario.state
+    unless @scenario.unexecuted? || @scenario.paused? # you can only execute unexecuted or paused scenarios
+      respond_to do |format|
+        format.json {render :json => {:msg => "You cannot execute a scenario of state " + Vms::Scenario::STATES.invert[@scenario].to_s + ".", :success => false}, :status => 400}
+      end
+      return
+    end
+    @scenario.update_attributes :state => Vms::Scenario::STATES[:executing]
+    
+    if current_state == Vms::Scenario::STATES[:paused]
+      custom_msg = params[:custom_msg].blank? ? nil : params[:custom_msg]
+      @scenario.resume(params[:send_msg], custom_msg)
+    else
+      @scenario.execute
+    end
+    
+    respond_to do |format|
+      format.json {render :json => {:success => true} }
+    end
+  end
+  
+  def pause
+    @scenario = current_user.scenarios.editable.find(params[:id])
+    unless @scenario.in_progress?
+      respond_to do |format|
+        format.json {render :json => {:msg => "You can only pause an executing scenario. Your scenario is " + Vms::Scenario::STATES.invert[@scenario].to_s + ".", :success => false}, :status => 400}
+      end
+      return
+    end
+    @scenario.update_attributes :state => Vms::Scenario::STATES[:paused]
+    
+    custom_msg = params[:custom_msg].blank? ? nil : params[:custom_msg]
+    @scenario.pause(params[:send_msg], custom_msg)
+    
+    respond_to do |format|
+      format.json {render :json => {:success => true} }
+    end
+  end
+  
+  def stop
+    @scenario = current_user.scenarios.editable.find(params[:id])
+    
+    unless @scenario.executing? || @scenario.paused? # you can only execute unexecuted or paused scenarios
+      respond_to do |format|
+        format.json {render :json => {:msg => "You cannot stop a scenario of state " + Vms::Scenario::STATES.invert[@scenario].to_s + ".", :success => false}, :status => 400}
+      end
+      return
+    end
+    @scenario.update_attributes :state => Vms::Scenario::STATES[:complete]
+    
+    custom_msg = params[:custom_msg].blank? ? nil : params[:custom_msg]
+    @scenario.stop(custom_msg)
+    
+    respond_to do |format|
+      format.json {render :json => {:success => true} }
     end
   end
 end

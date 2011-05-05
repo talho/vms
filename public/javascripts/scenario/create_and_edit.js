@@ -12,12 +12,16 @@ Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
       this.edit_mode = true;
     }
     this.masks = {};
+
     Talho.VMS.CreateAndEditScenario.superclass.constructor.apply(this, arguments);
+    
+    Application.addEvents('vms-editscenarioclose');
+    this.on('close', function(){Application.fireEvent('vms-editscenarioclose', this);}, this);
     this.removed_records = [];
   },
   
   initComponent: function(){
-    if(this.edit_mode){
+    if(this.edit_mode && this.source !== 'command_center'){
       var buttons = [
         {text: 'Save', handler: this.save, scope: this, mode: 'list'},
         {text: 'Save and Open Scenario', handler: this.save, scope: this},
@@ -121,6 +125,9 @@ Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {
         this.hideMask();
         if(b.mode == 'list'){
           Application.fireEvent('openwindow', {id: 'vms_open_scenario', title:'Manage Scenarios', initializer: 'Talho.VMS.ManageScenarios'});
+        }
+        else if(this.source === 'command_center'){
+          // do nothing
         }
         else{
           var scenario = action.result.scenario;

@@ -7,34 +7,46 @@ Talho.VMS.ManageScenarios = Ext.extend(Ext.Window, {
   layout: 'fit',
   modal: true,
   constructor: function(config){
-    Ext.apply(config, {
-      items: [
-        {xtype: 'grid', itemId: 'grid_panel', loadMask: true, hideHeaders: true,
-        store: new Ext.data.JsonStore({
-          url: '/vms/scenarios',
-          method: 'GET',
-          root: 'scenarios',
-          restful: true,
-          idProperty: 'id',
-          fields: ['name', 'id', 'can_admin', 'is_owner'],
-          autoLoad: true,
-          autoSave: false,
-          writer: new Ext.data.JsonWriter({ })
-        }),
-        columns:[
-          {dataIndex: 'name', id: 'name_column'},
-          {xtype: 'xactioncolumn', tooltip: 'edit', icon: '/stylesheets/images/pencil.png', iconCls: 'edit', scope: this, handler: this.edit_click, showField: 'can_admin' },
-          {xtype: 'xactioncolumn', tooltip: 'delete', icon: '/stylesheets/images/cross-circle.png', iconCls: 'delete', scope: this, handler: this.delete_click, showField: 'is_owner' }
-        ], autoExpandColumn: 'name_column',
-        sm: new Ext.grid.RowSelectionModel({singleSelect: true}) }
-      ],
-      buttons:[
-        {text: 'Open', handler: this.open_scenario, scope: this},
-        {text: 'Cancel', handler: function(){this.close();}, scope: this}
-      ]
-    });
-    
     Talho.VMS.ManageScenarios.superclass.constructor.apply(this, arguments);
+  },
+  
+  initComponent: function(){
+    this.items = [
+      {xtype: 'grid', itemId: 'grid_panel', loadMask: true, hideHeaders: false,
+      store: new Ext.data.JsonStore({
+        url: '/vms/scenarios',
+        method: 'GET',
+        root: 'scenarios',
+        restful: true,
+        idProperty: 'id',
+        fields: ['name', 'id', 'can_admin', 'is_owner', 'state'],
+        autoLoad: true,
+        autoSave: false,
+        writer: new Ext.data.JsonWriter({ })
+      }),
+      columns:[
+        {dataIndex: 'name', id: 'name_column', header: 'Name'},
+        {dataIndex: 'state', header: 'Status', renderer: function(v){
+          switch(v){
+            case 1: return 'Template';
+            case 2: return 'Unexecuted';
+            case 3: return 'In Progress';
+            case 4: return 'Paused';
+            case 5: return 'Completed';
+          }
+        }},
+        {xtype: 'xactioncolumn', tooltip: 'edit', icon: '/stylesheets/images/pencil.png', iconCls: 'edit', scope: this, handler: this.edit_click, showField: 'can_admin' },
+        {xtype: 'xactioncolumn', tooltip: 'delete', icon: '/stylesheets/images/cross-circle.png', iconCls: 'delete', scope: this, handler: this.delete_click, showField: 'is_owner' }
+      ], autoExpandColumn: 'name_column',
+      sm: new Ext.grid.RowSelectionModel({singleSelect: true}) }
+    ];
+    
+    this.buttons = [
+      {text: 'Open', handler: this.open_scenario, scope: this},
+      {text: 'Cancel', handler: function(){this.close();}, scope: this}
+    ];
+      
+    Talho.VMS.ManageScenarios.superclass.initComponent.apply(this, arguments);
   },
   
   open_scenario: function(){
@@ -50,7 +62,7 @@ Talho.VMS.ManageScenarios = Ext.extend(Ext.Window, {
    */
   edit_click: function(grid, row){
     var record = grid.getStore().getAt(row);
-    Application.fireEvent('openwindow', {title:'Modify ' + record.get('name'), scenarioId: record.get('id'), scenarioName: record.get('name'), initializer: 'Talho.VMS.CreateAndEditScenario'})
+    Application.fireEvent('openwindow', {title:'Modify ' + record.get('name'), scenarioId: record.get('id'), scenarioName: record.get('name'), initializer: 'Talho.VMS.CreateAndEditScenario'});
     this.close();
   },
   
