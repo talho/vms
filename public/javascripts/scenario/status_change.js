@@ -5,6 +5,9 @@ Ext.ns('Talho.VMS.ux');
 
 Talho.VMS.ux.ScenarioStatusChange = Ext.extend(Ext.Window, {
   modal: true,
+  width: 375,
+  height: 400,
+  layout: 'fit',
   constructor: function(config){
     this.addEvents('response');
     
@@ -16,10 +19,18 @@ Talho.VMS.ux.ScenarioStatusChange = Ext.extend(Ext.Window, {
   initComponent: function(){
     this.setTitle(this.titles[this.action]);
     
-    this.buttons = [
-      {text: 'Yes', handler: this.responseSelected.createDelegate(this, ['yes'])},
-      {text: 'No', handler: this.responseSelected.createDelegate(this, ['no'])}
-    ]
+    if(this.action == 'alert'){
+      this.buttons = [
+        {text: 'OK', handler: this.responseSelected.createDelegate(this, ['ok'])},
+        {text: 'Cancel', handler: this.responseSelected.createDelegate(this, ['cancel'])}
+      ]
+    }
+    else {
+      this.buttons = [
+        {text: 'Yes', handler: this.responseSelected.createDelegate(this, ['yes'])},
+        {text: 'No', handler: this.responseSelected.createDelegate(this, ['no'])}
+      ]
+    }
     
     if(this.action == 'execute'){
       this.items = [
@@ -27,11 +38,11 @@ Talho.VMS.ux.ScenarioStatusChange = Ext.extend(Ext.Window, {
       ];
     }
     else{
-      this.items = {xtype: 'tabpanel', itemId: 'tp', height: 300, width: 350, activeItem: 0, items: [
+      this.items = {xtype: 'tabpanel', itemId: 'tp', activeItem: 0, items: [
         {title: 'Action Information', layout: 'form', itemId: 't1', labelAlign: 'top', padding: '5', items: [
           {xtype: 'box', html: this.text[this.action], hideLabel: true},
-          {xtype: 'checkbox', hideLabel: true, itemId: 'custom_msg', boxLabel: 'Customize alert notification message', checked: false, scope: this, handler: this.customAlertChecked},
-          {xtype: 'textarea', disabled: true, itemId: 'alert_text', value: this.default_alert[this.action], anchor: '100%', height: 150, fieldLabel: 'Alert Message'}
+          {xtype: 'checkbox', hideLabel: true, itemId: 'custom_msg', boxLabel: 'Customize alert notification message', checked: this.action === 'alert' ? true : false, hidden: this.action === 'alert' ? true : false, scope: this, handler: this.customAlertChecked},
+          {xtype: 'textarea', disabled: this.action === 'alert' ? false : true, itemId: 'alert_text', value: this.default_alert[this.action], anchor: '100%', height: 150, fieldLabel: 'Alert Message'}
         ]},
         {title: 'Alert Audience', layout: 'fit', itemId: 'aud', items: [
           new Talho.ux.UserSelectionGrid({
@@ -126,12 +137,14 @@ Talho.VMS.ux.ScenarioStatusChange = Ext.extend(Ext.Window, {
     'resume': 'The scenario will resume its execution.<br/><br/> Would you like to notify staff that the scenario has been resumed?',
     'stop': "The scenario execution will stopped. This indicates that the scenario is<br/>" +
             "completed. You will no long be able to modify this scenario. This action<br/>" +
-            "cannot be undone. Are you sure you wish to end the scenario?"
+            "cannot be undone. Are you sure you wish to end the scenario?",
+    'alert': "Create your custom alert here."
   },
   
   default_alert: {
-    'pause': "The scenario that you were participating in has been suspended. You will may receive notification when this scenario has been resumed.",
+    'pause': "The scenario that you were participating in has been suspended. You may receive notification when this scenario has been resumed.",
     'resume': "The scenario that you have been participating in has resumed. Please reassume your normal duties.",
-    'stop': "The scenario that you have been participating in has ended. Thank you for your participation."
+    'stop': "The scenario that you have been participating in has ended. Thank you for your participation.",
+    'alert': ''
   }
 });

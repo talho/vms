@@ -147,7 +147,8 @@ Talho.VMS.ux.CreateAndEditRoles = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
     
     var name = this.role_select_box.getStore().getById(id).get('name');
     var store = this.role_grid.getStore();
-    var rec = new store.recordType({role: name, role_id: id, count: 1, status: 'new' });
+    var rec = new store.recordType({role: name, role_id: id, count: 1});
+    rec.set('status', 'new');
     rec.markDirty();
     store.insert(0, [rec]);
   },
@@ -171,7 +172,6 @@ Talho.VMS.ux.CreateAndEditRoles = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
   
   onSaveClicked: function(){
     var store = this.role_grid.getStore(),
-      original_records = [],
       modified_records = this.role_grid.getStore().getModifiedRecords();
     
     this.fireEvent('save', this, modified_records, this.deleted_records);

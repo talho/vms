@@ -329,12 +329,28 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     
     this.initControllers();
     
-    Ext.Ajax.request({
+    // Ext.Ajax.request({
+      // url: '/vms/scenarios/' + this.scenarioId,
+      // method: 'GET',
+      // success: this.loadScenario_success,
+      // scope: this
+    // });
+    
+    Ext.Direct.addProvider({
+      type: 'polling',
       url: '/vms/scenarios/' + this.scenarioId,
-      method: 'GET',
-      success: this.loadScenario_success,
-      scope: this
-    });
+      id: 'command_center_polling_provider-' + this.scenarioId,
+      interval: 15000,
+      listeners: {
+        scope: this,
+        beforepoll: function(){
+          return true;
+        },
+        data: function(pp, evt){
+          this.loadScenario_success(evt);
+        }
+      }
+    })
     
     this.on('afterrender', function(){
       if(!this.initial_load_complete){
@@ -342,6 +358,11 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         this.loadMask.show();
       }
     }, this, {delay: 1});
+  },
+  
+  destroy: function(){
+    Ext.Direct.getProvider('command_center_polling_provider-' + this.scenarioId).disconnect();
+    Talho.VMS.CommandCenter.superclass.destroy.apply(this, arguments);
   },
   
   initControllers: function(){
@@ -395,7 +416,9 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     this.initial_load_complete = true;
     if(this.loadMask) this.loadMask.hide();
     
-    var result = Ext.decode(response.responseText);
+    var result = response;
+    if(response.responseText)
+      result = Ext.decode(response.responseText);
     
     this.scenarioName = result.name;
     this.setTitle('Command Center - ' + this.scenarioName);
@@ -412,7 +435,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       case 5: this.scenario_state = 'ended';
         break;
     }
-    this.updateStateButtons();
+    this.updateState();
     
     this.can_edit = result.can_admin && this.scenario_state !== 'ended';
     // If the user cannot edit the scenario, lock the map and all of the toolset grids from allowing drag/drop
@@ -434,6 +457,14 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     this.qualsGrid.getStore().loadData(result.qualifications);
     this.teamsGrid.getStore().loadData(result.teams);
     this.staffGrid.getStore().loadData(result.all_staff);
+    
+    delete result.site_instances;
+    delete result.inventories;
+    delete result.roles;
+    delete result.qualifications;
+    delete result.teams;
+    delete result.all_staff;
+    result = null;
   },
   
   initMapDropZone: function(){
@@ -586,125 +617,11 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       return false;
     }});
     return marker;
-  },
-  
-  beginExecution: function(){
-    if(this.scenario_state === 'paused'){
-      var win = new Talho.VMS.ux.ScenarioStatusChange({
-        action: 'resume',
-        scenarioId: this.scenarioId,
-        scope: this,
-        handler: function(btn, msg, custom_aud){
-          var params = {};
-          if(btn === 'yes'){
-            params = {send_msg: true, custom_msg: msg, 'custom_aud[]': custom_aud};
-          }
-          this.changeScenarioState('execute', params, function(){
-            this.scenario_state = 'executing';
-            this.updateStateButtons();
-          });
-        }  
-      });
-      win.show();
-    }
-    else{
-      var win = new Talho.VMS.ux.ScenarioStatusChange({
-        action: 'execute',
-        scenarioId: this.scenarioId,
-        scope: this,
-        handler: function(btn){
-          if(btn === 'yes'){
-            this.changeScenarioState('execute', {}, function(){
-              this.scenario_state = 'executing';
-              this.updateStateButtons();
-            });
-          }
-        }
-      });
-      win.show();
-    }
-  },
-  
-  pauseExecution: function(){
-    var win = new Talho.VMS.ux.ScenarioStatusChange({
-      action: 'pause', 
-      scenarioId: this.scenarioId,
-      scope: this,
-      handler: function(btn, msg, custom_aud){
-        var params = {};
-        if(btn === 'yes'){
-          params = {send_msg: true, custom_msg: msg, 'custom_aud[]': custom_aud};
-        }
-        this.changeScenarioState('pause', params, function(){
-          this.scenario_state = 'paused';
-          this.updateStateButtons();
-        });
-      }
-    });
-    win.show();
-  },
-  
-  endExecution: function(){
-    var win = new Talho.VMS.ux.ScenarioStatusChange({
-      action: 'stop',
-      scenarioId: this.scenarioId,
-      scope: this,
-      handler: function(btn, msg, custom_aud){
-        if(btn === 'yes'){
-          this.changeScenarioState('stop', {custom_msg: msg, 'custom_aud[]': custom_aud}, function(){
-            this.scenario_state = 'ended';
-            this.updateStateButtons();
-          });
-        }
-      }
-    });
-    win.show();
-  },
-  
-  changeScenarioState: function (to_state, additional_params, success, failure){
-    failure = failure || function(resp){
-      var result = Ext.decode(resp.responseText),
-          msg = '';
-      msg = "Could not change the state of the current scenario" + (Ext.isEmpty(result['msg']) ? '.' : (":<br/>" + result['msg']) );
-      Ext.Msg.alert("Error", msg);
-    }
-    
-    Ext.Ajax.request({
-      url: '/vms/scenarios/' + this.scenarioId + '/' + to_state + '.json',
-      method: 'PUT',
-      params: additional_params,
-      success: success,
-      failure: failure,
-      scope: this
-    });
-  },
-  
-  updateStateButtons: function(){
-    (['paused', 'unexecuted'].indexOf(this.scenario_state) !== -1) ? this.executeBtn.show() : this.executeBtn.hide();
-    (['executing'].indexOf(this.scenario_state) !== -1) ? this.pauseBtn.show() : this.pauseBtn.hide();
-    (['executing', 'paused'].indexOf(this.scenario_state) !== -1) ? this.endBtn.show() : this.endBtn.hide();
-  },
-  
-  editScenario: function(){
-    Application.on('vms-editscenarioclose', function(){
-      if(this.loadMask) this.loadMask.show();
-      Ext.Ajax.request({
-        url: '/vms/scenarios/' + this.scenarioId,
-        method: 'GET',
-        success: this.loadScenario_success,
-        scope: this
-      });
-    }, this, {single: true});
-    
-    Application.fireEvent('openwindow', {title:'Modify ' + this.scenarioName, scenarioId: this.scenarioId, scenarioName: this.scenarioName, source: 'command_center', initializer: 'Talho.VMS.CreateAndEditScenario'});
-  },
-  
-  alertStaff: function(){
-    
   }
 });
 
 Ext.override(Talho.VMS.CommandCenter, Talho.VMS.ux.CommandCenter.ContextMenus);
 Ext.override(Talho.VMS.CommandCenter, Talho.VMS.ux.CommandCenter.SiteApplications);
+Ext.override(Talho.VMS.CommandCenter, Talho.VMS.ux.CommandCenter.ScenarioStatus);
 
 Talho.ScriptManager.reg('Talho.VMS.CommandCenter', Talho.VMS.CommandCenter, function(config){return new Talho.VMS.CommandCenter(config);});

@@ -110,6 +110,7 @@ class Vms::Scenario < ActiveRecord::Base
       
       users.each {|u| p u.display_name}
       # Alert users for the scenario that the execution has been paused.
+      al = VmsAlert.new :title => "Scenario #{name} has been paused.", :message => "The scenario that you were participating in has been suspended. You may receive notification when this scenario has been resumed."
     end
   end
   handle_asynchronously :pause

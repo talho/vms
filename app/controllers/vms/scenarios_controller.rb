@@ -27,7 +27,9 @@ class Vms::ScenariosController < ApplicationController
     @scenario[:qualifications] = @scenario.site_instances.map(&:complete_qualification_list).flatten
     respond_to do |format|
       unless @scenario.nil?
-        format.json {render :json => @scenario.as_json}
+        json = @scenario.as_json
+        json[:type] = 'event'
+        format.json {render :json => json}
       else
         format.json {render :json => {:msg => 'You do not have permission to open this scenario'}, :status => 404 }
       end
@@ -108,7 +110,7 @@ class Vms::ScenariosController < ApplicationController
     
     if current_state == Vms::Scenario::STATES[:paused]
       custom_msg = params[:custom_msg].blank? ? nil : params[:custom_msg]
-      aud = (params[:custom_aud] && !params[:custom_aud].nil?) ? params[:custom_aud] : nil
+      aud = (params[:custom_aud] && !params[:custom_aud].blank?) ? params[:custom_aud] : nil
       @scenario.resume(params[:send_msg], custom_msg, aud)
     else
       @scenario.execute
@@ -130,7 +132,7 @@ class Vms::ScenariosController < ApplicationController
     @scenario.update_attributes :state => Vms::Scenario::STATES[:paused]
     
     custom_msg = params[:custom_msg].blank? ? nil : params[:custom_msg]
-    aud = (params[:custom_aud] && !params[:custom_aud].nil?) ? params[:custom_aud] : nil 
+    aud = (params[:custom_aud] && !params[:custom_aud].blank?) ? params[:custom_aud] : nil 
     @scenario.pause(params[:send_msg], custom_msg, aud)
     
     respond_to do |format|
@@ -150,8 +152,20 @@ class Vms::ScenariosController < ApplicationController
     @scenario.update_attributes :state => Vms::Scenario::STATES[:complete]
     
     custom_msg = params[:custom_msg].blank? ? nil : params[:custom_msg]
-    aud = (params[:custom_aud] && !params[:custom_aud].nil?) ? params[:custom_aud] : nil
-    @scenario.stop(aud, custom_msg)
+    aud = (params[:custom_aud] && !params[:custom_aud].blank?) ? params[:custom_aud] : nil
+    @scenario.stop(custom_msg, aud)
+    
+    respond_to do |format|
+      format.json {render :json => {:success => true} }
+    end
+  end
+  
+  def alert
+    @scenario = current_user.scenarios.editable.find(params[:id])
+    
+    custom_msg = params[:custom_msg].blank? ? nil : params[:custom_msg]
+    aud = (params[:custom_aud] && !params[:custom_aud].blank?) ? params[:custom_aud] : nil
+    @scenario.alert(custom_msg, aud)
     
     respond_to do |format|
       format.json {render :json => {:success => true} }

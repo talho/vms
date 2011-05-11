@@ -1,5 +1,5 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :vms_scenarios, :controller => 'vms/scenarios', :as => 'vms/scenarios', :member => {:execute => :put, :pause => :put, :stop => :put} do |scenarios|
+  map.resources :vms_scenarios, :controller => 'vms/scenarios', :as => 'vms/scenarios', :member => {:execute => :put, :pause => :put, :stop => :put, :alert => :put} do |scenarios|
     scenarios.resources :vms_sites, :controller => 'vms/sites', :as => 'sites', :collection => [:existing] do |sites|
       sites.roles_show 'roles.:format', :controller => 'vms/roles', :action => 'show', :conditions => { :method => :get }
       sites.roles_update 'roles.:format', :controller => 'vms/roles', :action => 'update', :conditions => { :method => [:put, :post] }
