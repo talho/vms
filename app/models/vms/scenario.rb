@@ -63,7 +63,7 @@ class Vms::Scenario < ActiveRecord::Base
     (staff + teams.map{ |t| t.audience.recipients.map{|ui| Vms::Staff.new(:user => ui, :scenario_site => t.scenario_site, :source => 'team', :status => 'assigned')} }).flatten.uniq
   end
   
-  def execute(custom_alert = nil)
+  def execute(current_user, custom_alert = nil)
     # Find unfilled roles
     users = all_staff.map(&:user)
     h = Hash.new
@@ -99,7 +99,7 @@ class Vms::Scenario < ActiveRecord::Base
   end
   handle_asynchronously :execute
   
-  def pause(alert = false, custom_alert = nil, custom_audience = nil)
+  def pause(current_user, alert = false, custom_alert = nil, custom_audience = nil)
     if alert
       users = []
       if custom_audience
@@ -107,15 +107,17 @@ class Vms::Scenario < ActiveRecord::Base
       else
         users = all_staff.map(&:user)
       end
-      
-      users.each {|u| p u.display_name}
+
       # Alert users for the scenario that the execution has been paused.
-      al = VmsAlert.new :title => "Scenario #{name} has been paused.", :message => "The scenario that you were participating in has been suspended. You may receive notification when this scenario has been resumed."
+      al = VmsAlert.new :title => "Scenario #{name} has been paused.", :message => custom_alert || "The scenario that you were participating in has been suspended. You may receive notification when this scenario has been resumed.", :author => current_user
+      al.audiences << (Audience.new :users => users)
+      
+      al.save
     end
   end
   handle_asynchronously :pause
   
-  def resume(alert = false, custom_alert = nil, custom_audience = nil)
+  def resume(current_user, alert = false, custom_alert = nil, custom_audience = nil)
     if alert
       users = []
       if custom_audience
@@ -124,13 +126,16 @@ class Vms::Scenario < ActiveRecord::Base
         users = all_staff.map(&:user)
       end
       
-      users.each {|u| p u.display_name}
       # Alert users for the scenario that the execution has been resumed.
+      al = VmsAlert.new :title => "Scenario #{name} has been resumed.", :message => custom_alert || "The scenario that you have been participating in has resumed. Please reassume your normal duties.", :author => current_user
+      al.audiences << (Audience.new :users => users)
+      
+      al.save
     end
   end
   handle_asynchronously :resume
   
-  def stop(custom_alert = nil, custom_audience = nil)
+  def stop(current_user, custom_alert = nil, custom_audience = nil)
     users = []
     if custom_audience
       custom_audience.each { |a| users << User.find(a.to_i) }
@@ -138,20 +143,29 @@ class Vms::Scenario < ActiveRecord::Base
       users = all_staff.map(&:user)
     end
     
-    users.each {|u| p u.display_name}
     # Alert users that the scenario execution is complete and they can go home
+    al = VmsAlert.new :title => "Scenario #{name} has been stopped.", :message => custom_alert || "The scenario that you have been participating in has ended. Thank you for your participation.", :author => current_user
+    al.audiences << (Audience.new :users => users)
+    
+    al.save
   end
   handle_asynchronously :stop
   
-  def alert(custom_alert = nil, custom_audience = nil)
+  def alert(current_user, custom_alert = nil, custom_audience = nil)
+    return if custom_alert.nil?
+    
     users = []
     if custom_audience
       custom_audience.each { |a| users << User.find(a.to_i) }
     else
       users = all_staff.map(&:user)
     end
-    users.each {|u| p u.display_name}
+    
     # Send a custom alert to all volunteers or a subset thereof for a certain scenario.
+    al = VmsAlert.new :title => "Scenario #{name} has been paused.", :message => custom_alert, :author => current_user
+    al.audiences << (Audience.new :users => users)
+    
+    al.save
   end
   handle_asynchronously :alert
 end

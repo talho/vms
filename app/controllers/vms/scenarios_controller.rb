@@ -111,9 +111,9 @@ class Vms::ScenariosController < ApplicationController
     if current_state == Vms::Scenario::STATES[:paused]
       custom_msg = params[:custom_msg].blank? ? nil : params[:custom_msg]
       aud = (params[:custom_aud] && !params[:custom_aud].blank?) ? params[:custom_aud] : nil
-      @scenario.resume(params[:send_msg], custom_msg, aud)
+      @scenario.resume(current_user, params[:send_msg], custom_msg, aud)
     else
-      @scenario.execute
+      @scenario.execute(current_user)
     end
     
     respond_to do |format|
@@ -133,7 +133,7 @@ class Vms::ScenariosController < ApplicationController
     
     custom_msg = params[:custom_msg].blank? ? nil : params[:custom_msg]
     aud = (params[:custom_aud] && !params[:custom_aud].blank?) ? params[:custom_aud] : nil 
-    @scenario.pause(params[:send_msg], custom_msg, aud)
+    @scenario.pause(current_user, params[:send_msg], custom_msg, aud)
     
     respond_to do |format|
       format.json {render :json => {:success => true} }
@@ -153,7 +153,7 @@ class Vms::ScenariosController < ApplicationController
     
     custom_msg = params[:custom_msg].blank? ? nil : params[:custom_msg]
     aud = (params[:custom_aud] && !params[:custom_aud].blank?) ? params[:custom_aud] : nil
-    @scenario.stop(custom_msg, aud)
+    @scenario.stop(current_user, custom_msg, aud)
     
     respond_to do |format|
       format.json {render :json => {:success => true} }
@@ -165,7 +165,7 @@ class Vms::ScenariosController < ApplicationController
     
     custom_msg = params[:custom_msg].blank? ? nil : params[:custom_msg]
     aud = (params[:custom_aud] && !params[:custom_aud].blank?) ? params[:custom_aud] : nil
-    @scenario.alert(custom_msg, aud)
+    @scenario.alert(current_user, custom_msg, aud)
     
     respond_to do |format|
       format.json {render :json => {:success => true} }
