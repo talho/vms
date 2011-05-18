@@ -22,7 +22,7 @@ class Vms::Staff < ActiveRecord::Base
   def self.users_as_staff_json(users)
     users.map { |u| {:user => u.display_name, :user_id => u.id, :status => 'assigned', :source => u[:source], :id => u[:staff_id] } }
   end
-  
+
   def self.send_removed_message(users, scenario)
     if(scenario.executing? && users.count > 0)
       alert = VmsAlert.new :scenario => scenario, :author => scenario.users.owner, :audiences => [Audience.new :users => users], :title => "You have been unassigned",
@@ -44,7 +44,7 @@ class Vms::Staff < ActiveRecord::Base
   end
 
   def to_s
-   user.to_s 
+   user.to_s
   end
 
 end

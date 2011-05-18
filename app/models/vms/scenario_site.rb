@@ -11,7 +11,7 @@ class Vms::ScenarioSite < ActiveRecord::Base
 
 
 
-  STATES = {:inactive => 1, :active => 2}  
+  STATES = {:inactive => 1, :active => 2}
   
   has_many :inventories, :class_name => "Vms::Inventory"
   has_many :role_scenario_sites, :class_name => "Vms::RoleScenarioSite", :autosave => true
@@ -36,7 +36,7 @@ class Vms::ScenarioSite < ActiveRecord::Base
     tags << role_scenario_sites.map { |r| r.qualification_list.map { |q| {:name => q, :role => r.role.name, :role_id => r.role_id, :site_id => site_id, :site => site.name} } }
     tags
   end
-  
+
   def all_staff
     (staff + teams.map{ |t| t.audience.recipients.map{|ui| Vms::Staff.new(:user => ui, :scenario_site => self, :source => 'team', :status => 'assigned')} }).flatten.uniq
   end
@@ -54,7 +54,7 @@ class Vms::ScenarioSite < ActiveRecord::Base
     al.save
   end
   handle_asynchronously :alert_users_of_site_activation
-  
+
   # Copy returns a new scenario_site but does not save that record.
   def copy(opts = {})
     scenario_site = Vms::ScenarioSite.new(self.attributes)

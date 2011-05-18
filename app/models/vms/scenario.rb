@@ -54,7 +54,7 @@ class Vms::Scenario < ActiveRecord::Base
   def template?
     state == Vms::Scenario::STATES[:template]
   end
-  
+
   def in_progress?
     state == Vms::Scenario::STATES[:executing]
   end
