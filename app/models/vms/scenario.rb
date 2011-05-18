@@ -80,7 +80,6 @@ class Vms::Scenario < ActiveRecord::Base
     walkups.inject(staff.uniq.to_a){|s,w| s.push(w)}
   end
   
-<<<<<<< HEAD
   def clone(opts = {})
     # In this method, we're needing to do a complete clone of all of the attached values. This means that we have to copy any site_instances as new instances and all of those connections as new as well
     
@@ -101,9 +100,6 @@ class Vms::Scenario < ActiveRecord::Base
   end
   
   def execute(current_user)
-=======
-  def execute(current_user)     HI
->>>>>>> Kiosk mode with separate session, walkup volunteers and site admins - beta
     # Find unfilled roles
     h = Hash.new
     role_scenario_sites.each do |r| 

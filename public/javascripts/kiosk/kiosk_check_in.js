@@ -361,6 +361,33 @@ Ext.ns("Talho.VMS");
         renderTo: TARGET_DIV_ID, layoutConfig: {align: 'stretch'},
         height: getAvailableHeight(),
         items: [ this.leftPanel, this.rightPanel ]
+=======
+      this.registeredVolunteersPanel = new Ext.Panel ({
+        layout: 'border',
+        title: "Registered Volunteers",
+        flex: 1,
+        autoScroll: false,
+        items: [this.volunteersList, this.unassignedSignInForm]
+      });
+
+      this.walkupSignupPanel = new Ext.Panel ({
+        layout: 'fit',
+        title: "Walk-Up Volunteers",
+        flex: 1,
+        margins: '0 0 0 10',
+        items: [{html: "pong", border: false}]
+      });
+
+      this.checkInPanel = new Ext.Panel({
+        layout: 'hbox',
+        height: getAvailableHeight(),
+        renderTo: TARGET_DIV_ID,
+        layoutConfig: {align: 'stretch'},
+        id: 'vms-kiosk-main-ext-panel',
+        border: false,
+        padding: 10,
+        items: [ this.registeredVolunteersPanel, this.walkupSignupPanel ]
+>>>>>>> initial work on kiosk checkin mode, plus to_s on vms models
       });
     }
   });
