@@ -1,4 +1,5 @@
 class Vms::KiosksController < ApplicationController
+
   skip_before_filter :login_required
   before_filter :vms_session_required, :except => [:registered_checkin, :walkup_checkin]
   before_filter :vms_site_admin_required, :except => [:index, :registered_checkin, :walkup_checkin]
@@ -140,3 +141,4 @@ class Vms::KiosksController < ApplicationController
   end
   
 end
+
