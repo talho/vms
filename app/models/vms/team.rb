@@ -22,4 +22,8 @@ class Vms::Team < ActiveRecord::Base
       {:site => site.name, :site_id => site.id, :user_count => audience.users.count})
     json
   end
+
+  def to_s
+     Audience.find(audience_id).recipients.count.to_s + ' member team: ' + Vms::ScenarioSite.find(scenario_site_id).to_s
+  end
 end

@@ -12,4 +12,8 @@ class Vms::UserRight < ActiveRecord::Base
       {:name => user.display_name, :caption => "#{user.name} #{user.email}", :user_id => user.id, :title => user.title})
     json
   end
+
+  def to_s
+    'Level ' + permission_level.to_s + ': ' + User.find(user_id).to_s + ': ' + Vms::Scenario.find(scenario_id).to_s 
+  end
 end

@@ -44,6 +44,10 @@ class Vms::Scenario < ActiveRecord::Base
       end
     end
   end
+
+  def to_s
+    name
+  end
   
   def in_progress?
     state == Vms::Scenario::STATES[:executing]

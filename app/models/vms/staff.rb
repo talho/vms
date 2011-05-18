@@ -16,6 +16,7 @@ class Vms::Staff < ActiveRecord::Base
   def self.users_as_staff_json(users)
     users.map { |u| {:user => u.display_name, :user_id => u.id, :status => 'assigned', :source => u[:source], :id => u[:staff_id] } }
   end
+
   
   def self.send_removed_message(users, scenario)
     if(scenario.executing? && users.count > 0)
@@ -37,4 +38,8 @@ class Vms::Staff < ActiveRecord::Base
     #for now, we aren't really updating anything about the staff so we're not going to send a message.
   end
   
+  def to_s
+    User.find(user_id).to_s + ': ' + Vms::ScenarioSite.find(scenario_site_id).to_s
+  end
+
 end

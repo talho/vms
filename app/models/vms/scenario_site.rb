@@ -6,8 +6,10 @@ class Vms::ScenarioSite < ActiveRecord::Base
 
   belongs_to :site, :class_name => "Vms::Site"
   belongs_to :scenario, :class_name => "Vms::Scenario"
+  belongs_to :site_admin, :class_name => "User"
+
   before_update :check_state_for_alert_need
-  
+
   STATES = {:inactive => 1, :active => 2}  
   
   has_many :inventories, :class_name => "Vms::Inventory"
@@ -32,7 +34,7 @@ class Vms::ScenarioSite < ActiveRecord::Base
     tags << role_scenario_sites.map { |r| r.qualification_list.map { |q| {:name => q, :role => r.role.name, :role_id => r.role_id, :site_id => site_id, :site => site.name} } }
     tags
   end
-  
+
   def all_staff
     (staff + teams.map{ |t| t.audience.recipients.map{|ui| Vms::Staff.new(:user => ui, :scenario_site => self, :source => 'team', :status => 'assigned')} }).flatten.uniq
   end
@@ -50,7 +52,12 @@ class Vms::ScenarioSite < ActiveRecord::Base
     al.save
   end
   handle_asynchronously :alert_users_of_site_activation
-  
+
+  def to_s
+    Vms::Site.find(site_id).name  + ': ' + Vms::Scenario.find(scenario_id).name
+
+  end
+
   private
   def check_state_for_alert_need
     if self.changed.include?('status') && self.scenario.executing?
@@ -61,4 +68,5 @@ class Vms::ScenarioSite < ActiveRecord::Base
       end
     end
   end
+
 end
