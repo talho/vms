@@ -6,6 +6,7 @@ class Vms::ScenarioSite < ActiveRecord::Base
 
   belongs_to :site, :class_name => "Vms::Site"
   belongs_to :scenario, :class_name => "Vms::Scenario"
+  belongs_to :site_admin, :class_name => "User"
   STATES = {:inactive => 1, :active => 2}  
   
   has_many :inventories, :class_name => "Vms::Inventory"
@@ -29,5 +30,9 @@ class Vms::ScenarioSite < ActiveRecord::Base
     tags << qualification_list.map { |q| {:name => q, :site_id => site_id, :site => site.name} }
     tags << role_scenario_sites.map { |r| r.qualification_list.map { |q| {:name => q, :role => r.role.name, :role_id => r.role_id, :site_id => site_id, :site => site.name} } }
     tags
+  end
+
+  def to_s
+    Vms::Site.find(site_id).name  + ': ' + Vms::Scenario.find(scenario_id).name
   end
 end

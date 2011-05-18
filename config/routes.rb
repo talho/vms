@@ -16,7 +16,8 @@ ActionController::Routing::Routes.draw do |map|
     scenarios.teams 'teams', :controller => 'vms/teams', :action => 'index'
     scenarios.quals 'qualifications', :controller => 'vms/qualifications', :action => 'index'
   end
-  
+
+  map.resources :vms_kiosks, :controller => "vms/kiosks", :action => ['show']
   map.inventory_sources 'vms/inventory_sources.:format', :controller => 'vms/inventories', :action => 'sources'
   map.inventory_items 'vms/inventory_items.:format', :controller => 'vms/inventories', :action => 'items'
   map.inventory_item_categories 'vms/inventory_item_categories.:format', :controller => 'vms/inventories', :action => 'categories'

@@ -6,4 +6,8 @@ class Vms::Site < ActiveRecord::Base
   has_many :scenarios, :through => :scenario_instances
     
   validates_presence_of :name
+
+  def to_s
+    name
+  end
 end

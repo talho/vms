@@ -18,4 +18,8 @@ class Vms::RoleScenarioSite < ActiveRecord::Base
   def calculate_assignment(staff)
     self[:assigned] = staff.count { |s| s.roles.exists?(self.role_id) }
   end
+
+  def to_s
+    pluralize(count, Role.find(role_id).to_s) +  ': ' + Vms::ScenarioSite.find(scenario_site_id).to_s
+  end
 end

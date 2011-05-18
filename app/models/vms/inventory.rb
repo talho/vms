@@ -59,4 +59,8 @@ class Vms::Inventory < ActiveRecord::Base
       end
       json
     end
+
+  def to_s
+    name
+  end
 end
