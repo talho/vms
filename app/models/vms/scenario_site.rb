@@ -6,8 +6,11 @@ class Vms::ScenarioSite < ActiveRecord::Base
 
   belongs_to :site, :class_name => "Vms::Site"
   belongs_to :scenario, :class_name => "Vms::Scenario"
+  belongs_to :site_admin, :class_name => "User"
   before_update :check_state_for_alert_need
-  
+
+
+
   STATES = {:inactive => 1, :active => 2}  
   
   has_many :inventories, :class_name => "Vms::Inventory"
@@ -74,7 +77,11 @@ class Vms::ScenarioSite < ActiveRecord::Base
     
     scenario_site
   end
-  
+
+  def to_s
+    Vms::Site.find(site_id).name  + ': ' + Vms::Scenario.find(scenario_id).name
+  end
+
   private
   def check_state_for_alert_need
     if self.changed.include?('status') && self.scenario.executing?
@@ -85,4 +92,5 @@ class Vms::ScenarioSite < ActiveRecord::Base
       end
     end
   end
+
 end

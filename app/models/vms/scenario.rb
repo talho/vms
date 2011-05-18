@@ -44,6 +44,10 @@ class Vms::Scenario < ActiveRecord::Base
       end
     end
   end
+
+  def to_s
+    name
+  end
   
   def template?
     state == Vms::Scenario::STATES[:template]

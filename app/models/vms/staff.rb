@@ -36,5 +36,9 @@ class Vms::Staff < ActiveRecord::Base
   def self.send_updated_message(staff)
     #for now, we aren't really updating anything about the staff so we're not going to send a message.
   end
-  
+
+  def to_s
+    User.find(user_id).to_s + ': ' + Vms::ScenarioSite.find(scenario_site_id).to_s
+  end
+
 end

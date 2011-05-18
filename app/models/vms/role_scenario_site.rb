@@ -19,4 +19,8 @@ class Vms::RoleScenarioSite < ActiveRecord::Base
     self[:assigned] = staff.count { |s| s.roles.exists?(self.role_id) }
     self[:missing] = count - self[:assigned]
   end
+
+  def to_s
+    pluralize(count, Role.find(role_id).to_s) +  ': ' + Vms::ScenarioSite.find(scenario_site_id).to_s
+  end
 end
