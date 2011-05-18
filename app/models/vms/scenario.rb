@@ -47,10 +47,6 @@ class Vms::Scenario < ActiveRecord::Base
 
   named_scope :active, lambda { |scenario| { :conditions => [ "state IN (?)", [STATES[:executed], STATES[:paused]] ] } }
   
-  def to_s
-    name
-  end
-  
   def in_progress?
     state == Vms::Scenario::STATES[:executing]
   end
@@ -191,4 +187,9 @@ class Vms::Scenario < ActiveRecord::Base
     require 'vendor/plugins/vms/lib/workers/watch_for_vms_execution_alert_responses_worker.rb'
     WatchForVmsExecutionAlertResponsesWorker.new.query
   end
+
+  def to_s
+    name
+  end
+  
 end

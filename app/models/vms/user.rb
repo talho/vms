@@ -1,5 +1,4 @@
 class User < ActiveRecord::Base
-
   def vms_scenario_sites
     Vms::ScenarioSite.find(:all, :conditions => {:site_admin_id => id}, :order => 'id DESC')
   end
@@ -19,5 +18,4 @@ class User < ActiveRecord::Base
   def is_vms_scenario_site_admin_for?(scenario_site)
     scenario_site.site_admin_id == id
   end
-
 end
