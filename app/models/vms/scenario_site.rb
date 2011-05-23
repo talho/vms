@@ -30,4 +30,8 @@ class Vms::ScenarioSite < ActiveRecord::Base
     tags << role_scenario_sites.map { |r| r.qualification_list.map { |q| {:name => q, :role => r.role.name, :role_id => r.role_id, :site_id => site_id, :site => site.name} } }
     tags
   end
+  
+  def all_staff
+    (staff + teams.map{ |t| t.audience.recipients.map{|ui| Vms::Staff.new(:user => ui, :scenario_site => self, :source => 'team', :status => 'assigned')} }).flatten.uniq
+  end
 end

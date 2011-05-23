@@ -29,6 +29,8 @@ class Vms::Scenario < ActiveRecord::Base
   has_many :teams, :through => :site_instances
   has_many :role_scenario_sites, :through => :site_instances
   
+  has_many :vms_alerts, :class_name => "VmsAlert"
+  
   accepts_nested_attributes_for :user_rights, :allow_destroy => true, :reject_if => proc {|ur| ur[:permission_level]  == Vms::UserRight::PERMISSIONS[:owner]}
   
   STATES = {:template => 1, :unexecuted => 2, :executing => 3, :paused => 4, :complete => 5}
@@ -63,13 +65,13 @@ class Vms::Scenario < ActiveRecord::Base
     (staff + teams.map{ |t| t.audience.recipients.map{|ui| Vms::Staff.new(:user => ui, :scenario_site => t.scenario_site, :source => 'team', :status => 'assigned')} }).flatten.uniq
   end
   
-  def execute(current_user, custom_alert = nil)
+  def execute(current_user)
     # Find unfilled roles
-    users = all_staff.map(&:user)
     h = Hash.new
     role_scenario_sites.each do |r| 
-      r.calculate_assignment(users)
-      r[:missing] = r.count - r[:assigned]
+      r.calculate_assignment(r.scenario_site.all_staff.map(&:user))
+      
+      next if r[:missing] <= 0
       
       if h.key?(r.role)
         h[r.role][:missing] += r[:missing]
@@ -78,24 +80,22 @@ class Vms::Scenario < ActiveRecord::Base
         h[r.role] = {:missing => r[:missing], :rss => [r]}
       end
     end
-        
+    
+    all_volunteers = []
+    al = VmsExecutionAlert.new :title => "Scenario #{name} is looking for volunteers", :author => current_user, :scenario => self
     # Find capable volunteers to fill roles
+    vol_hash = Hash.new
     h.each do |role, args|
-      volunteers = role.volunteers.reject{|u| users.include?(u)}.take(args[:missing])
-      #prioritize providing some roles to each site over filling a site
-      rsss = args[:rss]
-      rss = nil
-      while (rss = rsss.pop) && volunteers.count > 0
-        v = volunteers.pop
-        users << v
-        rss.scenario_site.staff.create :user => v, :status => 'assigned', :source => 'auto'
-        rss[:missing] -= 1 # decrement missing
-        rsss.insert(0, rss) if rss[:missing] > 0 #stick the role back on the front of the array if we still have missing roles
+      volunteers = role.volunteers.reject{|u| users.include?(u)}
+      volunteers.each do |vol|
+        all_volunteers << vol unless all_volunteers.include?(vol)
+        al.vms_volunteer_roles.build :volunteer => vol, :role => role
       end
-      # Alert volunteers to ask if they can participate
-      # On callbacks, select the users that can respond soonest and notify of selection and standby      
     end
     
+    al.audiences << (Audience.new :users => all_volunteers)
+    
+    al.save
   end
   handle_asynchronously :execute
   
@@ -109,9 +109,10 @@ class Vms::Scenario < ActiveRecord::Base
       end
 
       # Alert users for the scenario that the execution has been paused.
-      al = VmsAlert.new :title => "Scenario #{name} has been paused.", :message => custom_alert || "The scenario that you were participating in has been suspended. You may receive notification when this scenario has been resumed.", :author => current_user
+      al = VmsAlert.new :title => "Scenario #{name} has been paused.", :message => custom_alert || "The scenario that you were participating in has been suspended. You may receive notification when this scenario has been resumed.", 
+           :author => current_user, :scenario => self
       al.audiences << (Audience.new :users => users)
-      
+
       al.save
     end
   end
@@ -127,7 +128,7 @@ class Vms::Scenario < ActiveRecord::Base
       end
       
       # Alert users for the scenario that the execution has been resumed.
-      al = VmsAlert.new :title => "Scenario #{name} has been resumed.", :message => custom_alert || "The scenario that you have been participating in has resumed. Please reassume your normal duties.", :author => current_user
+      al = VmsAlert.new :title => "Scenario #{name} has been resumed.", :message => custom_alert || "The scenario that you have been participating in has resumed. Please reassume your normal duties.", :author => current_user, :scenario => self
       al.audiences << (Audience.new :users => users)
       
       al.save
@@ -144,7 +145,7 @@ class Vms::Scenario < ActiveRecord::Base
     end
     
     # Alert users that the scenario execution is complete and they can go home
-    al = VmsAlert.new :title => "Scenario #{name} has been stopped.", :message => custom_alert || "The scenario that you have been participating in has ended. Thank you for your participation.", :author => current_user
+    al = VmsAlert.new :title => "Scenario #{name} has been stopped.", :message => custom_alert || "The scenario that you have been participating in has ended. Thank you for your participation.", :author => current_user, :scenario => self
     al.audiences << (Audience.new :users => users)
     
     al.save
@@ -162,7 +163,7 @@ class Vms::Scenario < ActiveRecord::Base
     end
     
     # Send a custom alert to all volunteers or a subset thereof for a certain scenario.
-    al = VmsAlert.new :title => "Scenario #{name} has been paused.", :message => custom_alert, :author => current_user
+    al = VmsAlert.new :title => "Custom Alert", :message => custom_alert, :author => current_user, :scenario => self
     al.audiences << (Audience.new :users => users)
     
     al.save
