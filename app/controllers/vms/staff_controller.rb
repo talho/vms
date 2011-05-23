@@ -41,25 +41,32 @@ class Vms::StaffController < ApplicationController
     
     current_staff = @site_instance.staff
     
+    deleted_users_for_alerts = []
     #delete existing staff
     deleted_staff.each do |s|
       db_staff = current_staff[current_staff.index{ |ts| ts.id === s['id']}]
       db_staff.mark_for_destruction
+      deleted_users_for_alerts << db_staff.user
     end
+    Vms::Staff.send_later(:send_removed_message, deleted_users_for_alerts, @scenario)
     
+    added_staff_for_alerts = []
     #create new staff
     new_staff.each do |s|
       #first, check to see if the user is already assigned to a different site instance
       st = @scenario.staff.find_by_user_id(s['user_id'])
       st.destroy unless st.nil?
-      @site_instance.staff.build(s)
+      added_staff_for_alerts << @site_instance.staff.build(s)
     end
+    Vms::Staff.send_later(:send_added_message, added_staff_for_alerts, @site_instance)
     
+    updated_staff_for_alerts = []
     #update existing staff
     updated_staff.each do |s|
-      db_staff = current_staff[current_staff.index{ |ts| ts.id === s['id']}]
+      updated_staff_for_alerts << db_staff = current_staff[current_staff.index{ |ts| ts.id === s['id']}]
       db_staff.attributes = s
     end
+    Vms::Staff.send_later(:send_updated_message, updated_staff_for_alerts)
     
     respond_to do |format|
       if @site_instance.save

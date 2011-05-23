@@ -94,11 +94,11 @@ Talho.VMS.ux.CommandCenter.ScenarioStatus = {
   
   updateState: function(){
     var pp = Ext.Direct.getProvider('command_center_polling_provider-' + this.scenarioId);
-    if((this.scenario_state === 'ended' || this.scenario_state === 'template' || this.scenario_state === 'unexecuted') && pp.isConnected()){
-      pp.disconnect();
-    }
-    else if (!pp.isConnected()) {
+    if((this.scenario_state === 'executing' || this.scenario_state === 'paused') && !pp.isConnected()){
       pp.connect();
+    }
+    else if (pp.isConnected() && this.scenario_state !== 'executing') {
+      pp.disconnect();
     }
     
     (['paused', 'unexecuted'].indexOf(this.scenario_state) !== -1) ? this.executeBtn.show() : this.executeBtn.hide();
