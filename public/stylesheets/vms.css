@@ -20,6 +20,7 @@
   height: 26px;
   position: absolute;
   width: 26px;
+  background-repeat:no-repeat;
 }
 
 .vms-row-text{
@@ -28,6 +29,17 @@
   right: 0;
   white-space: normal;
   word-wrap: normal;
+}
+
+.vms-row-button{
+  font-family: Arial, Helvetica, sans-serif;
+  border: 1px solid;
+  border-color: #FFF #EDEDED #EDEDED #FFF;
+}
+
+.vms-row-button.x-btn-over{
+  background-color: #E6E6E0;
+  border-color: #CCC;
 }
 
 /* ------------- Drag Proxy tool display ------------ */
@@ -116,6 +128,22 @@
 }
 .vms-tool-icon-inactive.vms-auto-user{
   background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-available-auto.png);
+}
+
+.vms-row-icon.vms-control-pause{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-control-pause.png);
+}
+.vms-row-icon.vms-control-play{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-control-play.png);
+}
+.vms-row-icon.vms-control-stop{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-control-stop.png);
+}
+.vms-row-icon.vms-control-edit{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-control-edit.png);
+}
+.vms-row-icon.vms-control-alert{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-control-alert.png);
 }
 
 /* ----------- VMS Site Info Window */

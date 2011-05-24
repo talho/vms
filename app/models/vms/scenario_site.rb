@@ -6,6 +6,8 @@ class Vms::ScenarioSite < ActiveRecord::Base
 
   belongs_to :site, :class_name => "Vms::Site"
   belongs_to :scenario, :class_name => "Vms::Scenario"
+  before_update :check_state_for_alert_need
+  
   STATES = {:inactive => 1, :active => 2}  
   
   has_many :inventories, :class_name => "Vms::Inventory"
@@ -33,5 +35,30 @@ class Vms::ScenarioSite < ActiveRecord::Base
   
   def all_staff
     (staff + teams.map{ |t| t.audience.recipients.map{|ui| Vms::Staff.new(:user => ui, :scenario_site => self, :source => 'team', :status => 'assigned')} }).flatten.uniq
+  end
+  
+  def alert_users_of_site_deactivation
+    al = VmsAlert.new :title => "Site #{site.name} deactivated", :author => scenario.users.owner, :audiences => [Audience.new :users => all_staff.map(&:user)], :scenario => scenario,
+                      :message => "The site #{site.name} located at #{site.address} has been deactivated. You were assigned to that site. You will be notified when the site is reactivated."
+    al.save
+  end
+  handle_asynchronously :alert_users_of_site_deactivation
+  
+  def alert_users_of_site_activation
+    al = VmsAlert.new :title => "Site #{site.name} activated", :author => scenario.users.owner, :audiences => [Audience.new :users => all_staff.map(&:user)], :scenario => scenario,
+                      :message => "The site #{site.name} located at #{site.address} has been activated. You are assigned to that site and should resume your duties."
+    al.save
+  end
+  handle_asynchronously :alert_users_of_site_activation
+  
+  private
+  def check_state_for_alert_need
+    if self.changed.include?('status') && self.scenario.executing?
+      if self.status == Vms::ScenarioSite::STATES[:inactive]
+        self.alert_users_of_site_deactivation
+      else
+        self.alert_users_of_site_activation
+      end
+    end
   end
 end

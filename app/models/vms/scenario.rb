@@ -61,6 +61,10 @@ class Vms::Scenario < ActiveRecord::Base
     state == Vms::Scenario::STATES[:unexecuted]
   end
   
+  def executing?
+    state == Vms::Scenario::STATES[:executing]
+  end
+  
   def all_staff
     (staff + teams.map{ |t| t.audience.recipients.map{|ui| Vms::Staff.new(:user => ui, :scenario_site => t.scenario_site, :source => 'team', :status => 'assigned')} }).flatten.uniq
   end
