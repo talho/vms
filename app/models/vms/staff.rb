@@ -44,7 +44,7 @@ class Vms::Staff < ActiveRecord::Base
   end
 
   def to_s
-   user.to_s
+    user.to_s
   end
 
 end
