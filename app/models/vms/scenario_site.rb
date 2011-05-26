@@ -13,6 +13,7 @@ class Vms::ScenarioSite < ActiveRecord::Base
   has_many :role_scenario_sites, :class_name => "Vms::RoleScenarioSite", :autosave => true
   has_many :roles, :through => :role_scenario_sites
   has_many :staff, :class_name => "Vms::Staff", :autosave => true
+  has_many :walkups, :class_name => 'Vms::Walkup'
   has_many :users, :through => :staff
   has_many :teams, :class_name => "Vms::Team", :autosave => true
   

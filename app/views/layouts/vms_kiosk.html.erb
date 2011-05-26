@@ -4,11 +4,12 @@
   <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
   <title>TXPhin Volunteer Management System: Volunteer Check-In</title>
   
-  <%= stylesheet_link_tag 'resources/css/ext-all', 'redesign/master', :cache => true %>
-  <%= javascript_include_tag 'ext/adapter/ext/ext-base', 'ext/ext-all-debug', 'vms/kiosk/kiosk_check_in', :cache=>true %>
+  <%= stylesheet_link_tag 'resources/css/ext-all', 'redesign/master', 'vms/vms', :cache => true %>
+  <%= javascript_include_tag 'ext/adapter/ext/ext-base', 'ext/ext-all-debug', 'vms/kiosk/kiosk_check_in', 'ext_extensions/validations', :cache=>true %>
   <script type="text/javascript">
   Ext.BLANK_IMAGE_URL = '/images/s.gif';
-
+  var TARGET_DIV_ID = 'checkin-ext-wrapper';
+  var SCENARIO_SITE_ID = <%= @ssite.id %>;
   Ext.onReady(function(){ Talho.VMS.kiosk.init() } );
   </script>
 </head>

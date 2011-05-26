@@ -14,9 +14,10 @@ class Vms::SitesController < ApplicationController
   end  
   
   def show
+    debugger
     @site = @scenario.site_instances.find_by_site_id(params[:id], :include => {:teams => {:audience => [:users]}, :staff => {:user => [:roles]}, :role_scenario_sites => [:role], :inventories => {:item_instances => {:item => :item_category} } })
     # here we need to work with calculating full lists of 1) the staff assigned to the site, both manually and automatically (automatic assignment in progress)
-    staff = (@site.staff.map {|s| s.user[:source] = 'manual'; s.user[:staff_id] = s.id; s.user } + @site.teams.map{ |t| t.audience.recipients }.flatten.map{|ui| ui[:source] = 'team'; ui}).flatten.uniq
+    staff = @site.staff.map {|s| s.user[:source] = 'manual'; s.user[:staff_id] = s.id; s.user }
     # 2) the roles assigned to the site and which staff members are filling those roles. this could become interesting because, when a user is manually assigned, we have to decide if he's filling 1 or many roles
     @site.role_scenario_sites.each { |r| r.calculate_assignment(staff) }
     # 3) any calculations that need to be done on inventory items

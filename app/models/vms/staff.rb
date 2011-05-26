@@ -18,6 +18,6 @@ class Vms::Staff < ActiveRecord::Base
   end
 
   def to_s
-    User.find(user_id).to_s + ': ' + Vms::ScenarioSite.find(scenario_site_id).to_s
+   user.to_s 
   end
 end
