@@ -47,6 +47,11 @@ class Vms::TeamsController < ApplicationController
     team.audience = Audience.new params[:team][:audience]
     team.audience.scope = "Team"
     team.audience.owner = current_user
+    team.audience.recipients.each do | user |
+      @staff = @scenario_site.staff.find_or_create_by_user_id_and_scenario_site_id( user.id, @scenario_site.id)
+      @staff.update_attributes({:status => 'team-assigned'})
+    end
+
     aud = nil
     if params[:save_template] == "true" && (par_aud.nil? || Group::SCOPE.include?(par_aud.scope)) #do this if we're saving a template and the parent template is null or the parent audience is a group (and not a team)
       aud = Audience.new team.audience.attributes
@@ -73,7 +78,8 @@ class Vms::TeamsController < ApplicationController
   
   def update
     @team = @scenario.site_instances.for_site(params[:vms_site_id]).teams.find(params[:id])
-    
+    @scenario_site = @scenario.site_instances.find_by_site_id_and_scenario_id(params[:site_id], params[:vms_scenario_id])
+
     unless params[:team].nil? || params[:team][:audience].nil?
       #build team. params[:team] should contain team[audience][name] and team[audience][users]
       if params[:team][:audience][:user_ids].nil?
@@ -82,8 +88,16 @@ class Vms::TeamsController < ApplicationController
       @team.audience.attributes = params[:team][:audience]
     end
     
-    unless params[:site_id].nil?
-      @team.scenario_site = @scenario.site_instances.for_site(Vms::Site.find(params[:site_id]))
+    unless params[:site_id].nil? || @team.scenario_site == @scenario_site
+      @team.audience.recipients.each do | u |
+        #remove all team members from their old ScenarioSite's staff
+        oldstaff = @scenario.staff.find_by_user_id(u.id)
+        oldstaff.destroy unless oldstaff.nil?
+        #add all team members to staff on target ScenarioSite
+        newstaff = @scenario_site.staff.find_or_create_by_user_id_and_scenario_site_id(u.id, @scenario_site.id)
+        newstaff.update_attributes({:status => 'team-assigned'})
+      end
+      @team.scenario_site = @scenario_site
     end
     
     respond_to do |format|

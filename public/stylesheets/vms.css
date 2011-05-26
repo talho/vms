@@ -186,3 +186,8 @@
   border-bottom: solid 1px #EDEDED;
   padding-bottom: 3px;
 }
+
+ /* ---------- Check-in Kiosk ------------ */
+.x-grid3-row.vms-checked-in{
+  background-color: #eeffee;
+}
