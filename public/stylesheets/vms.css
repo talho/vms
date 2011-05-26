@@ -165,3 +165,8 @@
 .vms-site-info-item-danger{
   background-image: url(/stylesheets/vms/images/bullet-red-alt.png)
 }
+ /* ---------- Check-in Kiosk */
+
+.x-grid3-row.vms-checked-in{
+  background-color: #eeffee;
+}

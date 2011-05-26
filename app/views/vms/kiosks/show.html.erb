@@ -6,10 +6,10 @@
     Volunteer Check-In
   </div>
   <div style="text-align:center; font-size: 200%; font-weight: bold;">
-    <%= Vms::Site.find(@ssite.site_id).to_s %>
+    <%= @ssite.site.to_s %>
   </div>
   <div style="text-align:center;">
-    Scenario: <b><%= Vms::Scenario.find(@ssite.scenario_id).to_s %></b>
+    <b><%= @ssite.site.address %></b>
   </div>
 </div>
 <div id="checkin-ext-wrapper" style="border: 1px dashed lightgray; height: 100%;"></div>
