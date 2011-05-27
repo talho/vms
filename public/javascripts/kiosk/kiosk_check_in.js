@@ -97,11 +97,30 @@ Ext.ns("Talho.VMS");
       }
     },
 
+    VOLUNTEER_REFRESH_INTERVAL: 60000,
+    startVolunteerRefresher: function(){
+      if (!this.volunteer_refresher) {
+        var inst = this;   // make a copy of this to pass into the interval timer because it runs /IN SPAAAAAAACE/
+        this.volunteer_refresher = setInterval(function(){ inst.siteVolunteersStore.load(); }, this.VOLUNTEER_REFRESH_INTERVAL);
+      }
+    },
+    stopVolunteerRefresher: function(){
+      if (this.volunteer_refresher) {
+        clearInterval(this.volunteer_refresher);
+        this.volunteer_refresher = null;
+      }
+    },
+
     init: function(){
 
       this.siteVolunteersStore = new Ext.data.JsonStore ({
         url: document.location.href + '.json', restful: true, root: 'volunteers', autoLoad: true,
-        fields: ['id', 'display_name', 'image', 'email', 'type', 'checked_in', 'scenario_site_admin']
+        fields: ['id', 'display_name', 'image', 'email', 'type', 'checked_in', 'scenario_site_admin'] ,
+        listeners: {
+          scope: this,
+          'beforeload': function(){ this.stopVolunteerRefresher(); },
+          'load':       function(){ this.startVolunteerRefresher(); }
+        }
       });
 
       this.volunteerTemplate = new Ext.XTemplate(
