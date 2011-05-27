@@ -194,6 +194,7 @@ Feature: Send alerts for different actions on scenarios
     And "Atticus Finch" is assigned to "Malawi" for scenario "Test"
     And scenario "Test" is "executing"
     When I open the "Test" scenario
+    And I click x-accordion-hd "Site"
     And I right click on site "Malawi"
     And I click x-menu-item "Deactivate"
     And I wait for the "Loading..." mask to go away
@@ -209,6 +210,7 @@ Feature: Send alerts for different actions on scenarios
     And "Atticus Finch" is assigned to "Inactiveness" for scenario "Test"
     And scenario "Test" is "executing"
     When I open the "Test" scenario
+    And I click x-accordion-hd "Site"
     When I drag the "Inactiveness" site to the map at "-13.962475513490757", "33.7866090623169"
     When I press "Save"
     And I wait for the "Loading..." mask to go away

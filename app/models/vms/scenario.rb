@@ -25,9 +25,9 @@ class Vms::Scenario < ActiveRecord::Base
   has_many :sites, :through => :site_instances
   
   has_many :inventories, :through => :site_instances
-  has_many :staff, :through => :site_instances
+  has_many :staff, :through => :site_instances, :order => 'vms_staff.id'
   has_many :teams, :through => :site_instances
-  has_many :role_scenario_sites, :through => :site_instances
+  has_many :role_scenario_sites, :through => :site_instances, :order => 'vms_roles_scenario_sites.id'
   
   has_many :vms_alerts, :class_name => "VmsAlert"
   

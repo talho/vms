@@ -175,7 +175,8 @@ Feature: Scen Access Control
     And I select the "Test" grid row
     And I press "Open"
     Then the "Command Center - Test" tab should be open
-    And I should see "New Site"
+    When I click x-accordion-hd "Site"
+    Then I should see "New Site"
     When I drag the "New Site" site to the map at "31.347573", "-94.71391"
     And I fill in "Name" with "Immunization Center"
     Then the "Address" field should contain "1303 Atkinson Dr, Lufkin, TX 75901, USA"

@@ -42,22 +42,22 @@ Then /^I should see role information for "([^\"]*)"$/ do |role_name|
       Then %{I should see "Chief Veterinarian" in grid row 1 within ".site_info_window .roles_grid"}
     when "Vet & BHD"
       Then %{I should see "Roles - 0/0/2" within ".site_info_window .roles_grid"}
-      Then %{I should see "Chief Veterinarian" in grid row 1 within ".site_info_window .roles_grid"}
-      Then %{I should see "Border Health Director" in grid row 2 within ".site_info_window .roles_grid"}
+      Then %{I should see "Border Health Director" in grid row 1 within ".site_info_window .roles_grid"}
+      Then %{I should see "Chief Veterinarian" in grid row 2 within ".site_info_window .roles_grid"}
     when "Filled Vet"
       Then %{I should see "Roles - 0/1/1" within ".site_info_window .roles_grid"}
       Then %{I should see "Chief Veterinarian" in grid row 1 within ".site_info_window .roles_grid"}
     when "Filled Vet & BHD"
       Then %{I should see "Roles - 0/2/2" within ".site_info_window .roles_grid"}
-      Then %{I should see "Chief Veterinarian" in grid row 1 within ".site_info_window .roles_grid"}
-      Then %{I should see "Border Health Director" in grid row 2 within ".site_info_window .roles_grid"}
+      Then %{I should see "Border Health Director" in grid row 1 within ".site_info_window .roles_grid"}
+      Then %{I should see "Chief Veterinarian" in grid row 2 within ".site_info_window .roles_grid"}
     when "Unfilled BHD"
       Then %{I should see "Roles - 0/0/1" within ".site_info_window .roles_grid"}
       Then %{I should see "Border Health Director" in grid row 1 within ".site_info_window .roles_grid"}
     when "Mixed Fill Vet & BHD"
       Then %{I should see "Roles - 0/1/2" within ".site_info_window .roles_grid"}
-      Then %{I should see "Chief Veterinarian" in grid row 1 within ".site_info_window .roles_grid"}
-      Then %{I should see "Border Health Director" in grid row 2 within ".site_info_window .roles_grid"}
+      Then %{I should see "Border Health Director" in grid row 1 within ".site_info_window .roles_grid"}
+      Then %{I should see "Chief Veterinarian" in grid row 2 within ".site_info_window .roles_grid"}
   end
 end
 

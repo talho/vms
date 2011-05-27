@@ -13,6 +13,7 @@ Feature: Test site creation for scenarios
 
   Scenario Outline: Create a new site
     When I open the "Test" scenario
+    And I click x-accordion-hd "Site"
     When I drag the "New Site" site to the map at "<lat>", "<lng>"
     And I fill in "Name" with "<name>"
     Then the "Address" field should contain "<address>"
@@ -30,6 +31,7 @@ Feature: Test site creation for scenarios
       | name                | address                                 | lat       | lng       | status | scenario |
       | Immunization Center | 1303 Atkinson Dr, Lufkin, TX 75901, USA | 31.347573 | -94.71391 | active | Test     |
     When I open the "Test" scenario
+    And I click x-accordion-hd "Site"
     When I drag the "Immunization Center" site to the map at "-13.962475513490757", "33.7866090623169"
     And I fill in "Name" with "Immunization Center 2"
     Then the "Address" field should contain "Kenyatta, Lilongwe, Malawi"
@@ -42,6 +44,7 @@ Feature: Test site creation for scenarios
       | name                | address                                 | lat       | lng       | status   | scenario |
       | Immunization Center | 1303 Atkinson Dr, Lufkin, TX 75901, USA | 31.347573 | -94.71391 | inactive |          |
     When I open the "Test" scenario
+    And I click x-accordion-hd "Site"
     When I drag the "New Site" site to the map at "-13.962475513490757", "33.7866090623169"
     And I fill in "Name" with "Immunization Center"
     And I select "Immunization Center" from ext combo "Name"
@@ -52,6 +55,7 @@ Feature: Test site creation for scenarios
 
   Scenario: Create a site and change the address
     When I open the "Test" scenario
+    And I click x-accordion-hd "Site"
     When I drag the "New Site" site to the map at "-13.962475513490757", "33.7866090623169"
     And I fill in "Name" with "Immunization Center"
     Then the "Address" field should contain "Kenyatta, Lilongwe, Malawi"
@@ -65,6 +69,7 @@ Feature: Test site creation for scenarios
       | name                | address                                 | lat       | lng       | status   | scenario |
       | Immunization Center | 1303 Atkinson Dr, Lufkin, TX 75901, USA | 31.347573 | -94.71391 | inactive | Test     |
     When I open the "Test" scenario
+    And I click x-accordion-hd "Site"
     When I drag the "Immunization Center" site to the map at "-13.962475513490757", "33.7866090623169"
     Then the "Name" field should contain "Immunization Center"
     And the "Address" field should contain "1303 Atkinson Dr, Lufkin, TX 75901, USA"
@@ -78,6 +83,7 @@ Feature: Test site creation for scenarios
       | name                | address                    | lat                 | lng              | status | scenario |
       | Immunization Center | Kenyatta, Lilongwe, Malawi | -13.962475513490757 | 33.7866090623169 | active | Test     |
     When I open the "Test" scenario
+    And I click x-accordion-hd "Site"
     And I right click on site "Immunization Center"
     And I click x-menu-item "Edit"
     Then the "Edit Site" window should be open
@@ -93,6 +99,7 @@ Feature: Test site creation for scenarios
       | name                | address                    | lat                 | lng              | status | scenario |
       | Immunization Center | Kenyatta, Lilongwe, Malawi | -13.962475513490757 | 33.7866090623169 | active | Test     |
     When I open the "Test" scenario
+    And I click x-accordion-hd "Site"
     And I right click on site "Immunization Center"
     And I click x-menu-item "Deactivate"
     And I wait for the "Loading..." mask to go away
@@ -103,6 +110,7 @@ Feature: Test site creation for scenarios
       | name                | address                    | lat                 | lng              | status | scenario |
       | Immunization Center | Kenyatta, Lilongwe, Malawi | -13.962475513490757 | 33.7866090623169 | active | Test     |
     When I open the "Test" scenario
+    And I click x-accordion-hd "Site"
     And I right click on site "Immunization Center"
     And I click x-menu-item "Remove"
     Then I should not see "Immunization Center" in grid row 2
