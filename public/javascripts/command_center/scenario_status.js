@@ -81,13 +81,20 @@ Talho.VMS.ux.CommandCenter.ScenarioStatus = {
       msg = "Could not change the state of the current scenario" + (Ext.isEmpty(result['msg']) ? '.' : (":<br/>" + result['msg']) );
       Ext.Msg.alert("Error", msg);
     }
-    
+    if(!this.saveMask) this.saveMask = new Ext.LoadMask(this.getLayoutTarget(), {msg: 'Saving...'});
+    this.saveMask.show();
     Ext.Ajax.request({
       url: '/vms/scenarios/' + this.scenarioId + '/' + to_state + '.json',
       method: 'PUT',
       params: additional_params,
-      success: success,
-      failure: failure,
+      success: function(){
+        this.saveMask.hide();
+        success.apply(this, arguments);
+      },
+      failure: function(){
+        this.saveMask.hide();
+        failure.apply(this, arguments);
+      },
       scope: this
     });
   },

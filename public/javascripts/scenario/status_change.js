@@ -74,7 +74,7 @@ Talho.VMS.ux.ScenarioStatusChange = Ext.extend(Ext.Window, {
             Ext.each(result, function(r){
               users.push(r.user_detail);
             });
-            this.getComponent('tp').getComponent('aud').getComponent('users').getStore().loadData(users);
+            if(this.getComponent('tp')) this.getComponent('tp').getComponent('aud').getComponent('users').getStore().loadData(users);
           }
           else{
             Ext.Msg.alert('There was a problem loading the staff for this site');
