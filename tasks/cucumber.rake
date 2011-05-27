@@ -5,7 +5,7 @@ begin
 
   namespace :cucumber do
     desc = "Vms plugin, add any cmd args after --"
-    Cucumber::Rake::Task.new({:vms => 'db:test:prepare'}, desc) do |t|
+    Cucumber::Rake::Task.new(:vms, desc) do |t|#'db:test:prepare'
       t.cucumber_opts = "-r features " +
                         "-r vendor/plugins/vms/spec/factories.rb " +
                         "-r vendor/plugins/vms/features/step_definitions " +

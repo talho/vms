@@ -85,12 +85,14 @@ class Vms::Scenario < ActiveRecord::Base
       end
     end
     
+    all_users = all_staff.map(&:user)
+    
     all_volunteers = []
     al = VmsExecutionAlert.new :title => "Scenario #{name} is looking for volunteers", :author => current_user, :scenario => self
     # Find capable volunteers to fill roles
     vol_hash = Hash.new
     h.each do |role, args|
-      volunteers = role.volunteers.reject{|u| users.include?(u)}
+      volunteers = role.volunteers.reject{|u| all_users.include?(u)}
       volunteers.each do |vol|
         all_volunteers << vol unless all_volunteers.include?(vol)
         al.vms_volunteer_roles.build :volunteer => vol, :role => role
@@ -98,8 +100,11 @@ class Vms::Scenario < ActiveRecord::Base
     end
     
     al.audiences << (Audience.new :users => all_volunteers)
-    
     al.save
+    
+    status_alert = VmsStatusAlert.default_alert(:title => "Scenario #{name} is now executing", :message => "Scenario #{name} is now executing. You are currently assigned to site {site_name} at {site_address}", 
+                                                :audiences => [Audience.new :users => all_users], :scenario => self)
+    status_alert.save
   end
   handle_asynchronously :execute
   

@@ -32,3 +32,25 @@ Given /^"([^\"]*)" is an? ([a-zA-Z0-9\-_]*) for scenario "([^\"]*)"$/ do |user_n
   scen = Vms::Scenario.find_by_name(scenario_name)
   scen.user_rights.create :user => user, :permission_level => Vms::UserRight::PERMISSIONS[role_name.to_sym]
 end
+
+Given /^scenario "([^\"]*)" is "([^\"]*)"$/ do |scenario_name, scenario_status|
+  scen = Vms::Scenario.find_by_name(scenario_name)
+  scen.update_attributes :state => Vms::Scenario::STATES[scenario_status.to_sym]
+end
+
+Then /^scenario "([^\"]*)" should be "([^\"]*)"$/ do |scenario_name, scenario_status|
+  scen = Vms::Scenario.find_by_name(scenario_name)
+  scen.state.should == Vms::Scenario::STATES[scenario_status.to_sym]
+end
+
+Then /^the polling service for "([^"]*)" should( not)? be running$/ do |scenario_name, neg|
+  scen = Vms::Scenario.find_by_name(scenario_name)
+
+  connected = page.evaluate_script("Ext.Direct.getProvider('command_center_polling_provider-#{scen.id.to_s}').isConnected()")
+
+  if neg
+    connected.should be_false
+  else
+    connected.should be_true
+  end
+end
