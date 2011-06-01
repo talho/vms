@@ -61,8 +61,7 @@ class Vms::TeamsController < ApplicationController
     elsif params[:save_template] == "false" && !par_aud.nil?
       team.audience.parent_audiences << par_aud
     end
-    
-    
+      
     respond_to do |format|
       if @scenario_site.save && (aud.nil? || aud.save)
         format.json {render :json => {:success => true} }
@@ -90,11 +89,10 @@ class Vms::TeamsController < ApplicationController
     
     unless params[:site_id].nil? || @team.scenario_site == @scenario_site
       @team.audience.recipients.each do | u |
-        #remove all team members from their old ScenarioSite's staff
-        oldstaff = @scenario.staff.find_by_user_id(u.id)
-        oldstaff.destroy unless oldstaff.nil?
+        #remove any members of this team from other sites staffs if they are not checked in
+        @scenario.staff.find(:all, :conditions=>['scenario_site_id != ? AND user_id = ? AND checked_in = ?',@scenario_site.id, u.id, false]).each{ |s| s.destroy }
         #add all team members to staff on target ScenarioSite
-        newstaff = @scenario_site.staff.find_or_create_by_user_id_and_scenario_site_id(u.id, @scenario_site.id)
+        newstaff = @scenario_site.staff.find_or_create_by_user_id(u.id)
         newstaff.update_attributes({:status => 'team-assigned'})
       end
       @team.scenario_site = @scenario_site

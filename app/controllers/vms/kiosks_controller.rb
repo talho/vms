@@ -26,23 +26,23 @@ class Vms::KiosksController < ApplicationController
   end
 
   def registered_checkin
-    success = false
-    if params['walkup_signout']
+    if params['walkup_id']
       walkup = Vms::Walkup.find(params['walkup_id'])
       walkup.update_attributes(:checked_in => !walkup.checked_in?)
-      success = true
       respond_to do |format|
-        format.json{ render :json=> {:success => success} }
+        format.json{ render :json=> {:success => true} }
       end
     else
       @ssite = Vms::ScenarioSite.find(params['scenario_site_id'])
       @user = User.authenticate(params['email'], params['password'])
-      unless @user.nil? || @ssite.nil?
-        staff_record = @ssite.scenario.staff.find_or_create_by_user_id(@user.id)
-        # if they're checking in/out of their current ssite, invert checked_in.  otherwise, check them in (to a new ssite)
-        staff_record.checked_in = staff_record.scenario_site == @ssite ? !staff_record.checked_in? : true
-        staff_record.scenario_site = @ssite
-        success = true if staff_record.save!
+      if @user.nil? || @ssite.nil?
+        success = false
+      else
+        staff_record = @ssite.staff.find_or_create_by_user_id(@user.id)
+        # remove any staff assignments for this user on other ssites in this scenario
+        @ssite.scenario.staff.find(:all, :conditions=>['scenario_site_id != ? AND user_id = ?',@ssite.id, @user.id]).each{ |s| s.destroy }
+        staff_record.checked_in = !staff_record.checked_in?
+        success = staff_record.save!
       end
       respond_to do |format|
         format.json{ render :json=> {:success => success} }
@@ -53,6 +53,7 @@ class Vms::KiosksController < ApplicationController
   def walkup_checkin
     @ssite = Vms::ScenarioSite.find(params['scenario_site_id'])
     if params['walkup_new_account']
+      #TODO: detect existing email and prompt for normal checkin
       #TODO: catch validation errors and return them to EXT
       begin
         debugger
