@@ -89,7 +89,6 @@ class Vms::TeamsController < ApplicationController
     
     unless params[:site_id].nil? || @team.scenario_site == @scenario_site
       @team.audience.recipients.each do | u |
-
         #remove any members of this team from other sites staffs if they are not checked in
         @scenario.staff.find(:all, :conditions=>['scenario_site_id != ? AND user_id = ? AND checked_in = ?',@scenario_site.id, u.id, false]).each{ |s| s.destroy }
         #add all team members to staff on target ScenarioSite
