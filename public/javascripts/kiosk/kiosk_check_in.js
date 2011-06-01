@@ -25,7 +25,7 @@ Ext.ns("Talho.VMS");
       var params = {'scenario_site_id':SCENARIO_SITE_ID};
       var record = this.volunteersList.getSelectionModel().getSelected();
       if (record != null && record.data['type'] == 'walkup' ){
-        params['walkup_signout'] = true;
+       // params['walkup_signout'] = true;
         params['walkup_id'] = record['id'];
       }
       form.getForm().submit({
@@ -97,19 +97,30 @@ Ext.ns("Talho.VMS");
       }
     },
 
-    VOLUNTEER_REFRESH_INTERVAL: 60000,
+    showTimeoutNotice: function(){
+
+    },
+
+    VOLUNTEER_REFRESH_INTERVAL: 5000,
+    VOLUNTEER_REFRESH_MAX: 3,
+    volunteer_refresh_count: 0,
     startVolunteerRefresher: function(){
-      if (!this.volunteer_refresher) {
+      if (this.volunteer_refresher) { clearInterval(this.volunteer_refresher); }
+      if (this.volunteer_refresh_count < this.VOLUNTEER_REFRESH_MAX){
         var inst = this;   // make a copy of this to pass into the interval timer because it runs /IN SPAAAAAAACE/
         this.volunteer_refresher = setInterval(function(){ inst.siteVolunteersStore.load(); }, this.VOLUNTEER_REFRESH_INTERVAL);
-      }
+        this.volunteer_refresh_count += 1;
+      } else {
+        this.volunteer_refresh_count = 0;
+        this.showTimeoutNotice();
+      } 
     },
-    stopVolunteerRefresher: function(){
-      if (this.volunteer_refresher) {
-        clearInterval(this.volunteer_refresher);
-        this.volunteer_refresher = null;
-      }
-    },
+//    stopVolunteerRefresher: function(){
+//      if (this.volunteer_refresher) {
+//        clearInterval(this.volunteer_refresher);
+//        this.volunteer_refresher = null;
+//      }
+//    },
 
     init: function(){
 
@@ -118,7 +129,7 @@ Ext.ns("Talho.VMS");
         fields: ['id', 'display_name', 'image', 'email', 'type', 'checked_in', 'scenario_site_admin'] ,
         listeners: {
           scope: this,
-          'beforeload': function(){ this.stopVolunteerRefresher(); },
+          //'beforeload': function(){ this.stopVolunteerRefresher(); },
           'load':       function(){ this.startVolunteerRefresher(); }
         }
       });
