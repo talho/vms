@@ -5,7 +5,7 @@ class CreateWalkup < ActiveRecord::Migration
       t.string :first_name
       t.string :last_name
       t.string :email
-      t.boolean :checked_in
+      t.boolean :checked_in, :default => false
     end
     add_index :vms_walkups, :scenario_site_id
   end
