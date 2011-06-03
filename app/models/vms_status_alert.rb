@@ -13,41 +13,44 @@ class VmsStatusAlert < VmsAlert
   end
   
   def to_xml
-    options = {:Messages => {}, :Recipients => {}, :Behavior => {:Delivery => {:Providers => {} } }, :IVRTree => {} }
+    options = {:Messages => {}, :Recipients => {}, :IVRTree => {} }
     
-    message_names = []
+    recipients = audiences.map(&:recipients).flatten.uniq if recipients.empty?
     staff = self.scenario.staff.find_all_by_user_id(recipients.map(&:id))
-    
-    options[:Messages][:supplement] = Proc.new do |messages|
-      staff.each do |s|
-        message_names << message_name = "user_#{s.user_id}"
-        messages.Message(:name => message_name, :lang => "en/us", :encoding => "utf8", :content_type => "text/plain") do |message|
-          message.Value self.message.gsub(/\{[^}]*\}/) { |m| {'{site_name}' => s.site.name, '{site_address}' => s.site.address}[m] }
-        end
-      end
+        
+    options[:Messages][:override] = Proc.new do |messages|
+      messages.Message(:name => 'title') {|msg| msg.Value "VMS Status Alert"}
+      messages.Message(:name => 'msg_body_1') {|msg| msg.Value "The status of the scenario has been modified. You are currently assigned to site "}
+      messages.Message(:name => 'site_name') {|msg| msg.Value "site_name"}
+      messages.Message(:name => 'msg_body_2') {|msg| msg.Value " at "}
+      messages.Message(:name => 'site_address') {|msg| msg.Value "site_address"}
+      messages.Message(:name => 'msg_body_3') {|msg| msg.Value "."}
     end
     
     options[:Recipients][:override] = Proc.new do |rcpts|
-      recipients.each do |recipient|
-        rcpts.Recipient(:id => recipient.id, :givenName => recipient.first_name, :surname => recipient.last_name, :display_name => recipient.display_name) do |rcpt|
-          (recipient.devices.find_all_by_type(self.alert_device_types.map(&:device))).each do |device|
+      staff.each do |s|
+        rcpts.Recipient(:id => s.user.id, :givenName => s.user.first_name, :surname => s.user.last_name, :display_name => s.user.display_name) do |rcpt|
+          (s.user.devices.find_all_by_type(self.alert_device_types.map(&:device))).each do |device|
             rcpt.Device(:id => device.id, :device_type =>  device.class.display_name) do |d|
               d.URN device.URN
-              d.Message(:name => 'message', :ref => "user_#{recipient.id}")
+              d.Message(:name => 'site_name') {|msg| msg.Value s.site.name}
+              d.Message(:name => 'site_address') {|msg| msg.Value s.site.address}
             end
           end
         end
       end
     end
-    
-    options[:Behavior][:Delivery][:Providers][:supplement] = Proc.new do |providers|
-      message_names.each do |message|
-        role_name = build_role_name(roles)
-        (self.alert_device_types.map{|device| device.device_type.display_name} || Service::SWN::Message::SUPPORTED_DEVICES.keys).each do |device|
-          providers.Provider(:name => "swn", :device => device, :ivr => 'acknowledge_alert') do |provider|
-            provider.Messages do |messages|
-              messages.ProviderMessage(:name => 'message', :ref => message)
-            end
+  
+    options[:IVRTree][:override] = Proc.new do |ivrtree|
+      ivrtree.IVR(:name => 'message_ivr') do |ivr|
+        ivr.RootNode(:operation => 'start') do |root_node|
+          root_node.ContextNode do |ctxt|
+            ctxt.operation 'put'
+            ctxt.response(:ref => 'msg_body_1')
+            ctxt.response(:ref => 'site_name')
+            ctxt.response(:ref => 'msg_body_2')
+            ctxt.response(:ref => 'site_address')
+            ctxt.response(:ref => 'msg_body_3')
           end
         end
       end
