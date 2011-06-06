@@ -15,11 +15,12 @@ class VmsStatusAlert < VmsAlert
   def to_xml
     options = {:Messages => {}, :Recipients => {}, :IVRTree => {} }
     
-    recipients = audiences.map(&:recipients).flatten.uniq if recipients.empty?
-    staff = self.scenario.staff.find_all_by_user_id(recipients.map(&:id))
+    recip = recipients
+    recip = audiences.map(&:recipients).flatten.uniq if recip.empty?
+    staff = self.scenario.staff.find_all_by_user_id(recip.map(&:id))
         
     options[:Messages][:override] = Proc.new do |messages|
-      messages.Message(:name => 'title') {|msg| msg.Value "VMS Status Alert"}
+      messages.Message(:name => 'title') {|msg| msg.Value self.title}
       messages.Message(:name => 'msg_body_1') {|msg| msg.Value "The status of the scenario has been modified. You are currently assigned to site "}
       messages.Message(:name => 'site_name') {|msg| msg.Value "site_name"}
       messages.Message(:name => 'msg_body_2') {|msg| msg.Value " at "}

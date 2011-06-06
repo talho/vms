@@ -36,12 +36,12 @@ Feature: Send alerts for different actions on scenarios
     And I press "Yes"
     And I wait for the "Saving..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsStatusAlert with title "Scenario Test is now executing" message "Scenario Test is now executing. You are currently assigned to site {site_name} at {site_address}"
-    And "Bartleby Scrivener" should receive a VmsExecutionAlert with title "Scenario Test is looking for volunteers"
+    And "atticus@example.com" should receive a VMS email with title "Scenario Test is now executing" message "The status of the scenario has been modified. You are currently assigned to site Malawi at Kenyatta, Lilongwe, Malawi"
+    And "bartleby@example.com" should receive a VMS email with title "Scenario Test is looking for volunteers"
     When "Bartleby Scrivener" has responded to a VmsExecutionAlert with title "Scenario Test is looking for volunteers" with 3
     And backgroundrb has processed the vms alert responses
     And "Bartleby Scrivener" should be assigned to "Immunization Center" for scenario "Test"
-    Then "Bartleby Scrivener" should receive a VmsAlert with title "You have been assigned" message "You have been selected as a volunteer. You have been assigned the role Chief Veterinarian at:\nImmunization Center\n1303 Atkinson Dr, Lufkin, TX 75901, USA"
+    Then "bartleby@example.com" should receive a VMS email with title "You have been assigned" message "You have been selected as a volunteer. You have been assigned the role Chief Veterinarian at:\nImmunization Center\n1303 Atkinson Dr, Lufkin, TX 75901, USA"
 
   Scenario: Pausing a scenario with default alert
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -52,8 +52,8 @@ Feature: Send alerts for different actions on scenarios
     And I press "Yes"
     And I wait for the "Saving..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsAlert with title "Scenario Test has been paused."
-    And "Bartleby Scrivener" should receive a VmsAlert with title "Scenario Test has been paused."
+    Then "atticus@example.com" should receive a VMS email with title "Scenario Test has been paused."
+    And "bartleby@example.com" should receive a VMS email with title "Scenario Test has been paused."
 
   Scenario: Pausing a scenario with custom alert
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -66,8 +66,8 @@ Feature: Send alerts for different actions on scenarios
     And I press "Yes"
     And I wait for the "Saving..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsAlert with title "Scenario Test has been paused." message "Test Alert"
-    And "Bartleby Scrivener" should receive a VmsAlert with title "Scenario Test has been paused." message "Test Alert"
+    Then "atticus@example.com" should receive a VMS email with title "Scenario Test has been paused." message "Test Alert"
+    And "bartleby@example.com" should receive a VMS email with title "Scenario Test has been paused." message "Test Alert"
 
   Scenario: Pausing a scenario with custom users
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -80,8 +80,8 @@ Feature: Send alerts for different actions on scenarios
     And I press "Yes"
     And I wait for the "Saving..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsAlert with title "Scenario Test has been paused."
-    And "Bartleby Scrivener" should not receive a VmsAlert
+    Then "atticus@example.com" should receive a VMS email with title "Scenario Test has been paused."
+    And "bartleby@example.com" should not receive a VMS email
 
   Scenario: Resuming a scenario with default alert
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -92,8 +92,8 @@ Feature: Send alerts for different actions on scenarios
     And I press "Yes"
     And I wait for the "Saving..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsAlert with title "Scenario Test has been resumed."
-    And "Bartleby Scrivener" should receive a VmsAlert with title "Scenario Test has been resumed."
+    Then "atticus@example.com" should receive a VMS email with title "Scenario Test has been resumed."
+    And "bartleby@example.com" should receive a VMS email with title "Scenario Test has been resumed."
 
   Scenario: Resuming a scenario with custom alert
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -106,8 +106,8 @@ Feature: Send alerts for different actions on scenarios
     And I press "Yes"
     And I wait for the "Saving..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsAlert with title "Scenario Test has been resumed." message "Test Alert"
-    And "Bartleby Scrivener" should receive a VmsAlert with title "Scenario Test has been resumed." message "Test Alert"
+    Then "atticus@example.com" should receive a VMS email with title "Scenario Test has been resumed." message "Test Alert"
+    And "bartleby@example.com" should receive a VMS email with title "Scenario Test has been resumed." message "Test Alert"
 
   Scenario: Resuming a scenario with custom users
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -120,8 +120,8 @@ Feature: Send alerts for different actions on scenarios
     And I press "Yes"
     And I wait for the "Saving..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsAlert with title "Scenario Test has been resumed."
-    And "Bartleby Scrivener" should not receive a VmsAlert
+    Then "atticus@example.com" should receive a VMS email with title "Scenario Test has been resumed."
+    And "bartleby@example.com" should not receive a VMS email
 
   Scenario: Stopping a scenario with default alert
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -132,8 +132,8 @@ Feature: Send alerts for different actions on scenarios
     And I press "Yes"
     And I wait for the "Saving..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsAlert with title "Scenario Test has been stopped."
-    And "Bartleby Scrivener" should receive a VmsAlert with title "Scenario Test has been stopped."
+    Then "atticus@example.com" should receive a VMS email with title "Scenario Test has been stopped."
+    And "bartleby@example.com" should receive a VMS email with title "Scenario Test has been stopped."
 
   Scenario: Stopping a scenario with custom alert
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -146,8 +146,8 @@ Feature: Send alerts for different actions on scenarios
     And I press "Yes"
     And I wait for the "Saving..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsAlert with title "Scenario Test has been stopped." message "Test Alert"
-    And "Bartleby Scrivener" should receive a VmsAlert with title "Scenario Test has been stopped." message "Test Alert"
+    Then "atticus@example.com" should receive a VMS email with title "Scenario Test has been stopped." message "Test Alert"
+    And "bartleby@example.com" should receive a VMS email with title "Scenario Test has been stopped." message "Test Alert"
 
   Scenario: Stopping a scenario with custom users
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -160,8 +160,8 @@ Feature: Send alerts for different actions on scenarios
     And I press "Yes"
     And I wait for the "Saving..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsAlert with title "Scenario Test has been stopped."
-    And "Bartleby Scrivener" should not receive a VmsAlert
+    Then "atticus@example.com" should receive a VMS email with title "Scenario Test has been stopped."
+    And "bartleby@example.com" should not receive a VMS email
 
   Scenario: Sending a custom alert
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -172,8 +172,8 @@ Feature: Send alerts for different actions on scenarios
     And I fill in "Alert Message" with "Test Alert"
     And I press "OK"
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsAlert with title "Custom Alert" message "Test Alert"
-    And "Bartleby Scrivener" should receive a VmsAlert with title "Custom Alert" message "Test Alert"
+    Then "atticus@example.com" should receive a VMS email with title "Custom Alert" message "Test Alert"
+    And "bartleby@example.com" should receive a VMS email with title "Custom Alert" message "Test Alert"
 
   Scenario: Sending a custom alert with custom users
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -186,8 +186,8 @@ Feature: Send alerts for different actions on scenarios
     And I click remove_btn on the "Bartleby Scrivener" grid row
     And I press "OK"
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsAlert with title "Custom Alert"
-    And "Bartleby Scrivener" should not receive a VmsAlert
+    Then "atticus@example.com" should receive a VMS email with title "Custom Alert"
+    And "bartleby@example.com" should not receive a VMS email
 
   Scenario: Deactivate a site
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -199,8 +199,8 @@ Feature: Send alerts for different actions on scenarios
     And I click x-menu-item "Deactivate"
     And I wait for the "Loading..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsAlert with title "Site Malawi deactivated" message "The site Malawi located at Kenyatta, Lilongwe, Malawi has been deactivated. You were assigned to that site. You will be notified when the site is reactivated."
-    And "Bartleby Scrivener" should receive a VmsAlert with title "Site Malawi deactivated"
+    Then "atticus@example.com" should receive a VMS email with title "Site Malawi deactivated" message "The site Malawi located at Kenyatta, Lilongwe, Malawi has been deactivated. You were assigned to that site. You will be notified when the site is reactivated."
+    And "bartleby@example.com" should receive a VMS email with title "Site Malawi deactivated"
 
   Scenario: Activate a site
     Given the following sites exist:
@@ -215,8 +215,8 @@ Feature: Send alerts for different actions on scenarios
     When I press "Save"
     And I wait for the "Loading..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsAlert with title "Site Inactiveness activated" message "The site Inactiveness located at 2600 McHale Ct, Austin, Tx, USA has been activated. You are assigned to that site and should resume your duties."
-    And "Bartleby Scrivener" should receive a VmsAlert with title "Site Inactiveness activated"
+    Then "atticus@example.com" should receive a VMS email with title "Site Inactiveness activated" message "The site Inactiveness located at 2600 McHale Ct, Austin, Tx, USA has been activated. You are assigned to that site and should resume your duties."
+    And "bartleby@example.com" should receive a VMS email with title "Site Inactiveness activated"
 
   Scenario: Add a user
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -229,8 +229,8 @@ Feature: Send alerts for different actions on scenarios
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsAlert with title "You have been assigned to a site" message "You have been assigned to Malawi at Kenyatta, Lilongwe, Malawi. Please make your way there now, if you are not already, and check-in when you arrive."
-    And "Bartleby Scrivener" should not receive a VmsAlert
+    Then "atticus@example.com" should receive a VMS email with title "You have been assigned to a site" message "You have been assigned to Malawi at Kenyatta, Lilongwe, Malawi. Please make your way there now, if you are not already, and check-in when you arrive."
+    And "bartleby@example.com" should not receive a VMS email
 
   Scenario: Move a user
     Given "Bartleby Scrivener" is assigned to "Immunization Center" for scenario "Test"
@@ -241,8 +241,8 @@ Feature: Send alerts for different actions on scenarios
     And I drag staff "Bartleby Scrivener" to "Malawi"
     And I wait for the "Loading..." mask to go away
     And delayed jobs are processed
-    Then "Bartleby Scrivener" should receive a VmsAlert with title "You have been assigned to a site" message "You have been assigned to Malawi at Kenyatta, Lilongwe, Malawi. Please make your way there now, if you are not already, and check-in when you arrive."
-    And "Atticus Finch" should not receive a VmsAlert
+    Then "bartleby@example.com" should receive a VMS email with title "You have been assigned to a site" message "You have been assigned to Malawi at Kenyatta, Lilongwe, Malawi. Please make your way there now, if you are not already, and check-in when you arrive."
+    And "atticus@example.com" should not receive a VMS email
 
   Scenario: Remove a user
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -255,8 +255,8 @@ Feature: Send alerts for different actions on scenarios
     And I press "Yes"
     And I wait for the "Loading..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should receive a VmsAlert with title "You have been unassigned" message "You have been unassigned from your volunteer site and not reassigned to a different. You will be notified if you are reassigned later."
-    And "Bartleby Scrivener" should not receive a VmsAlert
+    Then "atticus@example.com" should receive a VMS email with title "You have been unassigned" message "You have been unassigned from your volunteer site and not reassigned to a different. You will be notified if you are reassigned later."
+    And "bartleby@example.com" should not receive a VMS email
 
   Scenario: Deactivate a site for a non-executing scenario
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -267,8 +267,8 @@ Feature: Send alerts for different actions on scenarios
     And I click x-menu-item "Deactivate"
     And I wait for the "Loading..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should not receive a VmsAlert with title "Site Malawi deactivated" message "The site Malawi located at Kenyatta, Lilongwe, Malawi has been deactivated. You were assigned to that site. You will be notified when the site is reactivated."
-    And "Bartleby Scrivener" should not receive a VmsAlert with title "Site Malawi deactivated"
+    Then "atticus@example.com" should not receive a VMS email with title "Site Malawi deactivated" message "The site Malawi located at Kenyatta, Lilongwe, Malawi has been deactivated. You were assigned to that site. You will be notified when the site is reactivated."
+    And "bartleby@example.com" should not receive a VMS email with title "Site Malawi deactivated"
 
   Scenario: Add a user for a non-executing scenario
     Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
@@ -281,5 +281,5 @@ Feature: Send alerts for different actions on scenarios
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And delayed jobs are processed
-    Then "Atticus Finch" should not receive a VmsAlert with title "You have been assigned to a site" message "You have been assigned to Malawi at Kenyatta, Lilongwe, Malawi. Please make your way there now, if you are not already, and check-in when you arrive."
-    And "Bartleby Scrivener" should not receive a VmsAlert
+    Then "atticus@example.com" should not receive a VMS email with title "You have been assigned to a site" message "You have been assigned to Malawi at Kenyatta, Lilongwe, Malawi. Please make your way there now, if you are not already, and check-in when you arrive."
+    And "bartleby@example.com" should not receive a VMS email
