@@ -1,0 +1,19 @@
+<div id="vms-kiosk-header">
+  <div style="text-align:center; padding: 10px; font-size: 300%; font-weight: bold;">
+    My VMS Sites
+  </div>
+
+  <% if @ssites.blank? %>
+      <div style="text-align:center; font-size: 200%; font-weight: bold; margin: 20px; padding: 5px; border: 1px solid lightgray;">You have no active Sites at this time</div>
+  <% else
+    @ssites.each do |ssite| %>
+      <div style="margin: 20px; padding: 5px; border: 1px solid lightgray;">
+      <div style="text-align:center; font-size: 200%; font-weight: bold;"><%= ssite.site.to_s %></div>
+      <div style="text-align:center;"><%= ssite.site.address %></div>
+      <div style="text-align:center; font-weight: bold;"> <%= ssite.scenario.to_s %> : <%= ssite.scenario.state.nil? ? 'inactive' : ssite.scenario.state  %></div>
+      <div style="text-align:center;"><%= link_to 'Launch Check-In Kiosk', kiosk_show_path(ssite) %></div>
+      </div>
+    <% end %>
+  <% end %>
+
+</div>
