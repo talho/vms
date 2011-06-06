@@ -1,6 +1,8 @@
 class Vms::KiosksController < ApplicationController
-  before_filter :vms_kiosk_session_required, :except => [:registered_checkin, :walkup_checkin]
-  
+  skip_before_filter :login_required
+  before_filter :vms_session_required, :except => [:registered_checkin, :walkup_checkin]
+  before_filter :vms_site_admin_required, :except => [:index, :registered_checkin, :walkup_checkin]
+
   def show
     @ssite = Vms::ScenarioSite.find(params['id'])
     respond_to do |format|
@@ -20,9 +22,15 @@ class Vms::KiosksController < ApplicationController
             :id => w.id, :display_name => w.first_name + ' ' + w.last_name,:email => nil,:image => '/stylesheets/vms/images/walkup-icon.png',:checked_in => w.checked_in, :type => 'walkup'
           })
         end
-        render :json=>{:volunteers => volunteers.uniq}
+        render :json=>{ :volunteers => volunteers.uniq }
       }
     end
+  end
+
+  def index
+    @user = User.find(session[:vms_user_id])
+    @ssites = @user.vms_active_scenario_sites
+    render :layout => 'vms_kiosk'
   end
 
   def registered_checkin
@@ -56,7 +64,6 @@ class Vms::KiosksController < ApplicationController
       #TODO: detect existing email and prompt for normal checkin
       #TODO: catch validation errors and return them to EXT
       begin
-        debugger
         @user = User.create!(:first_name => params['walkup_first_name'], :last_name => params['walkup_last_name'], :display_name => params['walkup_first_name'] + ' ' + params['walkup_last_name'],
                              :email => params['walkup_email'], :password => params['walkup_password'], :password_confirm => params['walkup_password_confirm'])
         Vms::Staff.create(:scenario_site_id => @ssite.id, :user_id => @user.id, :status=> 'unassigned', :checked_in => true)
@@ -79,12 +86,29 @@ class Vms::KiosksController < ApplicationController
 
   protected
 
-  def vms_kiosk_session_required
-    unless current_user.is_vms_scenario_site_admin? && current_user.is_vms_scenario_site_admin_for?( Vms::ScenarioSite.find(params['id']) )
+  def vms_session_required
+    begin
+      if User.find(session[:vms_user_id])
+        session.delete(:user_id) if session[:user_id]   # nuke the Phin session when kiosk stuff is happening - we don't want active phin sessions when kiosks might be unattended
+        return true
+      end
+    rescue
+      respond_to do |format|
+          format.html {
+            flash[:error] = "You must sign in to access this page"
+            redirect_to vms_session_new_path
+          }
+      end
+    end
+  end
+
+  def vms_site_admin_required
+    user = User.find(session[:vms_user_id])
+    unless user.is_vms_scenario_site_admin? && user.is_vms_scenario_site_admin_for?( Vms::ScenarioSite.find(params['id']) )
       respond_to do |format|
           format.html {
             flash[:error] = "You are not an administrator for that Scenario and Site"
-            redirect_to ext_path
+            redirect_to kiosk_index_path
           }
       end
     end

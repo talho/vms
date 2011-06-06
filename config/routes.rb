@@ -17,9 +17,14 @@ ActionController::Routing::Routes.draw do |map|
     scenarios.quals 'qualifications.:format', :controller => 'vms/qualifications', :action => 'index'
   end
 
-  map.kiosk_show 'vms/kiosk/:id.:format', :controller => "vms/kiosks", :action => 'show'
+  map.vms_session_new 'vms/session/new', :controller => "vms/sessions", :action => 'new', :conditions => { :method => :get }
+  map.vms_session_create 'vms/session/create', :controller => "vms/sessions", :action => 'create', :conditions => { :method => :post }
+  map.vms_session_destroy 'vms/session/destroy', :controller => "vms/sessions", :action => 'destroy'#, :conditions => { :method => :get }
+  map.kiosk_index 'vms/kiosk', :controller => "vms/kiosks", :action => 'index'
+  map.kiosk_show 'vms/kiosk/:id.:format', :controller => "vms/kiosks", :action => 'show'  
   map.site_checkin 'vms/site_checkin.:format', :controller => "vms/kiosks", :action => 'registered_checkin'
   map.site_walkup 'vms/site_walkup.:format', :controller => "vms/kiosks", :action => 'walkup_checkin'
+
   map.inventory_sources 'vms/inventory_sources.:format', :controller => 'vms/inventories', :action => 'sources'
   map.inventory_items 'vms/inventory_items.:format', :controller => 'vms/inventories', :action => 'items'
   map.inventory_item_categories 'vms/inventory_item_categories.:format', :controller => 'vms/inventories', :action => 'categories'
