@@ -47,7 +47,7 @@ class Vms::Scenario < ActiveRecord::Base
 
   STATES.each { |k,v| named_scope k, :conditions => { :state => v } }
   named_scope :active, :conditions => [ "state IN (?)", [STATES[:executing], STATES[:paused]] ]
-  
+
   def to_s
     name
   end

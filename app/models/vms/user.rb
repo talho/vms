@@ -1,15 +1,15 @@
 class User < ActiveRecord::Base
+
+  def vms_scenario_sites
+    Vms::ScenarioSite.find(:all, :conditions => {:site_admin_id => id}, :order => 'id DESC')
+  end
+
   def vms_active_scenario_sites
-    Vms::ScenarioSite.find(:all, :conditions => ["site_admin_id = ? AND status = ? AND (select status from vms_scenarios where scenario_id = scenario_id) = ?", 
-                                                 id, Vms::ScenarioSite::STATES[:active],Vms::Scenario::STATES[:executed] ])
+    Vms::ScenarioSite.find(:all, :conditions => ['site_admin_id = ? AND scenario_id IN (?)', id, Vms::Scenario.active.map(&:id) ], :order => 'id DESC')
   end
 
   def is_vms_active_scenario_site_admin?
     vms_active_scenario_sites.count > 0
-  end
-
-  def vms_scenario_sites
-    Vms::ScenarioSite.find(:all, :conditions => {:site_admin_id => id})
   end
 
   def is_vms_scenario_site_admin?
@@ -19,6 +19,5 @@ class User < ActiveRecord::Base
   def is_vms_scenario_site_admin_for?(scenario_site)
     scenario_site.site_admin_id == id
   end
-
 
 end
