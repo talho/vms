@@ -43,6 +43,8 @@ class Vms::Scenario < ActiveRecord::Base
     end
   end
 
+  named_scope :active, lambda { |scenario| { :conditions => [ "state IN (?)", [STATES[:executed], STATES[:paused]] ] } }
+  
   def to_s
     name
   end
