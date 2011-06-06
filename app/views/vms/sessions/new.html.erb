@@ -1,0 +1,20 @@
+<div id="vms-signin-header">
+
+  <div style="text-align:center; padding: 10px; font-size: 300%; font-weight: bold;">
+    VMS Site Administrator Sign In
+  </div>
+  <div style="padding: 10px; margin: auto;">
+    <% form_for :session, :url => vms_session_create_path  do |form| %>
+      <table><tr>
+        <td><%= form.label :email %></td>
+        <td><%= form.text_field :email, :value => flash[:email] %></td>
+      </tr><tr>
+        <td><%= form.label :password %></td>
+        <td><%= form.password_field :password, :value => flash[:password]  %></td>
+      </tr>
+      <tr><td colspan=2 class="submit_field"><%= form.submit "Sign in", :disable_with => "Please wait..." %></td>
+      </tr></table>
+    <% end %>
+  </div>
+
+</div>

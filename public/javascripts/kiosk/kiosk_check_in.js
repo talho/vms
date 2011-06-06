@@ -23,7 +23,7 @@ Ext.ns("Talho.VMS");
     registeredCheckin: function(form){
       this.checkInOutButton.disable();
       var params = {'scenario_site_id':SCENARIO_SITE_ID};
-      var record = this.volunteersList.getSelectionModel().getSelected();
+      var record = this.volunteersGrid.getSelectionModel().getSelected();
       if (record != null && record.data['type'] == 'walkup' ){
        // params['walkup_signout'] = true;
         params['walkup_id'] = record['id'];
@@ -97,40 +97,71 @@ Ext.ns("Talho.VMS");
       }
     },
 
-    showTimeoutNotice: function(){
-
+    showTimeoutNotice: function(error_msg){
+      this.refresherIntervalLabelHead.hide();
+      this.refresherSlider.hide();
+      this.refresherIntervalLabelTail.hide();
+      this.stoppedMessage.setText(error_msg);
+      this.stoppedMessage.show();
     },
 
-    VOLUNTEER_REFRESH_INTERVAL: 5000,
-    VOLUNTEER_REFRESH_MAX: 3,
+    hideTimeoutNotice: function(){
+      this.refresherIntervalLabelHead.show();
+      this.refresherSlider.show();
+      this.refresherIntervalLabelTail.show();
+      this.stoppedMessage.hide();
+    },
+
+    DEFAULT_REFRESHER_INTERVAL: 60,
+    VOLUNTEER_REFRESH_MAX: 60,
     volunteer_refresh_count: 0,
-    startVolunteerRefresher: function(){
-      if (this.volunteer_refresher) { clearInterval(this.volunteer_refresher); }
-      if (this.volunteer_refresh_count < this.VOLUNTEER_REFRESH_MAX){
-        var inst = this;   // make a copy of this to pass into the interval timer because it runs /IN SPAAAAAAACE/
-        this.volunteer_refresher = setInterval(function(){ inst.siteVolunteersStore.load(); }, this.VOLUNTEER_REFRESH_INTERVAL);
-        this.volunteer_refresh_count += 1;
-      } else {
-        this.volunteer_refresh_count = 0;
-        this.showTimeoutNotice();
-      } 
+    VOLUNTEER_EXCEPTION_MAX: 3,
+    volunteer_exception_count: 0,
+
+    stopVolunteerRefresher: function(){
+      this.volunteer_refresh_count = 0;
+      if (this.volunteer_refresher) { 
+        clearInterval(this.volunteer_refresher);
+        this.volunteer_refresher = null;
+        this.volunteerRefresherStartButton.show();
+        this.volunteerRefresherStopButton.hide();
+      }
     },
-//    stopVolunteerRefresher: function(){
-//      if (this.volunteer_refresher) {
-//        clearInterval(this.volunteer_refresher);
-//        this.volunteer_refresher = null;
-//      }
-//    },
+
+    startVolunteerRefresher: function(){
+      this.volunteer_exception_count = 0;
+      if (this.volunteer_refresher) {
+        clearInterval(this.volunteer_refresher);
+      }
+      if (this.volunteer_refresh_count < this.VOLUNTEER_REFRESH_MAX){
+        var inst = this;   // make a copy of 'this' to pass into the interval timer because it runs /IN SPAAAAAAACE/
+        this.volunteer_refresher = setInterval(function(){ inst.siteVolunteersStore.load(); }, this.refresherSlider.getValue() * 1000);
+        this.volunteer_refresh_count += 1;
+        this.volunteerRefresherStopButton.show();
+        this.volunteerRefresherStartButton.hide();
+        this.hideTimeoutNotice();
+      } else {
+        this.stopVolunteerRefresher();
+        this.showTimeoutNotice('Auto-refreshing stopped (Refresh limit)');
+      }
+    },
+
+    handleVolunteerException: function(){
+      this.volunteer_exception_count += 1;
+      if (this.volunteer_exception_count > this.VOLUNTEER_EXCEPTION_MAX){
+        this.stopVolunteerRefresher();
+        this.showTimeoutNotice('Auto-refreshing stopped (Could not contact server)');
+      }
+    },
 
     init: function(){
-
       this.siteVolunteersStore = new Ext.data.JsonStore ({
         url: document.location.href + '.json', restful: true, root: 'volunteers', autoLoad: true,
         fields: ['id', 'display_name', 'image', 'email', 'type', 'checked_in', 'scenario_site_admin'] ,
         listeners: {
           scope: this,
-          //'beforeload': function(){ this.stopVolunteerRefresher(); },
-          'load':       function(){ this.startVolunteerRefresher(); }
+          'load':      function(){ this.startVolunteerRefresher(); },
+          'exception': function(){ this.handleVolunteerException(); }
         }
       });
 
@@ -140,7 +171,54 @@ Ext.ns("Talho.VMS");
         '<div style="float: right;"><img src="/stylesheets/vms/images/check-box<tpl if="checked_in">-checked</tpl>.png"></div>'
       );
 
-      this.volunteersList = new Ext.grid.GridPanel ({
+      this.refresherSlider = new Ext.Slider ({
+        value: this.DEFAULT_REFRESHER_INTERVAL,
+        width: 100, increment: 5, minValue: 10, maxValue: 90,
+        listeners: {
+          scope: this,
+          'change': function(){
+            this.refresherIntervalLabelTail.setText(this.refresherSlider.getValue() + ' seconds');
+            this.stopVolunteerRefresher();
+            this.startVolunteerRefresher();
+          }
+        }
+      });
+
+      this.stoppedMessage = new Ext.Toolbar.TextItem({
+        style: {'color': 'black'}, hidden: true, text: ''
+      });
+
+      this.refresherIntervalLabelHead = new Ext.Toolbar.TextItem({
+        style: {'color': 'black'}, text: 'Auto-refreshing every '
+      });
+
+      this.refresherIntervalLabelTail = new Ext.Toolbar.TextItem({
+        style: {'color': 'black'},
+        text: this.DEFAULT_REFRESHER_INTERVAL + ' seconds'
+      });
+
+      this.volunteerRefresherStartButton = new Ext.Button({
+        text: '<span style="font-weight: bold;">Start</span>', scope: this, hidden: true, handler: function(){ this.startVolunteerRefresher(); }
+      });
+
+      this.volunteerRefresherStopButton = new Ext.Button({
+        text: '<span style="font-weight: bold;">Stop</span>', scope: this, handler: function(){ this.stopVolunteerRefresher(); }
+      });
+
+      this.volunteersTbar = new Ext.Toolbar({
+        items: [
+          {text: '<span style="font-weight: bold;">Refresh</span>', scope: this, handler: function(){ this.siteVolunteersStore.load();} },
+          '->',
+          this.refresherIntervalLabelHead,
+          this.refresherSlider,
+          this.refresherIntervalLabelTail,
+          this.stoppedMessage,
+          this.volunteerRefresherStartButton,
+          this.volunteerRefresherStopButton
+        ]
+      });
+
+      this.volunteersGrid = new Ext.grid.GridPanel ({
         store: this.siteVolunteersStore,
         loadMask: true, region: 'center', itemId:'volunteers_list', border: false, hideHeaders: true, autoExpandColumn: 'volunteer', trackMouseOver: false,
         selModel: new Ext.grid.RowSelectionModel({ singleSelect: true }),
@@ -153,6 +231,7 @@ Ext.ns("Talho.VMS");
             if (record.get('checked_in')) { return 'vms-checked-in'; }
           }
         },
+        tbar: this.volunteersTbar,
         listeners: {
           scope: this,
           'rowclick': function(grid, row, column, e){
@@ -164,14 +243,14 @@ Ext.ns("Talho.VMS");
             this.walkupForm.getForm().reset();
           }
         }
-      });                                                             
+      });
 
       this.signinEmailField = new Ext.form.TextField({
         id:'email', name:'email', inputType:'text', fieldLabel:'Email Address', enableKeyEvents: true, labelStyle: 'text-align: right; font-weight:bold;',
         height: 35, anchor:'95%', style:{'fontSize':'150%'},
         listeners: {
           scope: this,
-          'keypress': function(){ this.volunteersList.getSelectionModel().clearSelections(); this.setCheckinButtonLabel('Check In'); },
+          'keypress': function(){ this.volunteersGrid.getSelectionModel().clearSelections(); this.setCheckinButtonLabel('Check In'); },
           'focus': function(){ this.walkupForm.getForm().reset(); this.signinEmailField.clearInvalid(); }
         } });
 
@@ -265,7 +344,7 @@ Ext.ns("Talho.VMS");
 
       this.leftPanel = new Ext.Panel ({
         layout: 'border', title: 'Registered Volunteers', flex: 1.2, autoScroll: false,
-        items: [this.volunteersList, this.signInForm]
+        items: [ this.signInForm, this.volunteersGrid ]
       });
 
       this.rightPanel = new Ext.Panel ({
