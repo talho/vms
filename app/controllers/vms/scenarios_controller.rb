@@ -115,7 +115,7 @@ class Vms::ScenariosController < ApplicationController
     else
       @scenario.execute(current_user)
     end
-    
+
     respond_to do |format|
       format.json {render :json => {:success => true} }
     end

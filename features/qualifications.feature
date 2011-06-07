@@ -216,3 +216,87 @@ Feature: Qualifications tests
     And I wait for the "Loading..." mask to go away
     Then I should not see "bilingual - Chief Veterinarian" in grid row 2 within ".qualGrid"
     And "bilingual" should not be a qualification for role "Chief Veterinarian" site "Malawi" on scenario "Test"
+
+  Scenario: User with a qualification is automatically assigned to a site with a matching qualification
+    Given the following sites exist:
+      | name                | address                                 | lat                 | lng              | status | scenario |
+      | Immunization Center | 1303 Atkinson Dr, Lufkin, TX 75901, USA | 31.347573           | -94.71391        | active | Test     |
+      | Malawi              | Kenyatta, Lilongwe, Malawi              | -13.962475513490757 | 33.7866090623169 | active | Test     |
+    And the site "Malawi" for scenario "Test" has the role "Chief Veterinarian"
+    And the site "Immunization Center" for scenario "Test" has the role "Chief Veterinarian"
+    And site "Malawi" is assigned the qualification "bilingual" on scenario "Test"
+    And the following users exist:
+      | Bartleby Scrivener | bartleby@example.com | Admin,Chief Veterinarian  | Dallas County |
+    And "Bartleby Scrivener" has the qualification "bilingual"
+    And scenario "Test" is "unexecuted"
+    When I open the "Test" scenario
+    And I click x-btn "Execute"
+    And I press "Yes"
+    And I wait for the "Saving..." mask to go away
+    And delayed jobs are processed
+    When "Bartleby Scrivener" has responded to a VmsExecutionAlert with title "Scenario Test is looking for volunteers" with 3
+    And backgroundrb has processed the vms alert responses
+    And "Bartleby Scrivener" should be assigned to "Malawi" for scenario "Test"
+
+  Scenario: User with a qualification is automatically assigned to a site with a matching qualification reversed
+    Given the following sites exist:
+      | name                | address                                 | lat                 | lng              | status | scenario |
+      | Immunization Center | 1303 Atkinson Dr, Lufkin, TX 75901, USA | 31.347573           | -94.71391        | active | Test     |
+      | Malawi              | Kenyatta, Lilongwe, Malawi              | -13.962475513490757 | 33.7866090623169 | active | Test     |
+    And the site "Malawi" for scenario "Test" has the role "Chief Veterinarian"
+    And the site "Immunization Center" for scenario "Test" has the role "Chief Veterinarian"
+    And site "Immunization Center" is assigned the qualification "bilingual" on scenario "Test"
+    And the following users exist:
+      | Bartleby Scrivener | bartleby@example.com | Admin,Chief Veterinarian  | Dallas County |
+    And "Bartleby Scrivener" has the qualification "bilingual"
+    And scenario "Test" is "unexecuted"
+    When I open the "Test" scenario
+    And I click x-btn "Execute"
+    And I press "Yes"
+    And I wait for the "Saving..." mask to go away
+    And delayed jobs are processed
+    When "Bartleby Scrivener" has responded to a VmsExecutionAlert with title "Scenario Test is looking for volunteers" with 3
+    And backgroundrb has processed the vms alert responses
+    And "Bartleby Scrivener" should be assigned to "Immunization Center" for scenario "Test"
+
+  Scenario: User with a qualification is automatically assigned to a site role with a matching qualification
+    Given the following sites exist:
+      | name                | address                                 | lat                 | lng              | status | scenario |
+      | Immunization Center | 1303 Atkinson Dr, Lufkin, TX 75901, USA | 31.347573           | -94.71391        | active | Test     |
+      | Malawi              | Kenyatta, Lilongwe, Malawi              | -13.962475513490757 | 33.7866090623169 | active | Test     |
+    Given the site "Malawi" for scenario "Test" has the role "Chief Veterinarian"
+    Given the site "Immunization Center" for scenario "Test" has the role "Chief Veterinarian"
+    Given role "Chief Veterinarian" site "Malawi" is assigned the qualification "bilingual" on scenario "Test"
+    And the following users exist:
+      | Bartleby Scrivener | bartleby@example.com | Admin,Chief Veterinarian  | Dallas County |
+    And "Bartleby Scrivener" has the qualification "bilingual"
+    And scenario "Test" is "unexecuted"
+    When I open the "Test" scenario
+    And I click x-btn "Execute"
+    And I press "Yes"
+    And I wait for the "Saving..." mask to go away
+    And delayed jobs are processed
+    When "Bartleby Scrivener" has responded to a VmsExecutionAlert with title "Scenario Test is looking for volunteers" with 3
+    And backgroundrb has processed the vms alert responses
+    And "Bartleby Scrivener" should be assigned to "Malawi" for scenario "Test"
+
+  Scenario: User with a qualification is automatically assigned to a site role with a matching qualification reversed
+    Given the following sites exist:
+      | name                | address                                 | lat                 | lng              | status | scenario |
+      | Immunization Center | 1303 Atkinson Dr, Lufkin, TX 75901, USA | 31.347573           | -94.71391        | active | Test     |
+      | Malawi              | Kenyatta, Lilongwe, Malawi              | -13.962475513490757 | 33.7866090623169 | active | Test     |
+    Given the site "Malawi" for scenario "Test" has the role "Chief Veterinarian"
+    Given the site "Immunization Center" for scenario "Test" has the role "Chief Veterinarian"
+    Given role "Chief Veterinarian" site "Immunization Center" is assigned the qualification "bilingual" on scenario "Test"
+    And the following users exist:
+      | Bartleby Scrivener | bartleby@example.com | Admin,Chief Veterinarian  | Dallas County |
+    And "Bartleby Scrivener" has the qualification "bilingual"
+    And scenario "Test" is "unexecuted"
+    When I open the "Test" scenario
+    And I click x-btn "Execute"
+    And I press "Yes"
+    And I wait for the "Saving..." mask to go away
+    And delayed jobs are processed
+    When "Bartleby Scrivener" has responded to a VmsExecutionAlert with title "Scenario Test is looking for volunteers" with 3
+    And backgroundrb has processed the vms alert responses
+    And "Bartleby Scrivener" should be assigned to "Immunization Center" for scenario "Test"

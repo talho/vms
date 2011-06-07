@@ -36,7 +36,7 @@ Feature: Send alerts for different actions on scenarios
     And I press "Yes"
     And I wait for the "Saving..." mask to go away
     And delayed jobs are processed
-    And "atticus@example.com" should receive a VMS email with title "Scenario Test is now executing" message "The status of the scenario has been modified. You are currently assigned to site Malawi at Kenyatta, Lilongwe, Malawi"
+    Then "atticus@example.com" should receive a VMS email with title "Scenario Test is now executing" message "Scenario Test is now executing. You are currently assigned to site Malawi at Kenyatta, Lilongwe, Malawi"
     And "bartleby@example.com" should receive a VMS email with title "Scenario Test is looking for volunteers"
     When "Bartleby Scrivener" has responded to a VmsExecutionAlert with title "Scenario Test is looking for volunteers" with 3
     And backgroundrb has processed the vms alert responses

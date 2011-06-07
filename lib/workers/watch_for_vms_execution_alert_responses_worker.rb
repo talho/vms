@@ -23,7 +23,7 @@ class WatchForVmsExecutionAlertResponsesWorker < BackgrounDRb::MetaWorker
       rsss.each do |rss|
         rss.calculate_assignment(rss.scenario_site.all_staff.map(&:user))
       end
-      rsss = prioritize_roles(rsss)
+      rsss = prioritize_roles(rsss, attempt.user.qualification_list) # we send the user qualifications in here because we want to fill in missing roles with people who have qualifications first
       
       al = VmsAlert.new
       if rsss.count > 0
@@ -45,10 +45,20 @@ class WatchForVmsExecutionAlertResponsesWorker < BackgrounDRb::MetaWorker
   end
   
   def sort_roles_for_responses(roles)
-    roles.sort_by{|a,b| a.id <=> (b.nil? ? nil : b.id)}
+    roles.sort{|a,b| a.id <=> b.id}
   end
   
-  def prioritize_roles(rsss)
-    rsss.reject{|r| r[:missing] <= 0}.sort_by{|a, b| (a.nil? ? nil : (a[:missing]/a.count)) <=> (b.nil? ? nil : (b[:missing]/b.count)) }
+  def prioritize_roles(rsss, user_qualifications)
+    rsss.reject{|r| r[:missing] <= 0}.sort do |a, b|
+      a_pct = a[:missing]/a.count
+      b_pct = b[:missing]/b.count
+      if a_pct == b_pct
+        a_quals = (a.qualification_list + a.scenario_site.qualification_list).uniq & user_qualifications
+        b_quals = (b.qualification_list + b.scenario_site.qualification_list).uniq & user_qualifications
+        b_quals.count <=> a_quals.count
+      else
+        b_pct <=> a_pct
+      end
+    end
   end
 end

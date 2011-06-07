@@ -102,7 +102,7 @@ class Vms::Scenario < ActiveRecord::Base
     al.audiences << (Audience.new :users => all_volunteers)
     al.save
     
-    status_alert = VmsStatusAlert.default_alert(:title => "Scenario #{name} is now executing", :message => "Scenario #{name} is now executing. You are currently assigned to site {site_name} at {site_address}", 
+    status_alert = VmsStatusAlert.default_alert(:title => "Scenario #{name} is now executing", :message => "Scenario #{name} is now executing.", 
                                                 :audiences => [Audience.new :users => all_users], :scenario => self, :author => current_user)
     status_alert.save
   end
@@ -178,4 +178,11 @@ class Vms::Scenario < ActiveRecord::Base
     al.save
   end
   handle_asynchronously :alert
+  
+  def process_alert_responses
+    require 'vendor/plugins/backgroundrb/server/lib/bdrb_server_helper.rb'
+    require 'vendor/plugins/backgroundrb/server/lib/meta_worker.rb'
+    require 'vendor/plugins/vms/lib/workers/watch_for_vms_execution_alert_responses_worker.rb'
+    WatchForVmsExecutionAlertResponsesWorker.new.query
+  end
 end

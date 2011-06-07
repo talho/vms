@@ -56,3 +56,8 @@ When /^I right click qualification "([^\"]*)"$/ do |qual|
     command_center.showQualsContextMenu(command_center.qualsGrid, i, evt);
   ")
 end
+
+When /^"([^\"]*)" has the qualification "([^\"]*)"$/ do |name, qual|
+  u = User.find_by_display_name(name)
+  u.qualification_list << qual
+end

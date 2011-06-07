@@ -7,7 +7,7 @@ class VmsStatusAlert < VmsAlert
    
   def self.default_alert(options = {})
     options[:title] ||= "VMS Status Alert"
-    options[:message] ||= "The status of the scenario has been modified. You are currently assigned to site {site_name} at {site_address}"
+    options[:message] ||= "The status of the scenario has been modified."
     options[:created_at] = Time.zone.now
     VmsStatusAlert.new options
   end
@@ -15,13 +15,12 @@ class VmsStatusAlert < VmsAlert
   def to_xml
     options = {:Messages => {}, :Recipients => {}, :IVRTree => {} }
     
-    recip = recipients
-    recip = audiences.map(&:recipients).flatten.uniq if recip.empty?
-    staff = self.scenario.staff.find_all_by_user_id(recip.map(&:id))
+    staff = self.scenario.staff.find_all_by_user_id(recipients(true).map(&:id))
         
     options[:Messages][:override] = Proc.new do |messages|
       messages.Message(:name => 'title') {|msg| msg.Value self.title}
-      messages.Message(:name => 'msg_body_1') {|msg| msg.Value "The status of the scenario has been modified. You are currently assigned to site "}
+      messages.Message(:name => 'msg_custom') {|msg| msg.Value self.message || "The status of the scenario has been modified."}
+      messages.Message(:name => 'msg_body_1') {|msg| msg.Value " You are currently assigned to site "}
       messages.Message(:name => 'site_name') {|msg| msg.Value "site_name"}
       messages.Message(:name => 'msg_body_2') {|msg| msg.Value " at "}
       messages.Message(:name => 'site_address') {|msg| msg.Value "site_address"}
@@ -47,6 +46,7 @@ class VmsStatusAlert < VmsAlert
         ivr.RootNode(:operation => 'start') do |root_node|
           root_node.ContextNode do |ctxt|
             ctxt.operation 'put'
+            ctxt.response(:ref => 'msg_custom')
             ctxt.response(:ref => 'msg_body_1')
             ctxt.response(:ref => 'site_name')
             ctxt.response(:ref => 'msg_body_2')
