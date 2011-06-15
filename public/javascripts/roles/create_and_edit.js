@@ -31,13 +31,14 @@ Talho.VMS.ux.CreateAndEditRoles = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
         buttons: [{text: 'Add Role', scope: this, handler: this.addRoleToGrid}, {text: 'Cancel', scope: this, handler: this.hideAddNewRole}], 
         items:[
           {xtype: 'combo', itemId: 'role_select_box', anchor: '100%', fieldLabel: 'Select Role', mode: 'local', triggerAction: 'all', store: new Ext.data.JsonStore({
-            url: '/audiences/roles',
+            url: '/roles.json',
             autoLoad: true,
             idProperty: 'id',
             fields: [{name: 'name', mapping: 'name'}, {name: 'id', mapping: 'id'}],
             listeners: {
               scope: this,
               'load': function(store){
+                store.sort('role');
                 if(this.creatingRecord && this.creatingRecord.get('status') !== 'new'){
                   var rec = store.getById(this.creatingRecord.get('role_id'));
                   this.role_select_box.setValue(rec.id);

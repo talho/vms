@@ -6,8 +6,8 @@ Feature: VMS Scenario
   I want to be able to create, edit, open, and delete scenarios
 
   Background:
-    Given the following administrators exist:
-          | admin@dallas.gov | Dallas County |
+    Given the following users exist:
+      | Ad min | admin@dallas.gov | Admin | Dallas County | vms |
     And I am logged in as "admin@dallas.gov"
     And I go to the ext dashboard page
 

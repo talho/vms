@@ -6,14 +6,13 @@ Feature: Site Info Window
   I want to be able to click on a map marker and see a breakdown of the site information
 
   Background:
-    Given the following administrators exist:
-          | admin@dallas.gov | Dallas County |
-    And the following entities exist:
+    Given the following entities exist:
       | Role | Chief Veterinarian     |
       | Role | Border Health Director |
     And the following users exist:
-      | Bartleby Scrivener | bartleby@example.com | Admin, Border Health Director | Dallas County |
-      | Atticus Finch      | atticus@example.com  | Admin, Chief Veterinarian     | Potter County |
+      | Ad min             | admin@dallas.gov     | Admin                  | Dallas County | vms |
+      | Bartleby Scrivener | bartleby@example.com | Border Health Director | Dallas County |     |
+      | Atticus Finch      | atticus@example.com  | Chief Veterinarian     | Potter County |     |
     And delayed jobs are processed
     And I am logged in as "admin@dallas.gov"
     And I have the scenarios "Test"

@@ -6,11 +6,10 @@ Feature: Scen Access Control
   I want to provide a list of other users that can access the scenario and assign their rights between admin and reader
 
   Background:
-    Given the following administrators exist:
-          | admin@dallas.gov | Dallas County |
-    And the following users exist:
-      | Bartleby Scrivener | bartleby@example.com | Admin  | Dallas County |
-      | Atticus Finch      | atticus@example.com  | Admin  | Potter County |
+    Given the following users exist:
+      | Ad min             | admin@dallas.gov     | Admin | Dallas County | vms |
+      | Bartleby Scrivener | bartleby@example.com | Admin | Dallas County | vms |
+      | Atticus Finch      | atticus@example.com  | Admin | Potter County | vms |
     And delayed jobs are processed
     And I am logged in as "admin@dallas.gov"
     And I go to the ext dashboard page

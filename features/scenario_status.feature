@@ -6,8 +6,8 @@ Feature: Scenario Status
   I want to change the status of a scenario between inactive and active states
 
   Background:
-    Given the following administrators exist:
-          | admin@dallas.gov | Dallas County |
+    Given the following users exist:
+      | Ad min | admin@dallas.gov | Admin | Dallas County | vms |
     And I am logged in as "admin@dallas.gov"
     And I have the scenarios "Test"
 

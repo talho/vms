@@ -6,11 +6,10 @@ Feature: Test staff interactions with site
   I want to be able to mass-manage users for those sites as well as move and remove users via the interface
 
   Background:
-    Given the following administrators exist:
-          | admin@dallas.gov | Dallas County |
-    And the following users exist:
-      | Bartleby Scrivener | bartleby@example.com | Admin  | Dallas County |
-      | Atticus Finch      | atticus@example.com  | Admin  | Potter County |
+    Given the following users exist:
+      | Ad min             | admin@dallas.gov     | Admin | Dallas County | vms |
+      | Bartleby Scrivener | bartleby@example.com | Admin | Dallas County | vms |
+      | Atticus Finch      | atticus@example.com  | Admin | Potter County | vms |
     And delayed jobs are processed
     And I am logged in as "admin@dallas.gov"
     And I have the scenarios "Test"

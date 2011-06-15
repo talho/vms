@@ -18,8 +18,8 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
         {xtype: 'grid', title: 'Staff', tools: staff_tools, cls: 'staff_grid', itemId: 'staff', store: new Ext.data.JsonStore({
             fields: ['user', 'role_filled', 'roles', 'qualifications', 'user_id', 'id', 'source']
           }),
-          columns: [{header: 'Name', dataIndex: 'user'}, {header: 'Role Filled', dataIndex: 'role_filled'}, {header: 'Roles', dataIndex: 'roles'}, {header: 'Qualifications', dataIndex: 'qualifications'},
-                    {header: 'Source', dataIndex: 'source', renderer: function(val){
+          columns: [{header: 'Name', dataIndex: 'user', menuDisabled: true}, {header: 'Role Filled', dataIndex: 'role_filled', menuDisabled: true}, {header: 'Roles', dataIndex: 'roles', menuDisabled: true}, {header: 'Qualifications', dataIndex: 'qualifications', menuDisabled: true},
+                    {header: 'Source', dataIndex: 'source', menuDisabled: true, renderer: function(val){
                       switch(val){
                         case 'manual': return 'Manually Assigned'; 
                         case 'team': return 'Assigned Via Team'; 
@@ -91,6 +91,7 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
           this.mask.hide();
         
         this.staffGrid.getStore().loadData(resp.staff);
+        this.staffGrid.getStore().sort('user');
         this.rolesGrid.getStore().loadData(resp.roles);
         this.itemsGrid.getStore().loadData(resp.items);
         

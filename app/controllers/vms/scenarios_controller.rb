@@ -43,6 +43,13 @@ class Vms::ScenariosController < ApplicationController
   end
   
   def create
+    unless current_user.vms_admin?
+      respond_to do |format|
+        format.json {render :json => {:msg => 'You are not a VMS admin, you cannot create scenarios'}, :status => 404}
+      end
+      return
+    end
+    
     tmpl = params[:template] || false
     
     params[:scenario][:state] = tmpl ? Vms::Scenario::STATES[:template] : Vms::Scenario::STATES[:unexecuted]
@@ -59,7 +66,14 @@ class Vms::ScenariosController < ApplicationController
     end
   end
   
-  def edit    
+  def edit
+    unless current_user.vms_admin?
+      respond_to do |format|
+        format.json {render :json => {:msg => 'You are not a VMS admin, you cannot modify scenarios'}, :status => 404}
+      end
+      return
+    end
+    
     @scenario = current_user.scenarios.editable.find(params[:id], :include => {:user_rights => [:user]})
     respond_to do |format|
       unless @scenario.nil?
@@ -71,6 +85,13 @@ class Vms::ScenariosController < ApplicationController
   end
   
   def update
+    unless current_user.vms_admin?
+      respond_to do |format|
+        format.json {render :json => {:msg => 'You are not a VMS admin, you cannot modify scenarios'}, :status => 404}
+      end
+      return
+    end
+    
     @scenario = current_user.scenarios.editable.find(params[:id])
     if @scenario.update_attributes(params[:scenario])
       respond_to do |format|
@@ -84,6 +105,13 @@ class Vms::ScenariosController < ApplicationController
   end
   
   def destroy
+    unless current_user.vms_admin?
+      respond_to do |format|
+        format.json {render :json => {:msg => 'You are not a VMS admin, you cannot delete scenarios'}, :status => 404}
+      end
+      return
+    end
+    
     @scenario = current_user.scenarios.editable.find(params[:id])
     respond_to do |format|
       if @scenario.destroy

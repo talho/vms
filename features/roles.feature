@@ -6,8 +6,10 @@ Feature: Modify Roles for VMS Sites
   I want to be able to select roles and assign them to a site instance
 
   Background:
-    Given the following administrators exist:
-          | admin@dallas.gov | Dallas County |
+    Given the following users exist:
+      | Ad min | admin@dallas.gov | Admin | Dallas County | vms  |
+      | Ad min | admin@dallas.gov | Admin | Dallas County | phin |
+    # admin needs access to the phin roles for now, so make him a phin admin as well as a vms admin
     And the following entities exist:
       | Role | Chief Veterinarian     |
       | Role | Border Health Director |

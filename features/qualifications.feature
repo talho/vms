@@ -6,8 +6,8 @@ Feature: Qualifications tests
   I would like to specify which qualifications I want on sites or specific roles
 
   Background:
-    Given the following administrators exist:
-          | admin@dallas.gov | Dallas County |
+    Given the following users exist:
+      | Ad min | admin@dallas.gov | Admin | Dallas County | vms |
     And the following entities exist:
       | Role | Chief Veterinarian     |
       | Role | Border Health Director |

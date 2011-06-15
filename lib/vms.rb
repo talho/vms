@@ -19,10 +19,17 @@ $expansion_list = [] unless defined?($expansion_list)
 $expansion_list.push(:vms) unless $expansion_list.index(:vms)
 
 $menu_config = {} unless defined?($menu_config)
-$menu_config[:vms] = "{name: 'VMS', items:[
-                    {name: 'New Scenario', win:{id: 'vms_new_scenario', title:'New Scenario', initializer: 'Talho.VMS.CreateAndEditScenario'}},
-                    {name: 'Manage Scenarios', win:{id: 'vms_open_scenario', title:'Manage Scenarios', initializer: 'Talho.VMS.ManageScenarios'}}
-                    ]}"
+                    
+$menu_config[:vms] = <<EOF
+  nav = "{name: 'VMS', items:["
+  if current_user.vms_admin?
+    nav += "{name: 'New Scenario', win:{id: 'vms_new_scenario', title:'New Scenario', initializer: 'Talho.VMS.CreateAndEditScenario'}},
+            {name: 'Manage Scenarios', win:{id: 'vms_open_scenario', title:'Manage Scenarios', initializer: 'Talho.VMS.ManageScenarios'}}"
+    nav += "," if current_user.vms_volunteer?
+  end
+  nav += "{name: 'My Volunteer Profile', tab:{id: 'vms_user_profile', title:'Volutneer Profile'}}" if current_user.vms_volunteer?
+  nav += "]}"
+EOF
 
 # Register any required javascript or stylesheet files with the appropriate
 # rails expansion helper

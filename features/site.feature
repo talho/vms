@@ -6,8 +6,8 @@ Feature: Test site creation for scenarios
   I want to be able to create, edit, activate, and delete sites
 
   Background:
-    Given the following administrators exist:
-          | admin@dallas.gov | Dallas County |
+    Given the following users exist:
+      | Ad min | admin@dallas.gov | Admin | Dallas County | vms |
     And I am logged in as "admin@dallas.gov"
     And I have the scenarios "Test"
 

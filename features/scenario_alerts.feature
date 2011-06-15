@@ -6,11 +6,10 @@ Feature: Send alerts for different actions on scenarios
   I would like to send regular alert updates informing them of modifications to the current scenario.
 
   Background:
-    Given the following administrators exist:
-          | admin@dallas.gov | Dallas County |
-    And the following users exist:
-      | Bartleby Scrivener | bartleby@example.com | Admin  | Dallas County |
-      | Atticus Finch      | atticus@example.com  | Admin  | Potter County |
+    Given the following users exist:
+      | Ad min             | admin@dallas.gov     | Admin | Dallas County | vms |
+      | Bartleby Scrivener | bartleby@example.com | Admin | Dallas County | vms |
+      | Atticus Finch      | atticus@example.com  | Admin | Potter County | vms |
     And delayed jobs are processed
     And I am logged in as "admin@dallas.gov"
     And I have the scenarios "Test"
