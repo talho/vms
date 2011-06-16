@@ -7,7 +7,7 @@ class Vms::StaffController < ApplicationController
   after_filter :change_include_root_back
   
   def index
-    @staff = @scenario.all_staff
+    @staff = params[:site_id] ? @scenario.site_instances.for_site(params[:site_id].to_i).staff : @scenario.staff
     @staff.each do |s|
       u = s.user
       s[:user_detail] = {:caption => "#{u.name} #{u.email}", :name => u.name, :email => u.email, :id => u.id, :title => u.title,

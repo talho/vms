@@ -282,3 +282,17 @@ Feature: Send alerts for different actions on scenarios
     And delayed jobs are processed
     Then "atticus@example.com" should not receive a VMS email with title "You have been assigned to a site" message "You have been assigned to Malawi at Kenyatta, Lilongwe, Malawi. Please make your way there now, if you are not already, and check-in when you arrive."
     And "bartleby@example.com" should not receive a VMS email
+
+  Scenario: Sending a custom alert to the staff at a specific site
+    Given "Bartleby Scrivener" is assigned to "Malawi" for scenario "Test"
+    Given "Atticus Finch" is assigned to "Immunization Center" for scenario "Test"
+    And scenario "Test" is "unexecuted"
+    When I open the "Test" scenario
+    And I click x-accordion-hd "Site"
+    And I right click on site "Malawi"
+    And I click x-menu-item "Alert staff at this site"
+    And I fill in "Alert Message" with "Test Alert"
+    And I press "OK"
+    And delayed jobs are processed
+    Then "atticus@example.com" should not receive a VMS email with title "Custom Alert" message "Test Alert"
+    And "bartleby@example.com" should receive a VMS email with title "Custom Alert" message "Test Alert"

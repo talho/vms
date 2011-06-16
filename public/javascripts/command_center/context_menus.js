@@ -43,6 +43,23 @@ Talho.VMS.ux.CommandCenter.ContextMenus = {
           site_controller.deactivate(record, this.findMarker(record), grid);
         }});
       }
+      
+      menuConfig.push({text: 'Alert staff at this site', scope: this, handler: function(){
+        var win = new Talho.VMS.ux.ScenarioStatusChange({
+          action: 'alert',
+          scenarioId: this.scenarioId,
+          siteId: record.id,
+          scope: this,
+          handler: function(btn, msg, custom_aud){
+            if(btn === 'ok'){
+              this.changeScenarioState('alert', {custom_msg: msg, 'custom_aud[]': custom_aud}, function(){
+                
+              });
+            }
+          }
+        });
+        win.show();
+      }});
     }
     
     menuConfig.push({

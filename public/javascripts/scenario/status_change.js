@@ -60,12 +60,15 @@ Talho.VMS.ux.ScenarioStatusChange = Ext.extend(Ext.Window, {
     });
     
     if(this.action !== 'execute'){
+      params = {
+        with_detail: true
+      };
+      if(this.siteId) params['site_id'] = this.siteId;
+      
       Ext.Ajax.request({
         url: '/vms/scenarios/' + this.scenarioId + '/staff.json',
         method: 'GET',
-        params: {
-          with_detail: true
-        },
+        params: params,
         callback: function(opts, success, resp){
           if(success){
             var result = Ext.decode(resp.responseText);
@@ -108,7 +111,7 @@ Talho.VMS.ux.ScenarioStatusChange = Ext.extend(Ext.Window, {
         }
       }, this);
       
-      if(user_selection_store.getModifiedRecords().length > 0 || removed){
+      if(user_selection_store.getModifiedRecords().length > 0 || removed || this.siteId){
         users = [];
         user_selection_store.each(function(u){
           users.push(u.id);
