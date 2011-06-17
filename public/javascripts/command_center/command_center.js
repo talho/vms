@@ -70,6 +70,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           }
         })});
         vms_tool_grid.superclass.constructor.call(this, config);
+        this.on('afterrender', this.command_center.initToolGridDropTarget, this.command_center, {delay: 1});
         this.getStore().on('load', this.add_default_rows, this);
       },
       add_default_rows: function(store){
@@ -523,7 +524,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         
         var marker = this.parent.map.getCurrentHover();
         
-        if(!rec && marker && marker.data && marker.data.record){
+        if(dd.grid.getStore().type == 'role' && !rec && marker && marker.data && marker.data.record){
           this.parent.copyRolesToSite(data, marker.data.record);
           return true;
         }
@@ -544,6 +545,57 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         else{
           return false;
         }
+      }
+    });
+  },
+  
+  initToolGridDropTarget: function(grid){
+    grid.dropTarget = new Ext.dd.DropTarget(grid.getView().mainBody, {
+      parent: this,
+      ddGroup: 'vms',
+      grid: grid,
+      canDrop: function(source, e, data){
+        if(Ext.isString(data) || data.rowIndex === undefined)
+          return false;
+          
+        var rec = data.grid.getStore().getAt(data.rowIndex), 
+            group_tar = e.getTarget('.x-grid-group'),
+            row_index = this.grid.getView().findRowIndex(e.target),
+            drop_rec = this.grid.getStore().getAt(row_index),
+            site_id;
+        
+        if(this.grid.getStore().type == 'site' && rec.get('type') == 'site')
+          return false;
+
+        if(this.grid.getStore().type !== 'site' && this.grid !== data.grid)
+          return false;
+          
+        if(drop_rec && drop_rec.get('status') == 'new')
+          return false;
+
+        if(row_index === false){
+          if(!group_tar)
+            return false;
+          site_id = group_tar.id.replace(/^ext-gen(\d*)-gp-site_id-/, '')
+        }
+        else
+          site_id = drop_rec.get('type') == 'site' ? drop_rec.get('id') : drop_rec.get('site_id');
+        
+        if(site_id == undefined || rec.get('site_id') == site_id)
+          return false;
+          
+        return site_id;
+      },
+      notifyDrop: function(source, e, data){
+        var site_id = this.canDrop(source, e, data);
+        if(site_id === false) return false;
+        rec = data.grid.getStore().getAt(data.rowIndex)
+        var site_rec = this.parent.siteGrid.getStore().getById(site_id);
+        this.parent.addItemToSite(site_rec, rec);
+        return true;
+      },
+      notifyOver: function(source, e, data){
+        return this.canDrop(source, e, data) === false ? this.dropNotAllowed : this.dropAllowed;
       }
     });
   },
