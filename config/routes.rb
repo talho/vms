@@ -24,6 +24,7 @@ ActionController::Routing::Routes.draw do |map|
   map.kiosk_show 'vms/kiosk/:id.:format', :controller => "vms/kiosks", :action => 'show'  
   map.site_checkin 'vms/site_checkin.:format', :controller => "vms/kiosks", :action => 'registered_checkin'
   map.site_walkup 'vms/site_walkup.:format', :controller => "vms/kiosks", :action => 'walkup_checkin'
+  map.vms_active_sites 'vms/user_active_sites', :controller => "vms/sites", :action => 'user_active_sites', :conditions => { :method => :get }
 
   map.inventory_sources 'vms/inventory_sources.:format', :controller => 'vms/inventories', :action => 'sources'
   map.inventory_items 'vms/inventory_items.:format', :controller => 'vms/inventories', :action => 'items'

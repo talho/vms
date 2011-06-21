@@ -1,6 +1,6 @@
 # user_id          | integer                     |
 # scenario_site_id | integer                     |
-# status           | character varying(255)      |
+# status           | varchar(255)                |
 # checked_in       | boolean                     | default false
 # created_at       | timestamp without time zone |
 # updated_at       | timestamp without time zone |
@@ -11,11 +11,13 @@ class Vms::Staff < ActiveRecord::Base
   belongs_to :user
   belongs_to :scenario_site, :class_name => "Vms::ScenarioSite"
   has_one :site, :through => :scenario_site, :class_name => "Vms::Site"
-   
+
+  before_destroy :remove_site_admin_status
+
   def as_json(options = {})
     json = super(options)
     ( json.key?("staff_instance") ? json["staff_instance"] : (json.key?('staff') ? json['staff'] : json) ).merge!( 
-      {:site => scenario_site.site.name, :site_id => scenario_site.site.id, :user => user.display_name, :user_id => user.id })
+      {:site => scenario_site.site.name, :site_id => scenario_site.site.id, :user => user.display_name, :user_id => user.id, :site_admin => scenario_site.site_admin_id == user.id })
     json
   end
   
@@ -45,6 +47,12 @@ class Vms::Staff < ActiveRecord::Base
 
   def to_s
     user.to_s
+  end
+
+  protected
+
+  def remove_site_admin_status
+    scenario_site.update_attribute(:site_admin_id, nil) if user_id == scenario_site.site_admin_id
   end
 
 end

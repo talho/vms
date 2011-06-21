@@ -108,7 +108,7 @@ Talho.VMS.ux.CommandCenter.SiteApplications = {
     }
   },
   
-  addManualUserToSite: function(record, site){
+  addUserToSite: function(record, site){
     this.staff_controller.siteId = site.id;
     if(record.get('status') === 'new' || record.get('site_id') == site.id){
       var win = new Talho.VMS.ux.CreateAndEditStaff({
@@ -130,9 +130,6 @@ Talho.VMS.ux.CommandCenter.SiteApplications = {
       this.staffGrid.loadMask.show();
       this.staff_controller.move(record);
     }
-  },
-  
-  addAutoUserToSite: function(record, site){
   },
   
   addQualificationToSite: function(record, site){

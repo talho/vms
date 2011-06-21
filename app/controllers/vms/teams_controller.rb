@@ -11,7 +11,7 @@ class Vms::TeamsController < ApplicationController
     respond_to do |format|
       format.json { render :json => @teams.as_json }
     end
-  end
+  end                    
   
   def show
     @team = @scenario.site_instances.for_site(params[:vms_site_id]).teams.find(params[:id], :include => {:audience => [:users]})
@@ -44,14 +44,11 @@ class Vms::TeamsController < ApplicationController
     
     #build team. params[:team] should contain team[audience][name] and team[audience][users]
     team = @scenario_site.teams.build
-    team.audience = Audience.new params[:team][:audience]
+    team.audience = Audience.new
+    team.audience.build params[:team][:audience]
     team.audience.scope = "Team"
     team.audience.owner = current_user
-    team.audience.recipients.each do | user |
-      @staff = @scenario_site.staff.find_or_create_by_user_id_and_scenario_site_id( user.id, @scenario_site.id)
-      @staff.update_attributes({:status => 'team-assigned'})
-    end
-
+    
     aud = nil
     if params[:save_template] == "true" && (par_aud.nil? || Group::SCOPE.include?(par_aud.scope)) #do this if we're saving a template and the parent template is null or the parent audience is a group (and not a team)
       aud = Audience.new team.audience.attributes
@@ -64,6 +61,10 @@ class Vms::TeamsController < ApplicationController
       
     respond_to do |format|
       if @scenario_site.save && (aud.nil? || aud.save)
+        team.audience.recipients.each do | user |
+          @staff = @scenario_site.staff.find_or_create_by_user_id_and_scenario_site_id( user.id, @scenario_site.id)
+          @staff.update_attributes({:source => 'team'})
+        end
         format.json {render :json => {:success => true} }
       else
         format.json {render :json => {:success => false, :errors => @scenario_site.errors, :aud_errors => aud.nil? ? [] : aud.errors}, :status => 400 }
@@ -93,7 +94,7 @@ class Vms::TeamsController < ApplicationController
         @scenario.staff.find(:all, :conditions=>['scenario_site_id != ? AND user_id = ? AND checked_in = ?',@scenario_site.id, u.id, false]).each{ |s| s.destroy }
         #add all team members to staff on target ScenarioSite
         newstaff = @scenario_site.staff.find_or_create_by_user_id(u.id)
-        newstaff.update_attributes({:status => 'team-assigned'})
+        newstaff.update_attributes({:status => 'assigned', :source => 'team'})
       end
       @team.scenario_site = @scenario_site
     end
