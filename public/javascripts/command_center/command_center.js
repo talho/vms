@@ -31,6 +31,8 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           switch(values.type){
             case 'site': cls += 'vms-site';
               break;
+            case 'site_noadmin': cls += 'vms-site-noadmin';
+              break;
             case 'inventory': cls += 'vms-inventory';
               break;
             case 'pod': cls += 'vms-pod';
@@ -43,9 +45,13 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
               break;
             case 'team': cls += 'vms-team';
               break;
+            case 'checked_in_team': cls += 'vms-checked-in-team';
+              break;
             case 'auto_user': cls += 'vms-auto-user';
               break;
             case 'staff': cls += 'vms-manual-user';
+              break;
+            case 'checked_in_user': cls += 'vms-checked-in-user';
               break;
           }
           
@@ -185,7 +191,14 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
             reader: new Ext.data.JsonReader({
               root: 'sites',
               idProperty: 'site_id',
-              fields: [{name:'name', mapping:'site.name'}, {name: 'type', defaultValue: 'site'}, {name:'status', convert: function(v){return v == 2 ? 'active': 'inactive';} }, {name: 'address', mapping: 'site.address'}, {name: 'lat', mapping: 'site.lat'}, {name: 'lng', mapping: 'site.lng'}, {name: 'id', mapping: 'site_id'}, 'qualifications']
+              fields: [
+                {name:'name', mapping:'site.name'},
+                {name: 'type', convert: function(v, r){ if (r.site_admin_id == null){return 'site_noadmin';} else {return 'site';} } },
+                {name:'status', convert: function(v){return v == 2 ? 'active': 'inactive';} },
+                {name: 'address', mapping: 'site.address'},
+                {name: 'lat', mapping: 'site.lat'},
+                {name: 'lng', mapping: 'site.lng'},
+                {name: 'id', mapping: 'site_id'}, 'qualifications']
             }),
             type: 'site',
             url: '/vms/scenarios/' + config.scenarioId + '/sites',
@@ -201,7 +214,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         },
         {title: 'PODs/Inventories', xtype: 'vms-toolgrid', cls: 'inventoryGrid', tools: tool_cfg, itemId: 'inventory_grid', seed_data: {name: 'New POD/Inventory (drag to site)', type: 'inventory', status: 'new'},
           store: new Talho.VMS.ux.InventoryController.inventory_list_store({ scenarioId: config.scenarioId, type: 'inventory',
-            groupField: 'site_id',
+            groupField: 'site_id'
           }),
           columns: [{xtype: 'templatecolumn', id: 'name_column', tpl: this.row_template}, {dataIndex: 'site_id', hidden: true}],
           view: new tool_grouping_view(),
@@ -274,7 +287,9 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           store: new Ext.data.GroupingStore({
             reader: new Ext.data.JsonReader({
               idProperty: 'id', 
-              fields: ['name', {name: 'type', defaultValue: 'team'}, {name: 'status', defaultValue: 'active'}, 'id', 'site_id', 'site', {name: 'user_count', type: 'integer'}]
+              fields: ['name', {name: 'type', convert: function(v, r){
+                if ( r.all_checked_in ){ return 'checked_in_team'; } else { return 'team'; }
+              }}, {name: 'status', defaultValue: 'active'}, 'id', 'site_id', 'site', {name: 'user_count', type: 'integer'}]
             }),
             type: 'team',
             url: '/vms/scenarios/' + config.scenarioId + '/teams',
@@ -648,6 +663,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       scenarioId: this.scenarioId,
       ext_rolesGrid: this.rolesGrid,
       ext_staffGrid: this.staffGrid,
+      ext_siteGrid: this.siteGrid,
       ext_inventoryGrid: this.inventoryGrid,
       listeners: { scope: this,
         'destroy': function(){

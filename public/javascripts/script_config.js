@@ -14,3 +14,4 @@ Talho.ScriptManager.addInitializer('Talho.VMS.CommandCenter', {js:'$(ext_extensi
 Talho.ScriptManager.addInitializer('Talho.VMS.CreateAndEditScenario', {js: 'UserSelectionGrid $(vms)/scenario/create_and_edit.js'});
 Talho.ScriptManager.addInitializer('Talho.VMS.ManageScenarios', {js: '$(ext_extensions)/xActionColumn.js $(vms)/scenario/manage_scenarios.js'});
 Talho.ScriptManager.addInitializer('Talho.VMS.Scenario.Manager', {js: 'VMS_Scenario_Manager'})
+Talho.ScriptManager.addInitializer('Talho.VMS.AdministerSites', {js: '$(ext_extensions)/xActionColumn.js $(vms)/site/administer_sites.js'});

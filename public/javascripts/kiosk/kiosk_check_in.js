@@ -173,7 +173,7 @@ Ext.ns("Talho.VMS");
 
       this.refresherSlider = new Ext.Slider ({
         value: this.DEFAULT_REFRESHER_INTERVAL,
-        width: 100, increment: 5, minValue: 10, maxValue: 90,
+        width: 100, increment: 5, minValue: 10, maxValue: 120,
         listeners: {
           scope: this,
           'change': function(){
@@ -335,9 +335,13 @@ Ext.ns("Talho.VMS");
           this.walkupFirstNameField,
           this.walkupLastNameField,
           this.walkupEmailField,
-          this.walkupNewUserCheckbox,
-          this.walkupNewUserForm
-        ],
+          this.walkupNewUserCheckbox
+        ]
+      });
+
+      this.walkupWrapper = new Ext.Panel({
+        border: false,
+        items: [this.walkupForm, this.walkupNewUserForm],
         buttonAlign: 'center',
         buttons: [ this.walkupCheckinButton ]
       });
@@ -349,7 +353,7 @@ Ext.ns("Talho.VMS");
 
       this.rightPanel = new Ext.Panel ({
         resize: true, border: true, flex: 0.8, margins: '0 5 0 30',
-        items: [ this.walkupForm ]
+        items: [ this.walkupWrapper ]
       });
 
       this.checkInPanel = new Ext.Panel({

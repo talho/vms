@@ -45,7 +45,8 @@ class Vms::Scenario < ActiveRecord::Base
     end
   end
 
-  named_scope :active, lambda { |scenario| { :conditions => [ "state IN (?)", [STATES[:executed], STATES[:paused]] ] } }
+  STATES.each { |k,v| named_scope k, :conditions => { :state => v } }
+  named_scope :active, :conditions => [ "state IN (?)", [STATES[:executing], STATES[:paused]] ]
   
   def to_s
     name
@@ -76,7 +77,7 @@ class Vms::Scenario < ActiveRecord::Base
   end
   
   def all_staff
-    (staff + teams.map{ |t| t.audience.recipients.map{|ui| Vms::Staff.new(:user => ui, :scenario_site => t.scenario_site, :source => 'team', :status => 'assigned')} }).flatten.uniq
+    staff.uniq
   end
   
   def clone(opts = {})

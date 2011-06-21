@@ -35,7 +35,7 @@ class Vms::SessionsController < ApplicationController
 
   def destroy
     session.delete(:vms_user_id)
-    flash[:notice] = "You have logged out."
+    flash[:notice] = "You have logged out of the Volunteer Management System."
     redirect_to :vms_session_new
   end
 

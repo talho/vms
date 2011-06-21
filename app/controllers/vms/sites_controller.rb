@@ -15,24 +15,34 @@ class Vms::SitesController < ApplicationController
   
   def show
     debugger
-    @site = @scenario.site_instances.find_by_site_id(params[:id], :include => {:teams => {:audience => [:users]}, :staff => {:user => [:roles]}, :role_scenario_sites => [:role], :inventories => {:item_instances => {:item => :item_category} } })
+    @site = @scenario.site_instances.find_by_site_id(params[:id], :include =>{
+      :teams => {:audience => [:users]},
+      :staff => {:user => [:roles]},
+      :role_scenario_sites => [:role],
+      :inventories => {:item_instances => {:item => :item_category} }
+    })
     # here we need to work with calculating full lists of 1) the staff assigned to the site, both manually and automatically (automatic assignment in progress)
     #staff = (@site.staff + @site.teams.map{ |t| t.audience.recipients.map{|ui| Vms::Staff.new(:user => ui, :scenario_site => t.scenario_site, :source => 'team', :status => 'assigned')} }).flatten.uniq
     staff = @site.staff.map {|s| s.user[:source] = 'manual'; s.user[:staff_id] = s.id; s.user }
     # 2) the roles assigned to the site and which staff members are filling those roles. this could become interesting because, when a user is manually assigned, we have to decide if he's filling 1 or many roles
-    @site.role_scenario_sites.each { |r| r.calculate_assignment(staff.map(&:user)) }
+    @site.role_scenario_sites.each { |r| r.calculate_assignment(@site.staff.map(&:user)) }
     # 3) any calculations that need to be done on inventory items
     # I think that it is best to push the calculations back to the models so we can reuse them elsewhere
     respond_to do |format|
-      format.json {render :json => { :site => @site.as_json, :roles => @site.role_scenario_sites.as_json,
-                                     :items => @site.inventories.map(&:item_instances).flatten.as_json, :staff => staff.as_json } }
+      format.json {render :json => {
+        :site => @site.as_json,
+        :roles => @site.role_scenario_sites.as_json,
+        :items => @site.inventories.map(&:item_instances).flatten.as_json,
+        :staff => @site.staff.as_json,
+        :walkups => @site.walkups
+      } }
     end
   end
-  
+
   def new
-   
+
   end
-  
+
   def create
     @site = Vms::Site.new(params[:site])
     @site.scenario_instances.build(:scenario => @scenario, :status => params[:status].nil? ? Vms::ScenarioSite::STATES[:inactive] : params[:status].to_i)
@@ -44,14 +54,14 @@ class Vms::SitesController < ApplicationController
       end
     end
   end
-  
+
   def edit
     @site = Vms::Site.find(params[:id])
     respond_to do |format|
       format.json {render :json => {:site => @site.as_json } }
     end
   end
-  
+
   def update
     @site = Vms::Site.find(params[:id])
     @site.update_attributes params[:site] unless params[:site].nil? || params[:site].blank?
@@ -66,7 +76,7 @@ class Vms::SitesController < ApplicationController
       end
     end
   end
-  
+
   def destroy
     @site = @scenario.sites.find(params[:id])
     permanent = params[:permanent] == 'true' && @site.scenario_instances.length == 1 && @site.scenario_instances.first.scenario == @scenario
@@ -76,7 +86,7 @@ class Vms::SitesController < ApplicationController
       @scenario_instance = @site.scenario_instances.find_by_scenario_id(@scenario.id)
       success = @scenario_instance.destroy
     end
-    
+
     respond_to do |format|
       if success
         format.json {render :json => {:success => true} }
@@ -85,13 +95,21 @@ class Vms::SitesController < ApplicationController
       end
     end
   end
-  
+
   def existing
     @sites = Vms::Site.find(:all, :conditions => ["name like ?", '%' + params[:name] + '%']) - @scenario.sites
-    
+
     respond_to do |format|
       format.json {render :json => {:sites => @sites} }
     end    
   end
-  
+
+  def user_active_sites
+    active_ssites = current_user.vms_active_scenario_sites
+    ssites = active_ssites.collect{ |s| {:scenario => s.scenario.name, :name => s.site.name, :id => s.site.id, :address => s.site.address} }
+    respond_to do |format|
+      format.json {render :json => ssites }
+    end
+  end
+
 end

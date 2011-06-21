@@ -65,6 +65,9 @@
 .vms-tool-icon-new.vms-site{
   background-image: url(/stylesheets/vms/images/cc_icons/icon-site-new.png);
 }
+.vms-site-noadmin{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-site-noadmin.png);
+}
 
 .vms-tool-icon-active.vms-inventory{
   background-image: url(/stylesheets/vms/images/cc_icons/icon-inventory-active.png);
@@ -113,8 +116,13 @@
   background-image: url(/stylesheets/vms/images/cc_icons/icon-team-new.png);
 }
 
+.vms-checked-in-team{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-team-checked-in.png);
+}
+
 .vms-tool-icon-active.vms-manual-user{
-  background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-active.png);
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-manual.png);
+  /*background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-active.png);*/
 }
 .vms-tool-icon-inactive.vms-manual-user{
   background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-available.png);
@@ -122,12 +130,17 @@
 .vms-tool-icon-new.vms-manual-user{
   background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-new.png);
 }
+.vms-checked-in-user{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-checked-in.png);
+}
 
 .vms-tool-icon-active.vms-auto-user{
-  background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-active-auto.png);
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-auto.png);
+  /*background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-active-auto.png);*/
 }
 .vms-tool-icon-inactive.vms-auto-user{
-  background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-available-auto.png);
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-available.png);
+  /*background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-available-auto.png);*/
 }
 
 .vms-row-icon.vms-control-pause{

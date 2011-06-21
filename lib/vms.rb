@@ -23,7 +23,8 @@ $menu_config = {} unless defined?($menu_config)
 $menu_config[:vms] = <<EOF
   nav = "{name: 'VMS', items:["
   if current_user.vms_admin?
-    nav += "{name: 'Manage Scenarios', tab:{id: 'vms_open_scenario', title:'Manage Scenarios', initializer: 'Talho.VMS.Scenario.Manager'}}"
+    nav += "{name: 'Manage Scenarios', tab:{id: 'vms_open_scenario', title:'Manage Scenarios', initializer: 'Talho.VMS.Scenario.Manager'}},
+            {name: 'Site Administration', win:{id: 'vms_site_admin', title:'Site Administration', initializer: 'Talho.VMS.AdministerSites'}}"
     nav += "," if current_user.vms_volunteer?
   end
   nav += "{name: 'My Volunteer Profile', tab:{id: 'vms_user_profile', title:'Volutneer Profile'}}" if current_user.vms_volunteer?
