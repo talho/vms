@@ -64,3 +64,24 @@ Given /^the site "([^\"]*)" exists for scenario "([^\"]*)"$/ do |site_name, scen
       })
   end
 end
+
+When /^I drag "([^\"]*)" \(([^\)]*)\) to the "([^\"]*)" site$/ do |item_name, item_type, site_name|
+  page.execute_script("
+  var command_center = Ext.getCmp(Ext.getBody().first().id).findComponent('vms_command_center');
+  var dest_i = command_center.siteGrid.getStore().find('name', new RegExp('#{site_name}'));
+  var i = command_center.#{item_type}Grid.getStore().find('name', new RegExp('#{item_name}'));
+  if(i === -1) i = 0;
+  var data = {
+    grid: command_center.#{item_type}Grid,
+    rowIndex: i,
+    selections: [command_center.#{item_type}Grid.getStore().getAt(i)]
+  };
+  var e = {
+    getTarget: function(){
+      return undefined;
+    },
+    target: command_center.siteGrid.getView().getRow(dest_i)
+  };
+  command_center.siteGrid.dropTarget.notifyDrop(null, e, data);
+  ")
+end

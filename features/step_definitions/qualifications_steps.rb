@@ -11,7 +11,7 @@ When /^I drag qualification "([^\"]*)" to site "([^\"]*)"$/ do |qual, site|
     var data = {
       selections: [command_center.qualsGrid.getStore().getAt(i)]
     };
-    command_center.map.dropZone.onNodeDrop(null, null, null, data);
+    command_center.map.dropZone.onNodeDrop(null, {grid:command_center.qualsGrid}, null, data);
   ")
 end
 

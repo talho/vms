@@ -44,7 +44,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
               break;
             case 'auto_user': cls += 'vms-auto-user';
               break;
-            case 'manual_user': cls += 'vms-manual-user';
+            case 'staff': cls += 'vms-manual-user';
               break;
           }
           
@@ -290,7 +290,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           }),
           view: new tool_grouping_view()
         },
-        {title: 'Staff', xtype: 'vms-toolgrid', itemId: 'staff_grid', tools: tool_cfg, cls: 'staffGrid', seed_data: {name: 'Add User (drag to site)', type: 'manual_user', status: 'new'},
+        {title: 'Staff', xtype: 'vms-toolgrid', itemId: 'staff_grid', tools: tool_cfg, cls: 'staffGrid', seed_data: {name: 'Add User (drag to site)', type: 'staff', status: 'new'},
           columns: [{xtype: 'templatecolumn', id:'name_column', tpl: this.row_template }, {dataIndex: 'site_id', hidden: true}],
           listeners:{
             scope: this,
@@ -300,12 +300,12 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           store: new Ext.data.GroupingStore({
             reader: new Ext.data.JsonReader({
               idProperty: 'id',
-              fields: [{name: 'name', mapping: 'user'}, {name: 'type', defaultValue: 'manual_user', convert: function(v, r){
+              fields: [{name: 'name', mapping: 'user'}, {name: 'type', defaultValue: 'staff', convert: function(v, r){
                 switch(r.source){
                   case 'team':
                   case 'auto': return 'auto_user';
                   case 'manual':
-                  default: return 'manual_user';
+                  default: return 'staff';
                 }
               }}, {name: 'status'}, 'source', 'id', 'site_id', 'site', 'user_id']
             }),
@@ -581,7 +581,11 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         else
           site_id = drop_rec.get('type') == 'site' ? drop_rec.get('id') : drop_rec.get('site_id');
         
-        if(site_id == undefined || rec.get('site_id') == site_id)
+        if(site_id == undefined)
+          return false;
+        
+        var type = rec.get('type')
+        if(rec.get('site_id') == site_id && type !== 'role' && type !== 'staff')
           return false;
           
         return site_id;
@@ -631,7 +635,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         break;
       case 'team': this.addTeamToSite(record, site);
         break;
-      case 'manual_user': this.addManualUserToSite(record, site);
+      case 'staff': this.addManualUserToSite(record, site);
         break;
       case 'auto_user': this.addAutoUserToSite(record, site);
         break;

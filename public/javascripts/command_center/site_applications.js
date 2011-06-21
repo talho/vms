@@ -44,8 +44,7 @@ Talho.VMS.ux.CommandCenter.SiteApplications = {
   
   addRoleToSite: function(record, site){ 
     this.role_controller.siteId = site.id; 
-    var win = new Talho.VMS.ux.CreateAndEditRoles({
-      creatingRecord: record,
+    var win_cfg = {
       scenarioId: this.scenarioId,
       siteId: site.id,
       listeners: {
@@ -55,7 +54,9 @@ Talho.VMS.ux.CommandCenter.SiteApplications = {
           this.role_controller.save(win, u, r);
         }
       }
-    });
+    };
+    if(site.id != record.get('site_id') ) win_cfg['creatingRecord'] = record;
+    var win = new Talho.VMS.ux.CreateAndEditRoles(win_cfg);
     win.show();
   },
   
@@ -109,7 +110,7 @@ Talho.VMS.ux.CommandCenter.SiteApplications = {
   
   addManualUserToSite: function(record, site){
     this.staff_controller.siteId = site.id;
-    if(record.get('status') === 'new'){
+    if(record.get('status') === 'new' || record.get('site_id') == site.id){
       var win = new Talho.VMS.ux.CreateAndEditStaff({
         creatingRecord: record,
         scenarioId: this.scenarioId,

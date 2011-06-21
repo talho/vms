@@ -11,7 +11,7 @@ When /^I drag the "([^\"]*)" inventory onto the "([^\"]*)" site$/ do |inv_name, 
   var data = {
     selections: [command_center.inventoryGrid.getStore().getAt(i)]
   };
-  command_center.map.dropZone.onNodeDrop(null, null, null, data);
+  command_center.map.dropZone.onNodeDrop(null, {grid:command_center.inventoryGrid}, null, data);
   ")
 end
 

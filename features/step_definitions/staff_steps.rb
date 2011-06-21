@@ -11,7 +11,7 @@ When /^I drag staff "([^\"]*)" to "([^\"]*)"$/ do |staff, site|
     var data = {
       selections: [command_center.staffGrid.getStore().getAt(i)]
     };
-    command_center.map.dropZone.onNodeDrop(null, null, null, data);
+    command_center.map.dropZone.onNodeDrop(null, {grid:command_center.staffGrid}, null, data);
   ")
 end
 

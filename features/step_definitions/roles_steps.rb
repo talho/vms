@@ -11,11 +11,11 @@ When /^I drag "([^\"]*)" to the "([^\"]*)" site$/ do |role, site|
     var data = {
       selections: [command_center.rolesGrid.getStore().getAt(i)]
     };
-    command_center.map.dropZone.onNodeDrop(null, null, null, data);
+    command_center.map.dropZone.onNodeDrop(null, {grid:command_center.rolesGrid}, null, data);
   ")
 end
 
-Then /^the "([^\"]*)" site for scenario "([^\"]*)" should have ([\d]*) "([^\"]*)" role$/ do |site_name, scenario_name, count, role_name|
+Then /^the "([^\"]*)" site for scenario "([^\"]*)" should have ([\d]*) "([^\"]*)" roles?$/ do |site_name, scenario_name, count, role_name|
   scenario = Vms::Scenario.find_by_name(scenario_name)
   site_instance = scenario.site_instances.for_site(Vms::Site.find_by_name(site_name))
   role_instance = site_instance.role_scenario_sites.find_by_role_id(Role.find_by_name(role_name))
@@ -68,7 +68,7 @@ When /^I drag role group "([^\"]*)" to "([^\"]*)"$/ do |role_group_name, site_na
     i = command_center.rolesGrid.getStore().find('site', new RegExp('#{role_group_name}'));
     var r = command_center.rolesGrid.getStore().getAt(i);
     var data = r.get('site_id');
-    command_center.map.dropZone.onNodeDrop(null, null, null, data);
+    command_center.map.dropZone.onNodeDrop(null, {grid:command_center.rolesGrid}, null, data);
   ")
 end
 

@@ -56,7 +56,7 @@ Talho.VMS.ux.ScenarioStatusChange = Ext.extend(Ext.Window, {
     Talho.VMS.ux.ScenarioStatusChange.superclass.initComponent.apply(this, arguments);
     
     this.original_user_store = new Ext.data.JsonStore({
-      fields: ['user', {name: 'type', defaultValue: 'manual_user'}, {name: 'status', defaultValue: 'active'}, 'id', 'site_id', 'site', 'user_id']
+      fields: ['user', {name: 'type', defaultValue: 'staff'}, {name: 'status', defaultValue: 'active'}, 'id', 'site_id', 'site', 'user_id']
     });
     
     if(this.action !== 'execute'){

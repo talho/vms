@@ -10,7 +10,7 @@ When /^I drag team "([^\"]*)" to the "([^\"]*)" site$/ do |team, site|
     var data = {
       selections: [command_center.teamsGrid.getStore().getAt(i)]
     };
-    command_center.map.dropZone.onNodeDrop(null, null, null, data);
+    command_center.map.dropZone.onNodeDrop(null, {grid:command_center.teamsGrid}, null, data);
   ")
 end
 

@@ -4,6 +4,7 @@ Talho.VMS.ux.InventoryWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
   modal: true,
   padding: '5',
   autoHeight: true,
+  cls: 'inventoryWindow',
   initComponent: function(){
     this.mode = this.mode || (this.record && this.record.get('status') !== 'new' ? 'copy' : 'create');
     
