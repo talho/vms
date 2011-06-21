@@ -57,6 +57,8 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
               break;
             case 'checked_in_walkup': cls += 'vms-checked-in-walkup';
               break;
+            case 'checked_in_user': cls += 'vms-checked-in-user';
+              break;
           }
           
           return cls;
