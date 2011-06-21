@@ -13,20 +13,30 @@ class Vms::SitesController < ApplicationController
     end
   end  
   
-  def show
-    debugger
-    @site = @scenario.site_instances.find_by_site_id(params[:id], :include => {:teams => {:audience => [:users]}, :staff => {:user => [:roles]}, :role_scenario_sites => [:role], :inventories => {:item_instances => {:item => :item_category} } })
+  def show    
+
+    @site = @scenario.site_instances.find_by_site_id(params[:id], :include =>{
+      :teams => {:audience => [:users]},
+      :staff => {:user => [:roles]},
+      :role_scenario_sites => [:role],
+      :inventories => {:item_instances => {:item => :item_category} }
+    })
     # here we need to work with calculating full lists of 1) the staff assigned to the site, both manually and automatically (automatic assignment in progress)
     #staff = (@site.staff + @site.teams.map{ |t| t.audience.recipients.map{|ui| Vms::Staff.new(:user => ui, :scenario_site => t.scenario_site, :source => 'team', :status => 'assigned')} }).flatten.uniq
-    staff = @site.staff.map {|s| s.user[:source] = 'manual'; s.user[:staff_id] = s.id; s.user }
-
+    #staff = @site.staff.map {|s| s.user[:source] = 'manual'; s.user[:staff_id] = s.id; s.user }
     # 2) the roles assigned to the site and which staff members are filling those roles. this could become interesting because, when a user is manually assigned, we have to decide if he's filling 1 or many roles
-    @site.role_scenario_sites.each { |r| r.calculate_assignment(staff.map(&:user)) }
+    @site.role_scenario_sites.each { |r| r.calculate_assignment(@site.staff.map(&:user)) }
     # 3) any calculations that need to be done on inventory items
     # I think that it is best to push the calculations back to the models so we can reuse them elsewhere
+    #administrator = @site.site_admin_id.nil? ? "none" : User.find(@site.site_admin_id).name
     respond_to do |format|
-      format.json {render :json => { :site => @site.as_json, :roles => @site.role_scenario_sites.as_json,
-                                     :items => @site.inventories.map(&:item_instances).flatten.as_json, :staff => staff.as_json } }
+      format.json {render :json => {
+        :site => @site.as_json,
+        :roles => @site.role_scenario_sites.as_json,
+        :items => @site.inventories.map(&:item_instances).flatten.as_json,
+        :staff => @site.staff.as_json,
+        :walkups => @site.walkups
+      } }
     end
   end
   
@@ -94,5 +104,13 @@ class Vms::SitesController < ApplicationController
       format.json {render :json => {:sites => @sites} }
     end    
   end
-  
+
+  def user_active_sites
+    active_ssites = current_user.vms_active_scenario_sites
+    ssites = active_ssites.collect{ |s| {:scenario => s.scenario.name, :name => s.site.name, :id => s.site.id, :address => s.site.address} }
+    respond_to do |format|
+      format.json {render :json => ssites }
+    end
+  end
+
 end

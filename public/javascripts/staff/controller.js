@@ -6,7 +6,7 @@ Ext.ns("Talho.VMS.ux");
 Talho.VMS.ux.StaffController = Ext.extend(Ext.util.Observable, {
   constructor: function(config){
     Ext.apply(this, config);
-    this.addEvents('aftersave', 'afterremove', 'aftermove');
+    this.addEvents('aftersave', 'afterremove', 'aftermove', 'aftersetsiteadmin');
     Talho.VMS.ux.StaffController.superclass.constructor.apply(this, arguments);
   },
   
@@ -106,8 +106,23 @@ Talho.VMS.ux.StaffController = Ext.extend(Ext.util.Observable, {
     
     return val;
   },
-  
+
+  setSiteAdmin: function(record){
+    Ext.Ajax.request({
+      url: this.getUrl(),
+      method: 'PUT',
+      params: { site_admin: record.data.user_id },
+      callback: function(opt, success, response){
+        var result = Ext.decode(response.responseText);
+        if(success && result.success !== true){ Ext.Msg.alert("There was a problem assigning Site Administrator"); }
+        this.fireEvent('aftersetsiteadmin', this);
+      },
+      scope: this
+    });
+  },
+
   getUrl: function(){
     return '/vms/scenarios/' + this.scenarioId + '/sites/' + this.siteId + '/staff.json';
   }
+
 });

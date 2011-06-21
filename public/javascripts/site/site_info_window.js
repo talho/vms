@@ -11,21 +11,26 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
     var staff_tools = this.can_edit ? [{id: 'gear', scope: this, handler: this.editStaff}] : [],
         roles_tools = this.can_edit ? [{id: 'gear', scope: this, handler: this.editRoles}] : [];
    
-    this.items = [{xtype: 'box', html: this.marker.data.record.get('name'), hideLabel:true},
-      {xtype: 'box', html: this.record.get('address'), fieldLabel: 'Address'},
+    this.items = [{xtype: 'box', html: this.marker.data.record.get('name'), hideLabel:true, style: {'font-weight':'bold', 'font-size': '150%'}},
+      {xtype: 'box', html: this.record.get('address'),  hideLabel:true},
       {xtype: 'box', html: this.record.get('qualifications'), fieldLabel: 'Qualifications'},
       {xtype: 'container', height: 300, itemId: 'accordion', layout: 'accordion', hideLabel: true, items: [
         {xtype: 'grid', title: 'Staff', tools: staff_tools, cls: 'staff_grid', itemId: 'staff', store: new Ext.data.JsonStore({
-            fields: ['user', 'role_filled', 'roles', 'qualifications', 'user_id', 'id', 'source']
+            fields: ['user', 'role_filled', 'roles', 'qualifications', 'user_id', 'id', 'source', 'site_admin']
           }),
-          columns: [{header: 'Name', dataIndex: 'user', menuDisabled: true}, {header: 'Role Filled', dataIndex: 'role_filled', menuDisabled: true}, {header: 'Roles', dataIndex: 'roles', menuDisabled: true}, {header: 'Qualifications', dataIndex: 'qualifications', menuDisabled: true},
-                    {header: 'Source', dataIndex: 'source', menuDisabled: true, renderer: function(val){
-                      switch(val){
-                        case 'manual': return 'Manually Assigned'; 
-                        case 'team': return 'Assigned Via Team'; 
-                        case 'auto': return 'Automatically Assigned';
-                      } 
-                    } }
+          columns: [
+            {header: 'Name', dataIndex: 'user', menuDisabled: true},
+            {header: 'Role Filled', dataIndex: 'role_filled', menuDisabled: true},
+            // {header: 'Roles', dataIndex: 'roles', menuDisabled: true},
+            // {header: 'Qualifications', dataIndex: 'qualifications', menuDisabled: true},
+            {header: 'Source', dataIndex: 'source', menuDisabled: true, renderer: function(val){
+              switch(val){
+                case 'manual': return 'Manually Assigned';
+                case 'team': return 'Assigned Via Team';
+                case 'auto': return 'Automatically Assigned';
+              }
+             }},
+            {header: 'Admin', dataIndex:'site_admin'}
           ],
           listeners: {
             scope: this,
@@ -109,16 +114,17 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
     var row = grid.getView().getRow(row_index);
     var record = grid.getStore().getAt(row_index);
     
-    if(!this.can_edit || record.get('source') !== 'manual'){
+    if(!this.can_edit){
       return;
     }
     
     var menu = new Ext.menu.Menu({
-      floating: true, defaultAlighn: 'tr-br',
+      floating: true, defaultAlign: 'tr-br',
       items: [{text: 'Remove Staff Member', scope: this, handler: function(){
         var staff_controller = new Talho.VMS.ux.StaffController({scenarioId: this.scenarioId, siteId: this.record.get('id'), listeners: {scope: this,
           'afterremove': function(){
             this.ext_staffGrid.getStore().load();
+            this.ext_siteGrid.getStore().load();
             this.load();
           }
         }});
@@ -128,7 +134,23 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
             staff_controller.remove(record);
           }
         }, this);
-      }}]
+      }},
+      {text: 'Set Site Admin', scope: this, handler: function(){
+        var staff_controller = new Talho.VMS.ux.StaffController({scenarioId: this.scenarioId, siteId: this.record.get('id'), listeners: {scope: this,
+          'aftersetsiteadmin': function(){
+            this.ext_siteGrid.getStore().load();
+            this.ext_staffGrid.getStore().load();
+            this.load();
+          }
+        }});
+        Ext.Msg.confirm("Site Administrator", "Make " + record.data.user + " the administrator for this site?", function(btn){
+          if(btn === "yes"){
+            this.ext_staffGrid.loadMask.show();
+            staff_controller.setSiteAdmin(record);
+          }
+        }, this);
+      }}
+      ]
     });
     
     if(Ext.isGecko){
@@ -144,6 +166,7 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
       'aftersave': function(cntrl, win){
         win.close();
         this.ext_staffGrid.getStore().load();
+        this.ext_siteGrid.getStore().load();
         this.load();
       }
     }});

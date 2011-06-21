@@ -7,4 +7,4 @@ Feature: Accessing site check-in kiosks from the phin app
 
   Background:
 
-  Scenario:
+  Scenario:             

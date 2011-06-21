@@ -11,3 +11,4 @@ dominoes.rule('VMS_CommandCenter', '( $(vms)/command_center/context_menus.js $(v
 Talho.ScriptManager.addInitializer('Talho.VMS.CommandCenter', {js:'$(ext_extensions)/DoNotCollapseActive.js GMap VMS_Site VMS_Roles VMS_Inventory VMS_Staff VMS_Teams VMS_Qualifications VMS_CommandCenter'});
 Talho.ScriptManager.addInitializer('Talho.VMS.CreateAndEditScenario', {js: 'UserSelectionGrid $(vms)/scenario/create_and_edit.js'});
 Talho.ScriptManager.addInitializer('Talho.VMS.ManageScenarios', {js: '$(ext_extensions)/xActionColumn.js $(vms)/scenario/manage_scenarios.js'});
+Talho.ScriptManager.addInitializer('Talho.VMS.AdministerSites', {js: '$(ext_extensions)/xActionColumn.js $(vms)/site/administer_sites.js'});

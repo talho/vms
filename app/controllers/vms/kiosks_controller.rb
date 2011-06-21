@@ -62,7 +62,7 @@ class Vms::KiosksController < ApplicationController
     @ssite = Vms::ScenarioSite.find(params['scenario_site_id'])
     if params['walkup_new_account']
       #TODO: detect existing email and prompt for normal checkin
-      #TODO: catch validation errors and return them to EXT
+      #TODO: catch validation errors and pass them to EXT
       begin
         @user = User.create!(:first_name => params['walkup_first_name'], :last_name => params['walkup_last_name'], :display_name => params['walkup_first_name'] + ' ' + params['walkup_last_name'],
                              :email => params['walkup_email'], :password => params['walkup_password'], :password_confirm => params['walkup_password_confirm'])
@@ -87,28 +87,53 @@ class Vms::KiosksController < ApplicationController
   protected
 
   def vms_session_required
-    begin
-      if User.find(session[:vms_user_id])
-        session.delete(:user_id) if session[:user_id]   # nuke the Phin session when kiosk stuff is happening - we don't want active phin sessions when kiosks might be unattended
-        return true
+    if !session[:user_id]
+      match = true
+    else
+      match = session[:user_id] == session[:vms_user_id]
+    end
+    if session[:vms_user_id] && match
+      begin
+        if User.find(session[:vms_user_id])
+          session.delete(:user_id) if session[:user_id]   # nuke the Phin session when kiosk stuff is happening
+          return true
+        end
+      rescue
+        respond_to do |format|
+            format.html {
+              flash[:error] = "You must sign in to access this page"
+              redirect_to vms_session_new_path
+            }
+        end
       end
-    rescue
-      respond_to do |format|
-          format.html {
-            flash[:error] = "You must sign in to access this page"
-            redirect_to vms_session_new_path
-          }
+    else
+      if session[:user_id]
+        session[:vms_user_id] = session[:user_id]
+        session.delete(:user_id)
+      else
+        redirect_to sign_in_path 
       end
     end
   end
 
   def vms_site_admin_required
     user = User.find(session[:vms_user_id])
-    unless user.is_vms_scenario_site_admin? && user.is_vms_scenario_site_admin_for?( Vms::ScenarioSite.find(params['id']) )
+    if user.is_vms_scenario_site_admin?
+       if user.is_vms_scenario_site_admin_for?( Vms::ScenarioSite.find(params['id']) )
+         return true
+       else
+         respond_to do |format|
+           format.html {
+              flash[:error] = "You are not the Administrator for that site"
+              redirect_to kiosk_index_path
+           }
+         end        
+       end
+    else
       respond_to do |format|
           format.html {
-            flash[:error] = "You are not an administrator for that Scenario and Site"
-            redirect_to kiosk_index_path
+            flash[:error] = "You are not a VMS Site Administrator"
+            redirect_to ext_path
           }
       end
     end

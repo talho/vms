@@ -19,13 +19,15 @@ class Vms::ScenarioSite < ActiveRecord::Base
   has_many :walkups, :class_name => 'Vms::Walkup'
   has_many :users, :through => :staff
   has_many :teams, :class_name => "Vms::Team", :autosave => true
+  belongs_to :site_admin, :class_name => "User"
   
   def as_json (options = {})
     options[:include] = {} if options[:include].nil?
     options[:include].merge! :site => {}
     json = super(options)    
     ( json.key?("scenario_site") ? json["scenario_site"] : json).merge!( 
-      {:qualifications => qualification_list.map(&:titleize).join(', ')})
+      {:qualifications => qualification_list.map(&:titleize).join(', ') }
+    )
     json   
   end
   
@@ -37,7 +39,8 @@ class Vms::ScenarioSite < ActiveRecord::Base
   end
 
   def all_staff
-    (staff + teams.map{ |t| t.audience.recipients.map{|ui| Vms::Staff.new(:user => ui, :scenario_site => self, :source => 'team', :status => 'assigned')} }).flatten.uniq
+    staff
+    #(staff + teams.map{ |t| t.audience.recipients.map{|ui| Vms::Staff.new(:user => ui, :scenario_site => self, :source => 'team', :status => 'assigned')} }).flatten.uniq
   end
   
   def alert_users_of_site_deactivation
@@ -54,9 +57,12 @@ class Vms::ScenarioSite < ActiveRecord::Base
   end
   handle_asynchronously :alert_users_of_site_activation
 
+  def has_site_admin?
+    !site_admin_id.blank?
+  end
+
   def to_s
     Vms::Site.find(site_id).name  + ': ' + Vms::Scenario.find(scenario_id).name
-
   end
 
   private
