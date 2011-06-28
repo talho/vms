@@ -49,7 +49,7 @@ Talho.VMS.AdministerSites = Ext.extend(Ext.Window, {
           window.location = "/vms/kiosk/" + scenario_site.data.id;
         }
       }, this);
-      Application.fireEvent('opentab', {title: 'Command Center - ' + scenario.get('name'), scenarioId: scenario.get('id'), scenarioName: scenario.get('name'), initializer: 'Talho.VMS.CommandCenter'});
+
     }
   }
 });

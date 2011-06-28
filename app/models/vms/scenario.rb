@@ -27,8 +27,8 @@ class Vms::Scenario < ActiveRecord::Base
   has_many :inventories, :through => :site_instances
   has_many :staff, :through => :site_instances, :order => 'vms_staff.id'
   has_many :teams, :through => :site_instances
+  has_many :walkups, :through => :site_instances
   has_many :role_scenario_sites, :through => :site_instances, :order => 'vms_roles_scenario_sites.id'
-  
   has_many :vms_alerts, :class_name => "VmsAlert"
   
   accepts_nested_attributes_for :user_rights, :allow_destroy => true, :reject_if => proc {|ur| ur[:permission_level]  == Vms::UserRight::PERMISSIONS[:owner]}
@@ -67,12 +67,12 @@ class Vms::Scenario < ActiveRecord::Base
   def executing?
     state == Vms::Scenario::STATES[:executing]
   end
-  
+
   def all_staff
-    staff.uniq
+    walkups.inject(staff.uniq.to_a){|s,w| s.push(w)}
   end
   
-  def execute(current_user)
+  def execute(current_user)     HI
     # Find unfilled roles
     h = Hash.new
     role_scenario_sites.each do |r| 

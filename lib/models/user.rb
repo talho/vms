@@ -8,9 +8,9 @@ module Vms
         def editable
           scoped :conditions => {'vms_user_rights.permission_level' => [Vms::UserRight::PERMISSIONS[:admin], Vms::UserRight::PERMISSIONS[:owner]] }
         end
-        acts_as_taggable_on :qualifications
+        #acts_as_taggable_on :qualifications
       end
-      base.acts_as_taggable_on :qualifications
+     base.acts_as_taggable_on :qualifications
       super # make sure ActiveRecord's own .included() is called
     end
     
