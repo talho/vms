@@ -8,13 +8,13 @@ class Vms::StaffController < ApplicationController
   
   def index
     @staff = params[:site_id] ? @scenario.site_instances.for_site(params[:site_id].to_i).staff : @scenario.staff
-    # kiosk code: 
-    # @staff = @scenario.staff.find(:all, :include => [:user, :site])
+    @walkups = params[:site_id] ? @scenario.site_instances.for_site(params[:site_id].to_i).walkups : @scenario.walkups
     @staff.each do |s|
       u = s.user
       s[:user_detail] = {:caption => "#{u.name} #{u.email}", :name => u.name, :email => u.email, :id => u.id, :title => u.title,
-                                      :tip => render_to_string(:partial => 'searches/extra.json', :locals => {:user => u})}
+                         :tip => render_to_string(:partial => 'searches/extra.json', :locals => {:user => u})}
     end if params[:with_detail]
+    @walkups.inject(@scenario.staff.to_a){|s,w| s.push(w)}
     respond_to do |format|
       format.json {render :json => @staff.as_json }
     end
@@ -23,10 +23,11 @@ class Vms::StaffController < ApplicationController
   def show
     @site_instance = @scenario.site_instances.for_site(params[:vms_site_id])
     @staff = @site_instance.staff.find(:all, :include => [:user , :site])
+    @walkups = @site_instance.walkups
     @staff.each do |s|
       u = s.user
       s[:user_detail] = {:caption => "#{u.name} #{u.email}", :name => u.name, :email => u.email, :id => u.id, :title => u.title,
-                                      :tip => render_to_string(:partial => 'searches/extra.json', :locals => {:user => u})}
+                         :tip => render_to_string(:partial => 'searches/extra.json', :locals => {:user => u})}
     end
     respond_to do |format|
       format.json {render :json => @staff.as_json }
@@ -37,9 +38,10 @@ class Vms::StaffController < ApplicationController
     @site_instance = @scenario.site_instances.first( {:conditions => {:site_id => params[:vms_site_id]}, :include => [:role_scenario_sites] })
     
     # pull out new, updated, and deleted staff from params
-    new_staff     = params[:added_staff].nil? ?   [] : JSON.parse(params[:added_staff])
+    new_staff = params[:added_staff].nil? ? [] : JSON.parse(params[:added_staff])
     updated_staff = params[:updated_staff].nil? ? [] : JSON.parse(params[:updated_staff])
     deleted_staff = params[:removed_staff].nil? ? [] : JSON.parse(params[:removed_staff])
+
     current_staff = @site_instance.staff
 
     deleted_users_for_alerts = []

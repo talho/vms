@@ -16,21 +16,27 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
       {xtype: 'box', html: this.record.get('qualifications'), fieldLabel: 'Qualifications'},
       {xtype: 'container', height: 300, itemId: 'accordion', layout: 'accordion', hideLabel: true, items: [
         {xtype: 'grid', title: 'Staff', tools: staff_tools, cls: 'staff_grid', itemId: 'staff', store: new Ext.data.JsonStore({
-            fields: ['user', 'role_filled', 'roles', 'qualifications', 'user_id', 'id', 'source', 'site_admin']
+            fields: ['user', 'role_filled', 'roles', 'qualifications', 'user_id', 'id', 'source', 'site_admin', 'checked_in']
           }),
           columns: [
+            {header: 'In', dataIndex: 'checked_in', width: 24, menuDisabled: true, renderer: function(checked_in){
+              if (checked_in) { return '<img src="/stylesheets/vms/images/cc_icons/check-12.png">'; } else { return null;}
+            }},
+            {header: 'A',  dataIndex: 'site_admin', width: 24, menuDisabled: true, renderer: function(site_admin){
+              if (site_admin) {return '<img src="/stylesheets/vms/images/cc_icons/star-12.png">'; } else { return null;}
+            }},
             {header: 'Name', dataIndex: 'user', menuDisabled: true},
-            {header: 'Role Filled', dataIndex: 'role_filled', menuDisabled: true},
-            // {header: 'Roles', dataIndex: 'roles', menuDisabled: true},
+            // {header: 'Role Filled', dataIndex: 'role_filled', menuDisabled: true},
+             {header: 'Roles', dataIndex: 'roles', menuDisabled: true},
             // {header: 'Qualifications', dataIndex: 'qualifications', menuDisabled: true},
             {header: 'Source', dataIndex: 'source', menuDisabled: true, renderer: function(val){
               switch(val){
                 case 'manual': return 'Manually Assigned';
                 case 'team': return 'Assigned Via Team';
                 case 'auto': return 'Automatically Assigned';
+                case 'walkup': return 'Walk-Up';
               }
-             }},
-            {header: 'Admin', dataIndex:'site_admin'}
+             }}
           ],
           listeners: {
             scope: this,
@@ -95,7 +101,7 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
         if(this.mask && this.mask.hide)
           this.mask.hide();
         
-        this.staffGrid.getStore().loadData(resp.staff);
+        this.staffGrid.getStore().loadData(resp.staff.concat(resp.walkups));
         this.staffGrid.getStore().sort('user');
         this.rolesGrid.getStore().loadData(resp.roles);
         this.itemsGrid.getStore().loadData(resp.items);
@@ -114,7 +120,7 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
     var row = grid.getView().getRow(row_index);
     var record = grid.getStore().getAt(row_index);
     
-    if(!this.can_edit){
+    if(!this.can_edit || record.data.source == 'walkup'){
       return;
     }
     

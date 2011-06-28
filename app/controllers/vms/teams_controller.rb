@@ -11,7 +11,7 @@ class Vms::TeamsController < ApplicationController
     respond_to do |format|
       format.json { render :json => @teams.as_json }
     end
-  end                    
+  end
   
   def show
     @team = @scenario.site_instances.for_site(params[:vms_site_id]).teams.find(params[:id], :include => {:audience => [:users]})

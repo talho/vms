@@ -14,7 +14,6 @@ class Vms::SitesController < ApplicationController
   end  
   
   def show
-    debugger
     @site = @scenario.site_instances.find_by_site_id(params[:id], :include =>{
       :teams => {:audience => [:users]},
       :staff => {:user => [:roles]},
@@ -34,7 +33,7 @@ class Vms::SitesController < ApplicationController
         :roles => @site.role_scenario_sites.as_json,
         :items => @site.inventories.map(&:item_instances).flatten.as_json,
         :staff => @site.staff.as_json,
-        :walkups => @site.walkups
+        :walkups => @site.walkups.as_json
       } }
     end
   end
