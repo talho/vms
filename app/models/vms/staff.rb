@@ -1,6 +1,6 @@
 # user_id          | integer                     |
 # scenario_site_id | integer                     |
-# status           | varchar(255)                |
+# status           | character varying(255)      |
 # checked_in       | boolean                     | default false
 # created_at       | timestamp without time zone |
 # updated_at       | timestamp without time zone |
@@ -18,7 +18,6 @@ class Vms::Staff < ActiveRecord::Base
     json = super(options)
     ( json.key?("staff_instance") ? json["staff_instance"] : (json.key?('staff') ? json['staff'] : json) ).merge!( 
       {:site => scenario_site.site.name, :site_id => scenario_site.site.id, :user => user.display_name, :user_id => user.id, :site_admin => scenario_site.site_admin_id == user.id })
-    json
   end
   
   def self.users_as_staff_json(users)

@@ -50,7 +50,11 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
               break;
             case 'staff': cls += 'vms-manual-user';
               break;
-            case 'checked_in_user': cls += 'vms-checked-in-user';
+            case 'checked_in_staff': cls += 'vms-checked-in-user';
+              break;
+            case 'walkup': cls += 'vms-walkup';
+              break;
+            case 'checked_in_walkup': cls += 'vms-checked-in-walkup';
               break;
           }
           
@@ -318,9 +322,10 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
               fields: [{name: 'name', mapping: 'user'}, {name: 'type', defaultValue: 'staff', convert: function(v, r){
                 switch(r.source){
                   case 'team':
-                  case 'auto': return 'auto_user';
+                  case 'auto': if ( r.checked_in ){ return 'checked_in_staff';} else { return 'auto_user'; }
+                  case 'walkup' : if ( r.checked_in ){ return 'checked_in_walkup';} else { return 'walkup'; }
                   case 'manual':
-                  default: return 'staff';
+                  default: if ( r.checked_in ){ return 'checked_in_staff';} else { return 'staff'; }
                 }
               }}, {name: 'status'}, 'source', 'id', 'site_id', 'site', 'user_id']
             }),

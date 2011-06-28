@@ -13,8 +13,7 @@ class Vms::SitesController < ApplicationController
     end
   end  
   
-  def show    
-
+  def show
     @site = @scenario.site_instances.find_by_site_id(params[:id], :include =>{
       :teams => {:audience => [:users]},
       :staff => {:user => [:roles]},
@@ -28,14 +27,13 @@ class Vms::SitesController < ApplicationController
     @site.role_scenario_sites.each { |r| r.calculate_assignment(@site.staff.map(&:user)) }
     # 3) any calculations that need to be done on inventory items
     # I think that it is best to push the calculations back to the models so we can reuse them elsewhere
-    #administrator = @site.site_admin_id.nil? ? "none" : User.find(@site.site_admin_id).name
     respond_to do |format|
       format.json {render :json => {
         :site => @site.as_json,
         :roles => @site.role_scenario_sites.as_json,
         :items => @site.inventories.map(&:item_instances).flatten.as_json,
         :staff => @site.staff.as_json,
-        :walkups => @site.walkups
+        :walkups => @site.walkups.as_json
       } }
     end
   end

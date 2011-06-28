@@ -134,6 +134,13 @@
   background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-checked-in.png);
 }
 
+.vms-walkup{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-walkup.png);
+}
+.vms-checked-in-walkup{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-walkup-checked-in.png);
+}
+
 .vms-tool-icon-active.vms-auto-user{
   background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-auto.png);
   /*background-image: url(/stylesheets/vms/images/cc_icons/icon-staff-active-auto.png);*/
