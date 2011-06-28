@@ -10,7 +10,7 @@ class Vms::ScenarioSite < ActiveRecord::Base
 
   before_update :check_state_for_alert_need
 
-  STATES = {:inactive => 1, :active => 2}  
+  STATES = {:inactive => 1, :active => 2}
   
   has_many :inventories, :class_name => "Vms::Inventory"
   has_many :role_scenario_sites, :class_name => "Vms::RoleScenarioSite", :autosave => true

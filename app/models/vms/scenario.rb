@@ -47,11 +47,11 @@ class Vms::Scenario < ActiveRecord::Base
 
   STATES.each { |k,v| named_scope k, :conditions => { :state => v } }
   named_scope :active, :conditions => [ "state IN (?)", [STATES[:executing], STATES[:paused]] ]
-  
+
   def to_s
     name
   end
-  
+
   def in_progress?
     state == Vms::Scenario::STATES[:executing]
   end
@@ -75,7 +75,7 @@ class Vms::Scenario < ActiveRecord::Base
   def all_staff
     walkups.inject(staff.uniq.to_a){|s,w| s.push(w)}
   end
-  
+
   def execute(current_user)     HI
     # Find unfilled roles
     h = Hash.new
