@@ -4,14 +4,17 @@ class Vms::ScenariosController < ApplicationController
   after_filter :change_include_root_back
   
   def index
-    @scenarios = current_user.scenarios.find(:all, :order=> 'created_at', :include => [:user_rights])
+    conditions = params[:state] ? {:state => params[:state].map{|x| x.to_i} } : {}
+    @scenarios = current_user.scenarios.find(:all, :conditions => conditions, :order=> 'created_at', :include => [:user_rights, :site_instances]).paginate(:page => ( (params[:start]||0).to_i/(params[:limit]||10).to_i ) + 1, :per_page => params[:limit] || 10)
     @scenarios.each do |sc|
       perm_lvl = sc.user_rights.find_by_user_id(current_user).permission_level
       sc[:can_admin] =  perm_lvl == Vms::UserRight::PERMISSIONS[:owner] || perm_lvl == Vms::UserRight::PERMISSIONS[:admin]
       sc[:is_owner] = perm_lvl == Vms::UserRight::PERMISSIONS[:owner]
+      sc[:user_rights] = sc.user_rights
+      sc[:site_instances] = sc.site_instances
     end
     respond_to do |format|
-      format.json {render :json => {:scenarios => @scenarios.as_json(:only => [:id, :name, :can_admin] ) } }
+      format.json {render :json => {:scenarios => @scenarios.as_json, :total => @scenarios.total_entries } }
     end
   end  
   
@@ -50,7 +53,7 @@ class Vms::ScenariosController < ApplicationController
       return
     end
     
-    tmpl = params[:template] || false
+    tmpl = params[:template] == true || params[:template] == 'true' || false
     
     params[:scenario][:state] = tmpl ? Vms::Scenario::STATES[:template] : Vms::Scenario::STATES[:unexecuted]
     @scenario = Vms::Scenario.new(params[:scenario])
@@ -128,13 +131,18 @@ class Vms::ScenariosController < ApplicationController
     @scenario = current_user.scenarios.editable.find(params[:id])
     
     current_state = @scenario.state
-    unless @scenario.unexecuted? || @scenario.paused? # you can only execute unexecuted or paused scenarios
+    unless @scenario.template? || @scenario.unexecuted? || @scenario.paused? # you can only execute unexecuted or paused scenarios
       respond_to do |format|
         format.json {render :json => {:msg => "You cannot execute a scenario of state " + Vms::Scenario::STATES.invert[@scenario].to_s + ".", :success => false}, :status => 400}
       end
       return
     end
-    @scenario.update_attributes :state => Vms::Scenario::STATES[:executing]
+    
+    if @scenario.template?
+      @scenario = @scenario.clone({:state => Vms::Scenario::STATES[:executing]})
+    else
+      @scenario.update_attributes :state => Vms::Scenario::STATES[:executing]
+    end
     
     if current_state == Vms::Scenario::STATES[:paused]
       custom_msg = params[:custom_msg].blank? ? nil : params[:custom_msg]
@@ -145,7 +153,7 @@ class Vms::ScenariosController < ApplicationController
     end
 
     respond_to do |format|
-      format.json {render :json => {:success => true} }
+      format.json {render :json => {:success => true, :scenario => @scenario} }
     end
   end
   
@@ -197,6 +205,20 @@ class Vms::ScenariosController < ApplicationController
     
     respond_to do |format|
       format.json {render :json => {:success => true} }
+    end
+  end
+  
+  def copy
+    @scenario = current_user.scenarios.editable.find(params[:id])
+    
+    respond_to do |format|
+      format.json {render :json => {:success => false}, :status => 400 }
+    end if params[:state].to_i < 1 || params[:state].to_i > 5 # we want to fail this transaction if they didn't provide a valid state
+    
+    @scenario = @scenario.clone({:state => params[:state].to_i})
+    
+    respond_to do |format|
+      format.json {render :json => {:success => true, :scenario => @scenario} }
     end
   end
 end

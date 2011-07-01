@@ -4,9 +4,10 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   title: 'VMS Command Center',
   closable: true,
   layout: 'border',
-  itemId: 'vms_command_center',
   
   constructor: function(config){
+    if(Application.rails_environment == 'cucumber') this.itemId = 'vms_command_center';
+    
     this.row_template = new Ext.XTemplate(
       '<div class="vms-tool-row">',
         '<div class="vms-row-icon {[this.iconClass(values)]}"></div>',
@@ -147,16 +148,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
     });
     
     var tool_cfg = [{id: 'refresh', handler: function(evt, el, pnl){pnl.getStore().load();}}];
-    
-    var action_button_template = new Ext.XTemplate(
-      '<div id="{2}" class="x-btn vms-tool-row vms-row-button">',
-        '<div class="vms-row-icon {0}"></div>',
-        '<div class="vms-row-text"><span class="{1}"></span></div>',
-        '<div style="clear:both;">',
-      '</div>',
-      {compiled: true}
-    );
-                    
+                       
     this.items = [{
           region: 'center',
           itemId: 'map',
@@ -180,12 +172,12 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       },
       { xtype: 'container', itemId: 'westRegion', region: 'west', layout: 'accordion', items:[
         { title: 'Controls', itemId: 'controlPanel', cls: 'controlPanel', layout: 'anchor', autoScroll: true, 
-          defaults: {anchor: '100%', template: action_button_template, buttonSelector: 'div.vms-row-text span', getTemplateArgs: function(){return [this.iconCls, this.cls, this.id];}}, items: [
-            {xtype: 'button', itemId: 'executeBtn', text: 'Execute', scope: this, handler: this.beginExecution, iconCls: 'vms-control-play'},
-            {xtype: 'button', itemId: 'pauseBtn', text: 'Pause Execution', hidden: true, scope: this, handler: this.pauseExecution, iconCls: 'vms-control-pause'},
-            {xtype: 'button', itemId: 'endBtn', text: 'End Scenario', hidden: true, scope: this, handler: this.endExecution, iconCls: 'vms-control-stop'},
-            {xtype: 'button', text: 'Edit Scenario', scope: this, handler: this.editScenario, iconCls: 'vms-control-edit'},
-            {xtype: 'button', text: 'Alert Staff', scope: this, handler: this.alertStaff, iconCls: 'vms-control-alert' }
+          defaults: {anchor: '100%'}, items: [
+            {xtype: 'actionbutton', itemId: 'executeBtn', text: 'Execute', scope: this, handler: this.beginExecution, iconCls: 'vms-control-play'},
+            {xtype: 'actionbutton', itemId: 'pauseBtn', text: 'Pause Execution', hidden: true, scope: this, handler: this.pauseExecution, iconCls: 'vms-control-pause'},
+            {xtype: 'actionbutton', itemId: 'endBtn', text: 'End Scenario', hidden: true, scope: this, handler: this.endExecution, iconCls: 'vms-control-stop'},
+            {xtype: 'actionbutton', text: 'Edit Scenario', scope: this, handler: this.editScenario, iconCls: 'vms-control-edit'},
+            {xtype: 'actionbutton', text: 'Alert Staff', scope: this, handler: this.alertStaff, iconCls: 'vms-control-alert' }
           ]
         },
         { title: 'Sites', itemId: 'siteGrid', cls: 'siteGrid', xtype: 'vms-toolgrid', tools: tool_cfg, seed_data: {name: 'New Site (drag to create)', status: 'new', type: 'site'},
@@ -347,6 +339,17 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
       // scope: this
     // });
     
+    this.buildPollingProvider();
+    
+    this.on('afterrender', function(){
+      if(!this.initial_load_complete){
+        this.loadMask = new Ext.LoadMask(this.getLayoutTarget());
+        this.loadMask.show();
+      }
+    }, this, {delay: 1});
+  },
+  
+  buildPollingProvider: function(){
     Ext.Direct.addProvider({
       type: 'polling',
       url: '/vms/scenarios/' + this.scenarioId,
@@ -361,14 +364,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           this.loadScenario_success(evt);
         }
       }
-    })
-    
-    this.on('afterrender', function(){
-      if(!this.initial_load_complete){
-        this.loadMask = new Ext.LoadMask(this.getLayoutTarget());
-        this.loadMask.show();
-      }
-    }, this, {delay: 1});
+    });
   },
   
   destroy: function(){

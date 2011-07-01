@@ -146,6 +146,21 @@
   background-image: url(/stylesheets/vms/images/cc_icons/icon-control-alert.png);
 }
 
+/* ----------- Scenario Manager Actions -------------- */
+.vms-row-icon.vms-scenario-delete{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-scenario-delete.png);
+}
+.vms-row-icon.vms-scenario-edit{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-scenario-edit.png);
+}
+.vms-row-icon.vms-scenario-copy{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-scenario-copy.png);
+}
+.vms-row-icon.vms-scenario-create{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-scenario-create.png);
+}
+
+
 /* ----------- VMS Site Info Window */
 .vms-site-info-attendance-danger{
   color: #f22;
@@ -164,4 +179,10 @@
 }
 .vms-site-info-item-danger{
   background-image: url(/stylesheets/vms/images/bullet-red-alt.png)
+}
+
+/* --------------- VMS Scenario Manager ------------------ */
+.vms-scenario-detail-list{
+  border-bottom: solid 1px #EDEDED;
+  padding-bottom: 3px;
 }

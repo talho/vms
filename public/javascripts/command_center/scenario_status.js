@@ -27,8 +27,16 @@ Talho.VMS.ux.CommandCenter.ScenarioStatus = {
         scope: this,
         handler: function(btn){
           if(btn === 'yes'){
-            this.changeScenarioState('execute', {}, function(){
+            this.changeScenarioState('execute', {}, function(response, options){
               this.scenario_state = 'executing';
+              
+              var resp = Ext.decode(response.responseText);
+              if(resp.scenario.id !== this.scenarioId){
+                Ext.Direct.removeProvider('command_center_polling_provider-' + this.scenarioId);
+                this.scenarioId = resp.scenario.id;
+                this.buildPollingProvider();
+              }
+              
               this.updateState();
             });
           }
@@ -108,7 +116,7 @@ Talho.VMS.ux.CommandCenter.ScenarioStatus = {
       pp.disconnect();
     }
     
-    (['paused', 'unexecuted'].indexOf(this.scenario_state) !== -1) ? this.executeBtn.show() : this.executeBtn.hide();
+    (['paused', 'unexecuted', 'template'].indexOf(this.scenario_state) !== -1) ? this.executeBtn.show() : this.executeBtn.hide();
     (['executing'].indexOf(this.scenario_state) !== -1) ? this.pauseBtn.show() : this.pauseBtn.hide();
     (['executing', 'paused'].indexOf(this.scenario_state) !== -1) ? this.endBtn.show() : this.endBtn.hide();
   },

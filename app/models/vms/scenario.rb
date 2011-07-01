@@ -45,6 +45,10 @@ class Vms::Scenario < ActiveRecord::Base
     end
   end
   
+  def template?
+    state == Vms::Scenario::STATES[:template]
+  end
+  
   def in_progress?
     state == Vms::Scenario::STATES[:executing]
   end
@@ -67,6 +71,25 @@ class Vms::Scenario < ActiveRecord::Base
   
   def all_staff
     (staff + teams.map{ |t| t.audience.recipients.map{|ui| Vms::Staff.new(:user => ui, :scenario_site => t.scenario_site, :source => 'team', :status => 'assigned')} }).flatten.uniq
+  end
+  
+  def clone(opts = {})
+    # In this method, we're needing to do a complete clone of all of the attached values. This means that we have to copy any site_instances as new instances and all of those connections as new as well
+    
+    scenario = Vms::Scenario.new(self.attributes)
+    scenario.attributes = opts
+    scenario.created_at = scenario.updated_at = Time.now
+    
+    self.site_instances.each do |si|
+      scenario.site_instances << si.copy # si.copy is going to copy all of the properties and associations of the site instance, but not save it
+    end
+    
+    self.user_rights.each do |ur|
+      scenario.user_rights.build(ur.attributes) # ur has no has_many associations, so we can just copy it directly
+    end
+    
+    scenario.save!
+    scenario
   end
   
   def execute(current_user)

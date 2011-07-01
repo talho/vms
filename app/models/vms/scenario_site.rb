@@ -51,6 +51,30 @@ class Vms::ScenarioSite < ActiveRecord::Base
   end
   handle_asynchronously :alert_users_of_site_activation
   
+  # Copy returns a new scenario_site but does not save that record.
+  def copy(opts = {})
+    scenario_site = Vms::ScenarioSite.new(self.attributes)
+    scenario_site.attributes = opts
+    
+    self.inventories.each do |inv|
+      scenario_site.inventories << inv.clone
+    end
+    
+    self.role_scenario_sites.each do |rss|
+      scenario_site.role_scenario_sites.build(rss.attributes)
+    end
+    
+    self.staff.each do |stf|
+      scenario_site.staff.build(stf.attributes)
+    end
+    
+    self.teams.each do |team|
+      scenario_site.teams.build(team.attributes)
+    end
+    
+    scenario_site
+  end
+  
   private
   def check_state_for_alert_need
     if self.changed.include?('status') && self.scenario.executing?
