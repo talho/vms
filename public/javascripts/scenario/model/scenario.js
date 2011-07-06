@@ -13,4 +13,5 @@ Talho.VMS.Scenario.Model.Scenario = Ext.data.Record.create(['id', 'name',
   }, 'user_rights', 'site_instances', 
   {name: 'created_at', type: 'date'}, 
   {name: 'updated_at', type: 'date'}, 
-  {name:'used_at', type: 'date'}]);
+  {name:'used_at', type: 'date'},
+  {name: 'can_admin', type: 'boolean'}]);

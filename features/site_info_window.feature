@@ -11,6 +11,7 @@ Feature: Site Info Window
       | Role | Border Health Director |
     And the following users exist:
       | Ad min             | admin@dallas.gov     | Admin                  | Dallas County | vms |
+      | Ad min             | admin@dallas.gov     | Admin                  | Dallas County |     |
       | Bartleby Scrivener | bartleby@example.com | Border Health Director | Dallas County |     |
       | Atticus Finch      | atticus@example.com  | Chief Veterinarian     | Potter County |     |
     And delayed jobs are processed

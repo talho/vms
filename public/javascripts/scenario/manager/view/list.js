@@ -44,7 +44,7 @@ Talho.VMS.Scenario.Manager.View.List = Ext.extend(Ext.Panel, {
     this.items = [
       {xtype: 'actionbutton', region: 'north', text: 'Create New Scenario', scope: this, handler: function(){this.fireEvent('create');}, iconCls: 'vms-scenario-create'},
       {xtype: 'container', layout: 'vbox', region: 'center', layoutConfig: {align: 'stretch', defaultMargins: '5'}, items: [
-        {xtype: 'grid', title: 'Scenario Templates', flex: 1, loadMask: true, columns: [
+        {xtype: 'grid', cls: 'vms-template-scenarios-list', title: 'Scenario Templates', flex: 1, loadMask: true, columns: [
             {dataIndex: 'name', id: 'name_column', header: 'Name'},
             {dataIndex: 'created_at', header: 'Created At', renderer: date_renderer},
             {dataIndex: 'updated_at', header: 'Last Updated At', renderer: date_renderer},
@@ -57,7 +57,7 @@ Talho.VMS.Scenario.Manager.View.List = Ext.extend(Ext.Panel, {
           }}),
           bbar: new Ext.PagingToolbar({pageSize: 10, store: template_store})
         },
-        {xtype: 'grid', title: 'Active Scenarios', flex: 1, loadMask: true, columns: [
+        {xtype: 'grid', cls: 'vms-active-scenarios-list', title: 'Active Scenarios', flex: 1, loadMask: true, columns: [
             {dataIndex: 'name', id: 'name_column', header: 'Name'},
             {dataIndex: 'state', header: 'Status'},
             {dataIndex: 'created_at', header: 'Created At', renderer: date_renderer},
@@ -70,7 +70,7 @@ Talho.VMS.Scenario.Manager.View.List = Ext.extend(Ext.Panel, {
           }}),
           bbar: new Ext.PagingToolbar({pageSize: 10, store: active_store})
         },
-        {xtype: 'grid', title: 'Completed Scenarios', flex: 1, loadMask: true, columns: [
+        {xtype: 'grid', cls: 'vms-completed-scenarios-list', title: 'Completed Scenarios', flex: 1, loadMask: true, columns: [
             {dataIndex: 'name', id: 'name_column', header: 'Name'},
             {dataIndex: 'updated_at', header: 'Completed At', renderer: date_renderer}
           ], 

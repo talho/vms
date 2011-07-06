@@ -85,3 +85,12 @@ When /^I drag "([^\"]*)" \(([^\)]*)\) to the "([^\"]*)" site$/ do |item_name, it
   command_center.siteGrid.dropTarget.notifyDrop(null, e, data);
   ")
 end
+
+Then /^the site "([^\"]*)" should( not)? exist for scenario "([^\"]*)"$/ do |site_name, neg, scen_name|
+  site_instance = Vms::Scenario.find_by_name(scen_name).site_instances.for_site(Vms::Site.find_by_name(site_name)[:id])
+  if neg.nil?
+    site_instance.should_not be_nil
+  else
+    site_instance.should be_nil
+  end
+end

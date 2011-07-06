@@ -26,7 +26,6 @@ Feature: Roles for application "vms"
     When I click x-menu-item "VMS"
     Then I should see the following ext menu items:
       | name             |
-      | New Scenario     |
       | Manage Scenarios |
 
   Scenario: User has vms Admin role and phin Admin role
@@ -44,7 +43,6 @@ Feature: Roles for application "vms"
     When I click x-menu-item "VMS"
     Then I should see the following ext menu items:
       | name             |
-      | New Scenario     |
       | Manage Scenarios |
 
   Scenario: User has vms Volunteer role
@@ -64,7 +62,6 @@ Feature: Roles for application "vms"
       | My Volunteer Profile |
     Then I should not see the following ext menu items:
       | name             |
-      | New Scenario     |
       | Manage Scenarios |
 
   Scenario: User has vms Volunteer role and phin Admin role
@@ -85,5 +82,4 @@ Feature: Roles for application "vms"
       | My Volunteer Profile |
     Then I should not see the following ext menu items:
       | name             |
-      | New Scenario     |
       | Manage Scenarios |

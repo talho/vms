@@ -226,7 +226,8 @@ Feature: Qualifications tests
     And the site "Immunization Center" for scenario "Test" has the role "Chief Veterinarian"
     And site "Malawi" is assigned the qualification "bilingual" on scenario "Test"
     And the following users exist:
-      | Bartleby Scrivener | bartleby@example.com | Admin,Chief Veterinarian  | Dallas County |
+      | Bartleby Scrivener | bartleby@example.com | Admin,Chief Veterinarian | Dallas County |     |
+      | Bartleby Scrivener | bartleby@example.com | Volunteer                | Dallas County | vms |
     And "Bartleby Scrivener" has the qualification "bilingual"
     And scenario "Test" is "unexecuted"
     When I open the "Test" scenario
@@ -247,7 +248,8 @@ Feature: Qualifications tests
     And the site "Immunization Center" for scenario "Test" has the role "Chief Veterinarian"
     And site "Immunization Center" is assigned the qualification "bilingual" on scenario "Test"
     And the following users exist:
-      | Bartleby Scrivener | bartleby@example.com | Admin,Chief Veterinarian  | Dallas County |
+      | Bartleby Scrivener | bartleby@example.com | Admin,Chief Veterinarian | Dallas County |     |
+      | Bartleby Scrivener | bartleby@example.com | Volunteer                | Dallas County | vms |
     And "Bartleby Scrivener" has the qualification "bilingual"
     And scenario "Test" is "unexecuted"
     When I open the "Test" scenario
@@ -268,7 +270,8 @@ Feature: Qualifications tests
     Given the site "Immunization Center" for scenario "Test" has the role "Chief Veterinarian"
     Given role "Chief Veterinarian" site "Malawi" is assigned the qualification "bilingual" on scenario "Test"
     And the following users exist:
-      | Bartleby Scrivener | bartleby@example.com | Admin,Chief Veterinarian  | Dallas County |
+      | Bartleby Scrivener | bartleby@example.com | Admin,Chief Veterinarian | Dallas County |     |
+      | Bartleby Scrivener | bartleby@example.com | Volunteer                | Dallas County | vms |
     And "Bartleby Scrivener" has the qualification "bilingual"
     And scenario "Test" is "unexecuted"
     When I open the "Test" scenario
@@ -289,7 +292,8 @@ Feature: Qualifications tests
     Given the site "Immunization Center" for scenario "Test" has the role "Chief Veterinarian"
     Given role "Chief Veterinarian" site "Immunization Center" is assigned the qualification "bilingual" on scenario "Test"
     And the following users exist:
-      | Bartleby Scrivener | bartleby@example.com | Admin,Chief Veterinarian  | Dallas County |
+      | Bartleby Scrivener | bartleby@example.com | Admin,Chief Veterinarian | Dallas County |     |
+      | Bartleby Scrivener | bartleby@example.com | Volunteer                | Dallas County | vms |
     And "Bartleby Scrivener" has the qualification "bilingual"
     And scenario "Test" is "unexecuted"
     When I open the "Test" scenario

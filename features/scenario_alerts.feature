@@ -7,9 +7,9 @@ Feature: Send alerts for different actions on scenarios
 
   Background:
     Given the following users exist:
-      | Ad min             | admin@dallas.gov     | Admin | Dallas County | vms |
-      | Bartleby Scrivener | bartleby@example.com | Admin | Dallas County | vms |
-      | Atticus Finch      | atticus@example.com  | Admin | Potter County | vms |
+      | Ad min             | admin@dallas.gov     | Admin           | Dallas County | vms |
+      | Bartleby Scrivener | bartleby@example.com | Admin,Volunteer | Dallas County | vms |
+      | Atticus Finch      | atticus@example.com  | Admin           | Potter County | vms |
     And delayed jobs are processed
     And I am logged in as "admin@dallas.gov"
     And I have the scenarios "Test"

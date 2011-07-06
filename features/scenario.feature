@@ -12,12 +12,16 @@ Feature: VMS Scenario
     And I go to the ext dashboard page
 
   Scenario: Create New Scenario
-    When I navigate to "Apps > VMS > New Scenario"
-    Then I should see "New Scenario"
-    Then the "New Scenario" window should be open
-    When I fill in "Scenario Name" with "My Scenario"
+    When I navigate to "Apps > VMS > Manage Scenarios"
+    Then the "Manage Scenarios" tab should be open
+    When I click vms-row-button "Create New Scenario"
+    When I fill in "Name" with "My Scenario"
     And I press "Save"
     And I wait for the "Saving..." mask to go away
+    And I wait for the "Loading..." mask to go away
+    Then I should see "My Scenario" in grid row 1 within ".vms-active-scenarios-list"
+    When I select the "My Scenario" grid row within ".vms-active-scenarios-list"
+    And I click vms-row-button "Open Scenario"
     Then the "Command Center - My Scenario" tab should be open
     And the "My Scenario" scenario should be created
 
@@ -25,55 +29,41 @@ Feature: VMS Scenario
     Given I have the scenarios "Scenario 1, Scenario 2, Scenario 3"
     When I navigate to "Apps > VMS > Manage Scenarios"
     Then I should see "Manage Scenarios"
-    And the "Manage Scenarios" window should be open
-    And I should see "Scenario 1" in grid row 1
-    And I should see "Scenario 2" in grid row 2
-    And I should see "Scenario 3" in grid row 3
-    When I select the "Scenario 1" grid row
-    And I press "Open"
+    And the "Manage Scenarios" tab should be open
+    And I should see "Scenario 1" in grid row 1 within ".vms-active-scenarios-list"
+    And I should see "Scenario 2" in grid row 2 within ".vms-active-scenarios-list"
+    And I should see "Scenario 3" in grid row 3 within ".vms-active-scenarios-list"
+    When I select the "Scenario 1" grid row within ".vms-active-scenarios-list"
+    And I click vms-row-button "Open Scenario"
     Then the "Command Center - Scenario 1" tab should be open
 
   Scenario: Edit Existing Scenario and Go Back to List
     Given I have the scenarios "Scenario 1, Scenario 2, Scenario 3"
     When I navigate to "Apps > VMS > Manage Scenarios"
-    And I click edit on the "Scenario 1" grid row
-    Then I should see "Modify Scenario 1"
-    And the "Modify Scenario 1" window should be open
-    When I fill in "Scenario Name" with "Modified Scenario"
+    When I select the "Scenario 1" grid row within ".vms-active-scenarios-list"
+    And I press "Edit Scenario Details"
+    When I fill in "Name" with "Modified Scenario"
     And I press "Save"
     And I wait for the "Saving..." mask to go away
-    Then I should see "Manage Scenarios"
-    And the "Manage Scenarios" window should be open
-    When I wait for the "Loading..." mask to go away
+    And I wait for the "Loading..." mask to go away
     Then I should see "Modified Scenario" in grid row 1
-
-  Scenario: Edit Existing Scenario and Open Command Center
-    Given I have the scenarios "Scenario 1, Scenario 2, Scenario 3"
-    When I navigate to "Apps > VMS > Manage Scenarios"
-    And I click edit on the "Scenario 1" grid row
-    Then I should see "Modify Scenario 1"
-    And the "Modify Scenario 1" window should be open
-    When I fill in "Scenario Name" with "Modified Scenario"
-    And I press "Save and Open Scenario"
-    And I wait for the "Saving..." mask to go away
-    Then the "Command Center - Modified Scenario" tab should be open
 
   Scenario: Cancelling from Edit Scenario should return to Scenario List
     Given I have the scenarios "Scenario 1, Scenario 2, Scenario 3"
     When I navigate to "Apps > VMS > Manage Scenarios"
-    And I click edit on the "Scenario 1" grid row
-    Then I should see "Modify Scenario 1"
-    And the "Modify Scenario 1" window should be open
+    When I select the "Scenario 1" grid row within ".vms-active-scenarios-list"
+    And I press "Edit Scenario Details"
     When press "Cancel"
-    Then I should see "Manage Scenarios"
-    And the "Manage Scenarios" window should be open
+    Then I should see "Scenario 1" in grid row 1
 
   Scenario: Delete Existing Scenario
     Given I have the scenarios "Scenario 1, Scenario 2, Scenario 3"
     When I navigate to "Apps > VMS > Manage Scenarios"
-    And I click delete on the "Scenario 1" grid row
+    When I select the "Scenario 1" grid row within ".vms-active-scenarios-list"
+    And I click vms-row-button "Delete Scenario"
     Then the "Delete Scenario" window should be open
     When I press "Yes"
     And I wait for the "Saving..." mask to go away
+    And I wait for the "Loading..." mask to go away
     Then I should see "Scenario 2" in grid row 1
     And I should see "Scenario 3" in grid row 2

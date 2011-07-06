@@ -142,7 +142,7 @@ Talho.VMS.Scenario.Manager.Controller = Ext.extend(Ext.util.Observable, {
     // Post or update to the server if we're creating or editing with the values we've got
     Ext.Ajax.request({
       url: '/vms/scenarios' + (edit ? '/' + record.get('id') : '') + '.json',
-      method: edit ? 'PUT' : post,
+      method: edit ? 'PUT' : 'POST',
       params: params,
       scope: this,
       success: function(){
@@ -188,7 +188,10 @@ Talho.VMS.Scenario.Manager.Controller = Ext.extend(Ext.util.Observable, {
     }, this);
   },
   
-  copy_scenario: function(template, state){
+  copy_scenario: function(template, state){    
+    if(!this.saveMask) this.saveMask = new Ext.LoadMask(this.columnPanel.getEl(), {msg: 'Saving...'});
+    this.saveMask.show();
+    
     Ext.Ajax.request({
       url: '/vms/scenarios/' + template.get('id') + '/copy.json',
       params: {
@@ -202,8 +205,12 @@ Talho.VMS.Scenario.Manager.Controller = Ext.extend(Ext.util.Observable, {
           var scenario = new Talho.VMS.Scenario.Model.Scenario(resp.scenario);
           this.open_scenario(scenario)
         }
+        this.columnPanel.getColumn1().clearSelections();
         this.columnPanel.getColumn1().refreshGrids();
         this.clearColumnPanel();
+      },
+      callback: function(){
+        this.saveMask.hide();
       }
     });
   }
