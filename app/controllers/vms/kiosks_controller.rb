@@ -3,6 +3,7 @@ class Vms::KiosksController < ApplicationController
   skip_before_filter :login_required
   before_filter :vms_session_required, :except => [:registered_checkin, :walkup_checkin]
   before_filter :vms_site_admin_required, :except => [:index, :registered_checkin, :walkup_checkin]
+  before_filter :vms_active_scenario_required, :except => [:index, :registered_checkin, :walkup_checkin]
 
   def show
     @ssite = Vms::ScenarioSite.find(params['id'])
@@ -137,6 +138,13 @@ class Vms::KiosksController < ApplicationController
             redirect_to ext_path
           }
       end
+    end
+  end
+
+  def vms_active_scenario_required
+    unless Vms::ScenarioSite.find(params['id']).scenario.active?
+      flash[:error] = "That scenario is not currently active"
+      redirect_to kiosk_index_path
     end
   end
   

@@ -63,3 +63,15 @@ When /^staff "([^\"]*)" are assigned to "([^\"]*)" for scenario "([^\"]*)"$/ do 
       Given %{"Atticus Finch" is assigned to "#{site_name}" for scenario "#{scenario_name}"}
   end
 end
+
+Then /^"([^"]*)" should( not)? be checked in to "([^"]*)" for scenario "([^"]*)"$/ do |staff_name, neg, site_name, scenario_name|
+  user = User.find_by_display_name(staff_name)
+  scenario_site =  Vms::Scenario.find_by_name(scenario_name).site_instances.for_site(Vms::Site.find_by_name(site_name))
+  staff = Vms::Staff.find_by_user_id_and_scenario_site_id(user.id, scenario_site.id)
+  if neg.nil?
+    staff.should_not be_nil
+    staff.checked_in.should == true
+  else
+    staff.checked_in.should == false unless staff.nil?
+  end
+end
