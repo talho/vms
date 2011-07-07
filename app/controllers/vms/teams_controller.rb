@@ -48,7 +48,7 @@ class Vms::TeamsController < ApplicationController
     team.audience.build params[:team][:audience]
     team.audience.scope = "Team"
     team.audience.owner = current_user
-    
+
     aud = nil
     if params[:save_template] == "true" && (par_aud.nil? || Group::SCOPE.include?(par_aud.scope)) #do this if we're saving a template and the parent template is null or the parent audience is a group (and not a team)
       aud = Audience.new team.audience.attributes

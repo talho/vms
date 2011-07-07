@@ -39,7 +39,7 @@ class Vms::Staff < ActiveRecord::Base
       alert.save
     end
   end
-  
+
   def self.send_updated_message(staff)
     #for now, we aren't really updating anything about the staff so we're not going to send a message.
   end
