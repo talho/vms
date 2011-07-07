@@ -68,6 +68,10 @@ class Vms::Scenario < ActiveRecord::Base
     state == Vms::Scenario::STATES[:executing]
   end
 
+  def active?
+    state == (Vms::Scenario::STATES[:executing] || Vms::Scenario::STATES[:paused] )
+  end
+
   def all_staff
     walkups.inject(staff.uniq.to_a){|s,w| s.push(w)}
   end

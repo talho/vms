@@ -347,12 +347,12 @@ Ext.ns("Talho.VMS");
       });
 
       this.leftPanel = new Ext.Panel ({
-        layout: 'border', title: 'Registered Volunteers', flex: 1.2, autoScroll: false,
+        layout: 'border', title: 'Registered Volunteers', flex: 1.2, autoScroll: false, cls: 'vms-kiosk-registered-panel',
         items: [ this.signInForm, this.volunteersGrid ]
       });
 
       this.rightPanel = new Ext.Panel ({
-        resize: true, border: true, flex: 0.8, margins: '0 5 0 30',
+        resize: true, border: true, flex: 0.8, margins: '0 5 0 30', cls: 'vms-kiosk-walkup-panel',
         items: [ this.walkupWrapper ]
       });
 
