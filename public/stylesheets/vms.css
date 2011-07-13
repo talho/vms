@@ -160,6 +160,17 @@
   background-image: url(/stylesheets/vms/images/cc_icons/icon-scenario-create.png);
 }
 
+/* --------- Call Down Responses -------------------*/
+.vms-call-down-selected-response{
+  background: #CCCCCC;
+}
+
+.vms-row-icon.vms-call-down-positive{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-call-down-positive.png); 
+}
+.vms-row-icon.vms-call-down-negative{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-call-down-negative.png);
+}
 
 /* ----------- VMS Site Info Window */
 .vms-site-info-attendance-danger{

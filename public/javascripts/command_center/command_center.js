@@ -201,7 +201,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         },
         {title: 'PODs/Inventories', xtype: 'vms-toolgrid', cls: 'inventoryGrid', tools: tool_cfg, itemId: 'inventory_grid', seed_data: {name: 'New POD/Inventory (drag to site)', type: 'inventory', status: 'new'},
           store: new Talho.VMS.ux.InventoryController.inventory_list_store({ scenarioId: config.scenarioId, type: 'inventory',
-            groupField: 'site_id',
+            groupField: 'site_id'
           }),
           columns: [{xtype: 'templatecolumn', id: 'name_column', tpl: this.row_template}, {dataIndex: 'site_id', hidden: true}],
           view: new tool_grouping_view(),

@@ -16,6 +16,23 @@ class VmsExecutionAlert < VmsAlert
     VmsExecutionAlert.new(:title => title, :message => message, :created_at => Time.zone.now)
   end
   
+  def call_downs (user, roles = nil)
+    vol_roles = roles || self.vms_volunteer_roles.find_all_by_volunteer_id(user).map(&:role)
+    calldowns = [
+      {:msg => "1) I cannot respond", :value => 1, :polarity => 'negative'},
+      {:msg => "#{vol_roles.count + 2}) I can respond as any role", :value => vol_roles.count + 2, :polarity => 'positive'}
+    ]
+    vol_roles.each_index do |i|
+      calldowns << {:msg => "#{i + 2}) I can respond as #{vol_roles[i].name}", :value => i + 2, :polarity => 'positive'}
+    end
+    calldowns.sort_by{|c| c[:value]}
+  end
+  
+  def formatted_message(user, roles = nil)
+    vol_roles = roles || self.vms_volunteer_roles.find_all_by_volunteer_id(user).map(&:role)
+    "There has been a call for volunteers put out. Users with roles #{vol_roles.map(&:name).join(', ')} are needed and we show you can fill at least one of these roles. Please indicate if you will respond to this scenario:"
+  end
+  
   def vol_role_hash
     v_hash = {}
     vms_volunteer_roles.each do |vr|
@@ -47,10 +64,7 @@ class VmsExecutionAlert < VmsAlert
           role_names << role_name
           messages.Message(:name => "#{role_name}_list") {|msg| msg.Value "#{roles.map(&:name).join(', ')}"}
           messages.Message(:name => "#{role_name}_opts") do |msg|
-            text = "1) I cannot respond\n"
-            roles.each_index {|i| text += "#{i + 2}) I can respond as #{roles[i].name}\n"}
-            text += "#{roles.count + 2}) I can respond as any role"
-            msg.Value text
+            msg.Value self.call_downs(vol, roles).map{|cd| cd[:msg]}.join('\n')
           end
         end
       end

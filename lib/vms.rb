@@ -26,7 +26,7 @@ $menu_config[:vms] = <<EOF
     nav += "{name: 'Manage Scenarios', tab:{id: 'vms_open_scenario', title:'Manage Scenarios', initializer: 'Talho.VMS.Scenario.Manager'}}"
     nav += "," if current_user.vms_volunteer?
   end
-  nav += "{name: 'My Volunteer Profile', tab:{id: 'vms_user_profile', title:'Volutneer Profile'}}" if current_user.vms_volunteer?
+  nav += "{name: 'My Volunteer Profile', tab:{id: 'vms_user_profile', title:'My Volunteer Profile', initializer: 'Talho.VMS.User.Profile'}}" if current_user.vms_volunteer?
   nav += "]}"
 EOF
 

@@ -12,6 +12,11 @@ class VmsStatusAlert < VmsAlert
     VmsStatusAlert.new options
   end
   
+  def formatted_message(user)
+    staff = self.scenario.staff.find_by_user_id(user)
+    staff.nil? ? self.message : "The status of the scenario has been modified. You are currently assigned to site #{staff.site.name} at #{staff.site.address}."
+  end
+  
   def to_xml
     options = {:Messages => {}, :Recipients => {}, :IVRTree => {} }
     
