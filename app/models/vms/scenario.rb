@@ -132,7 +132,7 @@ class Vms::Scenario < ActiveRecord::Base
         al.vms_volunteer_roles.build :volunteer => vol, :role => role
       end
     end
-    
+
     al.audiences << (Audience.new :users => all_volunteers)
     al.save
     

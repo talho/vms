@@ -31,8 +31,6 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           switch(values.type){
             case 'site': cls += 'vms-site';
               break;
-            case 'site_noadmin': cls += 'vms-site-noadmin';
-              break;
             case 'inventory': cls += 'vms-inventory';
               break;
             case 'pod': cls += 'vms-pod';
@@ -199,7 +197,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
               idProperty: 'site_id',
               fields: [
                 {name:'name', mapping:'site.name'},
-                {name: 'type', convert: function(v, r){ if (r.site_admin_id == null){return 'site_noadmin';} else {return 'site';} } },
+                {name: 'type', defaultValue:'site'},
                 {name:'status', convert: function(v){return v == 2 ? 'active': 'inactive';} },
                 {name: 'address', mapping: 'site.address'},
                 {name: 'lat', mapping: 'site.lat'},
@@ -653,9 +651,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         break;
       case 'team': this.addTeamToSite(record, site);
         break;
-      case 'staff': this.addManualUserToSite(record, site);
-        break;
-      case 'auto_user': this.addAutoUserToSite(record, site);
+      case 'staff': this.addUserToSite(record, site);
         break;
       case 'qual': this.addQualificationToSite(record, site);
         break;

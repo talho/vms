@@ -58,6 +58,7 @@ Feature: Drag drop within a tool grid
     And I click x-accordion-hd "Roles"
     And I drag "Border Health Director" to "Chief Veterinarian" in the roles grid
     Then the "Modify Roles" window should be open
+    And I wait for the "Loading..." mask to go away
     And I press "Add Role"
     When I press "Save"
     And I wait for the "Saving..." mask to go away
@@ -73,6 +74,7 @@ Feature: Drag drop within a tool grid
     And I click x-accordion-hd "Roles"
     And I drag "Border Health Director" (roles) to the "Immunization Center" site
     Then the "Modify Roles" window should be open
+    And I wait for the "Loading..." mask to go away
     And I press "Add Role"
     When I press "Save"
     And I wait for the "Saving..." mask to go away
@@ -88,6 +90,7 @@ Feature: Drag drop within a tool grid
     And I click x-accordion-hd "Roles"
     And I drag "Border Health Director" (roles) to the "Malawi" site
     Then the "Modify Roles" window should be open
+    And I wait for the "Loading..." mask to go away
     When I click increase_count on the "Border Health Director" grid row within ".modifyRoleGrid"
     Then I should see "2" in grid row 1 column 3 within ".modifyRoleGrid"
     When I press "Save"
@@ -125,6 +128,7 @@ Feature: Drag drop within a tool grid
     And I click x-accordion-hd "Qualifications"
     When I drag "bilingual" (quals) to the "Immunization Center" site
     Then the "Copy Qualification" window should be open
+    And I wait for the "Loading..." mask to go away
     When the "Qualification" field should contain "bilingual"
     And I press "Save"
     And I wait for the "Saving..." mask to go away
@@ -166,6 +170,7 @@ Feature: Drag drop within a tool grid
     And I click x-accordion-hd "Teams"
     When I drag "Scribin Team" (teams) to the "Immunization Center" site
     Then the "Move Team" window should be open
+    And I wait for the "Loading..." mask to go away
     When I press "Yes"
     And I wait for the "Loading..." mask to go away
     And "Scribin Team" should be a team assigned to site "Immunization Center", scenario "Test"

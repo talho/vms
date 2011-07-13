@@ -26,11 +26,15 @@ Feature: VMS Teams
     When I fill in "Team Name" with "Lawyerin Team"
     And I fill in "User" with "Bartleby"
     And I select "Bartleby Scrivener" from ext combo "User"
-    Then I should see "Bartleby Scrivener" in grid row 1 within ".user_selection_grid"
+    Then the grid ".user_selection_grid" should contain:
+      | Users              |
+      | Bartleby Scrivener |
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
-    Then I should see "Lawyerin Team" in grid row 2 within ".vms_teams_grid"
+    Then the grid ".vms_teams_grid" should contain:
+      | Teams         |
+      | Lawyerin Team |
     And "Lawyerin Team" should be a team assigned to site "Malawi", scenario "Test"
     And "Bartleby Scrivener" should be a member of the "Lawyerin Team" audience
 
@@ -43,11 +47,16 @@ Feature: VMS Teams
     And I fill in "User" with "Bartleby"
     And I select "Bartleby Scrivener" from ext combo "User"
     And I check "Save as template"
-    Then I should see "Bartleby Scrivener" in grid row 1 within ".user_selection_grid"
+    And I wait for the "Loading..." mask to go away
+    Then the grid ".user_selection_grid" should contain:
+      | Users              |
+      | Bartleby Scrivener |
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
-    Then I should see "Lawyerin Team" in grid row 2 within ".vms_teams_grid"
+    Then the grid ".vms_teams_grid" should contain:
+      | Teams         |
+      | Lawyerin Team |
     And "Lawyerin Team" should be a team assigned to site "Malawi", scenario "Test"
     And "Bartleby Scrivener" should be a member of the "Lawyerin Team" audience
     And a team should exist named "Lawyerin Team" with 1 sub audience
@@ -63,16 +72,24 @@ Feature: VMS Teams
     Then the "Create Team" window should be open
     When I press "Import Team"
     Then the "Select Group" window should be open
+    And I wait for the "Loading..." mask to go away
     When I select the "Lawyerin Team" grid row within ".vms_group_import_selection_grid"
-    Then I should see "Bartleby Scrivener" in grid row 1 within ".vms_import_teams_preview"
-    And I should see "Atticus Finch" in grid row 2 within ".vms_import_teams_preview"
+    And I wait for the "Loading..." mask to go away
+    Then the grid ".vms_import_teams_preview" should contain:
+      | Users              |
+      | Bartleby Scrivener |
+      | Atticus Finch      |
     When I press "Import" within ".import_group_window"
-    Then I should see "Bartleby Scrivener" in grid row 1 within ".user_selection_grid"
-    Then I should see "Atticus Finch" in grid row 2 within ".user_selection_grid"
+    Then the grid ".user_selection_grid" should contain:
+      | Users              | E-Mail               |
+      | Bartleby Scrivener | bartleby@example.com |
+      | Atticus Finch      | atticus@example.com  |
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
-    Then I should see "Lawyerin Team" in grid row 2 within ".vms_teams_grid"
+    Then the grid ".vms_teams_grid" should contain:
+      | Teams         | 
+      | Lawyerin Team |
     And "Lawyerin Team" should be a team assigned to site "Malawi", scenario "Test"
     And "Bartleby Scrivener" should be a member of the "Lawyerin Team" audience
     And "Atticus Finch" should be a member of the "Lawyerin Team" audience
@@ -89,16 +106,23 @@ Feature: VMS Teams
     When I press "Import Team"
     Then the "Select Group" window should be open
     When I select the "Lawyerin Group" grid row
-    Then I should see "Bartleby Scrivener" in grid row 1 within ".vms_import_teams_preview"
-    And I should see "Atticus Finch" in grid row 2 within ".vms_import_teams_preview"
+    And I wait for the "Loading..." mask to go away
+    Then the grid ".vms_import_teams_preview" should contain:
+      | Users              |
+      | Bartleby Scrivener |
+      | Atticus Finch      |
     When I press "Import" within ".import_group_window"
-    Then I should see "Bartleby Scrivener" in grid row 1 within ".user_selection_grid"
-    Then I should see "Atticus Finch" in grid row 2 within ".user_selection_grid"
+    Then the grid ".user_selection_grid" should contain:
+      | Users              |                      |
+      | Bartleby Scrivener | bartleby@example.com |
+      | Atticus Finch      | atticus@example.com  |
     When I fill in "Team Name" with "Lawyerin Team"
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
-    Then I should see "Lawyerin Team" in grid row 2 within ".vms_teams_grid"
+    Then the grid ".vms_teams_grid" should contain:
+      | Users         |
+      | Lawyerin Team |
     And "Lawyerin Team" should be a team assigned to site "Malawi", scenario "Test"
     And "Bartleby Scrivener" should be a member of the "Lawyerin Team" audience
     And "Atticus Finch" should be a member of the "Lawyerin Team" audience
@@ -115,16 +139,23 @@ Feature: VMS Teams
     When I press "Import Team"
     Then the "Select Group" window should be open
     When I select the "Lawyerin Team" grid row
-    Then I should see "Bartleby Scrivener" in grid row 1 within ".vms_import_teams_preview"
+    And I wait for the "Loading..." mask to go away
+    Then the grid ".vms_import_teams_preview" should contain:
+      | Users              |
+      | Bartleby Scrivener |
     When I press "Import" within ".import_group_window"
     And I fill in "User" with "Atticus"
     And I select "Atticus Finch" from ext combo "User"
-    Then I should see "Bartleby Scrivener" in grid row 1 within ".user_selection_grid"
-    Then I should see "Atticus Finch" in grid row 2 within ".user_selection_grid"
+    Then the grid ".user_selection_grid" should contain:
+      | Users              |
+      | Bartleby Scrivener |
+      | Atticus Finch      |
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
-    Then I should see "Lawyerin Team" in grid row 2 within ".vms_teams_grid"
+    Then the grid ".vms_teams_grid" should contain:
+      | Users         |
+      | Lawyerin Team |
     And "Lawyerin Team" should be a team assigned to site "Malawi", scenario "Test"
     And "Bartleby Scrivener" should be a member of the "Lawyerin Team" audience
     And "Atticus Finch" should be a member of the "Lawyerin Team" audience
@@ -141,17 +172,24 @@ Feature: VMS Teams
     When I press "Import Team"
     Then the "Select Group" window should be open
     When I select the "Lawyerin Group" grid row
-    Then I should see "Bartleby Scrivener" in grid row 1 within ".vms_import_teams_preview"
+    And I wait for the "Loading..." mask to go away
+    Then the grid ".vms_import_teams_preview" should contain:
+      | Users              |
+      | Bartleby Scrivener |
     When I press "Import" within ".import_group_window"
     When I fill in "Team Name" with "Lawyerin Team"
     And I fill in "User" with "Atticus"
     And I select "Atticus Finch" from ext combo "User"
-    Then I should see "Bartleby Scrivener" in grid row 1 within ".user_selection_grid"
-    Then I should see "Atticus Finch" in grid row 2 within ".user_selection_grid"
+    Then the grid ".user_selection_grid" should contain:
+      | Users              |
+      | Bartleby Scrivener |
+      | Atticus Finch      |
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
-    Then I should see "Lawyerin Team" in grid row 2 within ".vms_teams_grid"
+    Then the grid ".vms_teams_grid" should contain:
+      | Users         |
+      | Lawyerin Team |
     And "Lawyerin Team" should be a team assigned to site "Malawi", scenario "Test"
     And "Bartleby Scrivener" should be a member of the "Lawyerin Team" audience
     And "Atticus Finch" should be a member of the "Lawyerin Team" audience
@@ -169,16 +207,23 @@ Feature: VMS Teams
     When I press "Import Team"
     Then the "Select Group" window should be open
     When I select the "Lawyerin Team" grid row
-    Then I should see "Bartleby Scrivener" in grid row 1 within ".vms_import_teams_preview"
-    And I should see "Atticus Finch" in grid row 2 within ".vms_import_teams_preview"
+   And I wait for the "Loading..." mask to go away
+    Then the grid ".vms_import_teams_preview" should contain:
+      | Users              |
+      | Bartleby Scrivener |
+      | Atticus Finch      |
     When I press "Import" within ".import_group_window"
-    Then I should see "Bartleby Scrivener" in grid row 1 within ".user_selection_grid"
-    Then I should see "Atticus Finch" in grid row 2 within ".user_selection_grid"
+    Then the grid ".user_selection_grid" should contain:
+      | Users              |
+      | Bartleby Scrivener |
+      | Atticus Finch      |
     And I click remove_btn on the "Bartleby Scrivener" grid row within ".user_selection_grid"
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
-    Then I should see "Lawyerin Team" in grid row 2 within ".vms_teams_grid"
+    Then the grid ".vms_teams_grid" should contain:
+      | Users         |
+      | Lawyerin Team |
     And "Lawyerin Team" should be a team assigned to site "Malawi", scenario "Test"
     And "Bartleby Scrivener" should not be a member of the "Lawyerin Team" audience
     And "Atticus Finch" should be a member of the "Lawyerin Team" audience
@@ -199,7 +244,9 @@ Feature: VMS Teams
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
-    Then I should see "Law Team" in grid row 2 within ".vms_teams_grid"
+    Then the grid ".vms_teams_grid" should contain:
+      | Users    |
+      | Law Team |
     And "Law Team" should be a team assigned to site "Malawi", scenario "Test"
     And "Bartleby Scrivener" should not be a member of the "Law Team" audience
     And "Atticus Finch" should be a member of the "Law Team" audience
@@ -218,7 +265,9 @@ Feature: VMS Teams
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
-    Then I should see "Law Team" in grid row 2 within ".vms_teams_grid"
+    Then the grid ".vms_teams_grid" should contain:
+      | Teams    |
+      | Law Team |
     And "Law Team" should be a team assigned to site "Malawi", scenario "Test"
     And "Bartleby Scrivener" should not be a member of the "Law Team" audience
     And "Atticus Finch" should be a member of the "Law Team" audience
@@ -242,7 +291,9 @@ Feature: VMS Teams
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
-    Then I should see "Law Team" in grid row 2 within ".vms_teams_grid"
+    Then the grid ".vms_teams_grid" should contain:
+      | Teams    |
+      | Law Team |
     And "Law Team" should be a team assigned to site "Malawi", scenario "Test"
     And "Bartleby Scrivener" should not be a member of the "Law Team" audience
     And "Atticus Finch" should be a member of the "Law Team" audience
@@ -259,7 +310,9 @@ Feature: VMS Teams
     Then the "Move Team" window should be open
     When I press "Yes"
     And I wait for the "Loading..." mask to go away
-    Then I should see "Lawyerin Team" in grid row 2 within ".vms_teams_grid"
+    Then the grid ".vms_teams_grid" should contain:
+      | Teams         |
+      | Lawyerin Team |
     And "Lawyerin Team" should be a team assigned to site "Immunization Center", scenario "Test"
 
   Scenario: Delete a team
@@ -272,7 +325,9 @@ Feature: VMS Teams
     Then the "Remove Team" window should be open
     When I press "Yes"
     And I wait for the "Loading..." mask to go away
-    Then I should not see "Lawyerin Team" in grid row 2 within ".vms_teams_grid"
+    Then the grid ".vms_teams_grid" should not contain:
+      | Teams         |
+      | Lawyerin Team |
     And "Lawyerin Team" should not be a team assigned to site "Malawi", scenario "Test"
 
   Scenario: Delete a team that was templated
@@ -285,7 +340,9 @@ Feature: VMS Teams
     Then the "Remove Team" window should be open
     When I press "Yes"
     And I wait for the "Loading..." mask to go away
-    Then I should not see "Lawyerin Team" in grid row 2 within ".vms_teams_grid"
+    Then the grid ".vms_teams_grid" should not contain:
+      | Teams         |
+      | Lawyerin Team |
     And "Lawyerin Team" should not be a team assigned to site "Malawi", scenario "Test"
     And "Atticus Finch" should be a member of the "Lawyerin Team" team
 
@@ -302,6 +359,8 @@ Feature: VMS Teams
     Then the "Remove Team" window should be open
     When I press "Yes"
     And I wait for the "Loading..." mask to go away
-    Then I should not see "Lawyerin Team" in grid row 2 within ".vms_teams_grid"
+    Then the grid ".vms_teams_grid" should not contain:
+      | Teams         |
+      | Lawyerin Team |
     And "Lawyerin Team" should not be a team assigned to site "Malawi", scenario "Test"
     And "Bartleby Scrivener" should be a member of the "Lawyerin Group" group

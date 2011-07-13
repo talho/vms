@@ -114,10 +114,10 @@ Feature: Inventory creation on sites
     And I select "Medical POD" from ext combo "Name"
     Then the "Source" field should contain "DSHS"
     And the "POD" checkbox should be checked
-    And I should see "Surgical Mask" in grid row 1 column name_column within ".itemGrid"
-    And I should see "10" in grid row 1 column 2 within ".itemGrid"
-    And I should see "Cold Vaccine" in grid row 2 column name_column within ".itemGrid"
-    And I should see "100" in grid row 2 column 2 within ".itemGrid"
+    Then the grid ".itemGrid" should contain:
+      | Name          | Quantity |
+      | Cold Vaccine  | 100      |
+      | Surgical Mask | 10       |
     And the "Template" checkbox should not be checked
     And I press "Save"
     And I wait for the "Saving..." mask to go away
@@ -405,7 +405,9 @@ Feature: Inventory creation on sites
     And I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
-    Then I should see "Medical Inventory" in grid row 2 within ".inventoryGrid"
+    Then the grid ".inventoryGrid" should contain:
+      | Inventory         |
+      | Medical Inventory |
     And "Medical Inventory" should exist on site "Immunization Center" for scenario "Test" with source "DSHS" and type "inventory"
     And "Medical Inventory" on site "Immunization Center" for scenario "Test" should have the following items:
       | name          | category         | quantity | consumable |
@@ -430,15 +432,14 @@ Feature: Inventory creation on sites
 
     When I drag the "New POD/Inventory" inventory onto the "Immunization Center" site
     Then the "Create POD/Inventory" window should be open
-    When I fill in "Name" with "Medical Inventory"
-    And I wait for the "Loading..." mask to go away
+    When I fill in "Name" with "Med"
     And I select "Medical Inventory" from ext combo "Name"
     Then the "Source" field should contain "DSHS"
     And the "Inventory" checkbox should be checked
-    And I should see "Surgical Mask" in grid row 1 column name_column within ".itemGrid"
-    And I should see "10" in grid row 1 column 2 within ".itemGrid"
-    And I should see "Cold Vaccine" in grid row 2 column name_column within ".itemGrid"
-    And I should see "100" in grid row 2 column 2 within ".itemGrid"
+    Then the grid ".itemGrid" should contain:
+      | Name          | Quantity |
+      | Cold Vaccine  | 100      |
+      | Surgical Mask | 10       |
     And the "Template" checkbox should not be checked
     And I press "Save"
     And I wait for the "Saving..." mask to go away
