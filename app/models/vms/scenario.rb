@@ -76,7 +76,7 @@ class Vms::Scenario < ActiveRecord::Base
     walkups.inject(staff.uniq.to_a){|s,w| s.push(w)}
   end
   
-  def execute(current_user)     HI
+  def execute(current_user)
     # Find unfilled roles
     h = Hash.new
     role_scenario_sites.each do |r| 
@@ -105,7 +105,7 @@ class Vms::Scenario < ActiveRecord::Base
         al.vms_volunteer_roles.build :volunteer => vol, :role => role
       end
     end
-    
+
     al.audiences << (Audience.new :users => all_volunteers)
     al.save
     

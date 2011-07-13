@@ -5,8 +5,6 @@ class Vms::Team < ActiveRecord::Base
   belongs_to :scenario_site, :class_name => "Vms::ScenarioSite"
   has_one :site, :through => :scenario_site, :class_name => "Vms::Site"
 
-  #TODO:  why are audience attributes failing after initial load?   Very weird.
-
   def name
     audience.name
   end                                       
