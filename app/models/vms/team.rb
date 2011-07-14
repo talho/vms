@@ -5,6 +5,8 @@ class Vms::Team < ActiveRecord::Base
   belongs_to :scenario_site, :class_name => "Vms::ScenarioSite"
   has_one :site, :through => :scenario_site, :class_name => "Vms::Site"
 
+  after_create :make_staff
+
   def name
     audience.name
   end                                       
@@ -26,5 +28,14 @@ class Vms::Team < ActiveRecord::Base
 
   def to_s
      audience.recipients.count.to_s + ' member team: ' + Vms::ScenarioSite.find(scenario_site_id).to_s
+  end
+
+  def make_staff
+    unless scenario_site.nil?
+      audience.recipients.each do | user |
+        staff = scenario_site.staff.find_or_create_by_user_id_and_scenario_site_id( user.id, scenario_site.id)
+        staff.update_attributes({:source => 'team'})
+      end
+    end
   end
 end

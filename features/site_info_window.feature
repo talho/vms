@@ -35,7 +35,7 @@ Feature: Site Info Window
     When I click x-accordion-hd "Inventory" within ".site_info_window"
     Then I should see inventory information for "<inventory_name>"
 
-    Examples:
+  Examples:
     | site_name | staff_list     | team_name | role_list            | inventory_name   |
     | Malawi    | Just Atticus   |           |                      |                  |
     | Malawi    | Atticus & Team | Bart Team |                      |                  |

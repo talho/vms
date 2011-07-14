@@ -27,7 +27,9 @@ Feature: Modify Roles for VMS Sites
     When I fill in "Select Role" with "Chief"
     And I select "Chief Veterinarian" from ext combo "Select Role"
     And I press "Add Role"
-    Then I should see "Chief Veterinarian" in grid row 1 within ".modifyRoleGrid"
+    Then the grid ".modifyRoleGrid" should contain:
+      | Roles                  |
+      | Chief Veterinarian     |
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
@@ -46,8 +48,10 @@ Feature: Modify Roles for VMS Sites
     When I fill in "Select Role" with "Chief"
     And I select "Chief Veterinarian" from ext combo "Select Role"
     And I press "Add Role"
-    Then I should see "Chief Veterinarian" in grid row 1 within ".modifyRoleGrid"
-    Then I should see "Border Health Director" in grid row 2 within ".modifyRoleGrid"
+    Then the grid ".modifyRoleGrid" should contain:
+      | Roles                  |
+      | Chief Veterinarian     |
+      | Border Health Director | 
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
@@ -64,7 +68,9 @@ Feature: Modify Roles for VMS Sites
     When I drag "Border Health Director" to the "Immunization Center" site
     Then the "Modify Roles" window should be open
     And I press "Add Role"
-    Then I should see "Border Health Director" in grid row 1 within ".modifyRoleGrid"
+    Then the grid ".modifyRoleGrid" should contain:
+      | Roles                  |
+      | Border Health Director |
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
@@ -82,13 +88,21 @@ Feature: Modify Roles for VMS Sites
     Then the "Modify Roles" window should be open
     When I press "Cancel" within ".addRolePanel"
     And I click decrease_count on the "Border Health Director" grid row within ".modifyRoleGrid"
-    Then I should see "1" in grid row 1 column 3 within ".modifyRoleGrid"
+    Then the grid ".modifyRoleGrid" should contain:
+      | Roles                  | Count |
+      | Border Health Director | 1     |
     When I click increase_count on the "Border Health Director" grid row within ".modifyRoleGrid"
-    Then I should see "2" in grid row 1 column 3 within ".modifyRoleGrid"
+    Then the grid ".modifyRoleGrid" should contain:
+      | Roles                  | Count |
+      | Border Health Director | 2     |
     When I click decrease_count on the "Border Health Director" grid row within ".modifyRoleGrid"
-    Then I should see "1" in grid row 1 column 3 within ".modifyRoleGrid"
+    Then the grid ".modifyRoleGrid" should contain:
+      | Roles                  | Count |
+      | Border Health Director | 1     |
     When I click increase_count on the "Border Health Director" grid row within ".modifyRoleGrid"
-    Then I should see "2" in grid row 1 column 3 within ".modifyRoleGrid"
+    Then the grid ".modifyRoleGrid" should contain:
+      | Roles                  | Count |
+      | Border Health Director | 2     |
     When I click remove_role on the "Chief Veterinarian" grid row within ".modifyRoleGrid"
     And I press "Save"
     And I wait for the "Saving..." mask to go away
@@ -108,7 +122,9 @@ Feature: Modify Roles for VMS Sites
     And I click x-menu-item "Edit"
     Then the "Modify Roles" window should be open
     When I click increase_count on the "Border Health Director" grid row within ".modifyRoleGrid"
-    Then I should see "2" in grid row 1 column 3 within ".modifyRoleGrid"
+    Then the grid ".modifyRoleGrid" should contain:
+      | Roles                  | Count |
+      | Border Health Director | 2     |
     When I click remove_role on the "Chief Veterinarian" grid row within ".modifyRoleGrid"
     And I press "Save"
     And I wait for the "Saving..." mask to go away
@@ -128,7 +144,9 @@ Feature: Modify Roles for VMS Sites
     And I click x-menu-item "Edit"
     Then the "Modify Roles" window should be open
     When I click increase_count on the "Border Health Director" grid row within ".modifyRoleGrid"
-    Then I should see "2" in grid row 1 column 3 within ".modifyRoleGrid"
+    Then the grid ".modifyRoleGrid" should contain:
+      | Roles                  | Count |
+      | Border Health Director | 2     |
     When I click remove_role on the "Chief Veterinarian" grid row within ".modifyRoleGrid"
     And I press "Save"
     And I wait for the "Saving..." mask to go away
@@ -148,7 +166,9 @@ Feature: Modify Roles for VMS Sites
     And I click x-menu-item "Remove"
     Then the "Modify Roles" window should be open
     When I click increase_count on the "Border Health Director" grid row within ".modifyRoleGrid"
-    Then I should see "2" in grid row 1 column 3 within ".modifyRoleGrid"
+    Then the grid ".modifyRoleGrid" should contain:
+      | Roles                  | Count |
+      | Border Health Director | 2     |
     And I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
@@ -166,7 +186,9 @@ Feature: Modify Roles for VMS Sites
     And I drag role group "Malawi Center" to "Immunization Center"
     Then the "Modify Roles" window should be open
     When I wait for the "Loading..." mask to go away
-    Then I should see "Border Health Director" in grid row 1 within ".modifyRoleGrid"
+    Then the grid ".modifyRoleGrid" should contain:
+      | Roles                  |
+      | Border Health Director |
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
@@ -187,8 +209,10 @@ Feature: Modify Roles for VMS Sites
     And I drag role group "Malawi Center" to "Immunization Center"
     Then the "Modify Roles" window should be open
     When I wait for the "Loading..." mask to go away
-    Then I should see "Chief Veterinarian" in grid row 1 within ".modifyRoleGrid"
-    Then I should see "Border Health Director" in grid row 2 within ".modifyRoleGrid"
+    Then the grid ".modifyRoleGrid" should contain:
+      | Roles                  |
+      | Border Health Director |
+      | Chief Veterinarian     |
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away

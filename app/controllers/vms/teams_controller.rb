@@ -61,10 +61,6 @@ class Vms::TeamsController < ApplicationController
       
     respond_to do |format|
       if @scenario_site.save && (aud.nil? || aud.save)
-        team.audience.recipients.each do | user |
-          @staff = @scenario_site.staff.find_or_create_by_user_id_and_scenario_site_id( user.id, @scenario_site.id)
-          @staff.update_attributes({:source => 'team'})
-        end
         format.json {render :json => {:success => true} }
       else
         format.json {render :json => {:success => false, :errors => @scenario_site.errors, :aud_errors => aud.nil? ? [] : aud.errors}, :status => 400 }

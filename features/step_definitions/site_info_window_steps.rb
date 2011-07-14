@@ -66,15 +66,21 @@ Then /^I should see inventory information for "([^\"]*)"$/ do |inventory_name|
     when "One Item"
       Then %{I should see "Item 1" in grid row 1 within ".site_info_window .inv_grid"}
     when "Many Items"
-      Then %{I should see "Item 1" in grid row 1 within ".site_info_window .inv_grid"}
-      Then %{I should see "Item 2" in grid row 2 within ".site_info_window .inv_grid"}
+    Then %{the grid ".site_info_window .inv_grid" should contain:}, table(%{
+      | Roles  |
+      | Item 1 |
+      | Item 2 |
+    })
     when "Many Inventories"
       Then %{I should see "Item 1" in grid row 1 within ".site_info_window .inv_grid"}
       Then %{I should see "Item 1" in grid row 2 within ".site_info_window .inv_grid"}
     when "Out of Items"
       Then %{I should see "" within ".site_info_window .inv_grid .vms-site-info-item-danger"}
-      Then %{I should see "Item 1" in grid row 1 within ".site_info_window .inv_grid"}
-      Then %{I should see "Item 2" in grid row 2 within ".site_info_window .inv_grid"}
+      Then %{the grid ".site_info_window .inv_grid" should contain:}, table(%{
+      | Roles  |
+      | Item 1 |
+      | Item 2 |
+    })
     when "Modified Many Inventories"
       Then %{I should see "Item 1" in grid row 1 within ".site_info_window .inv_grid"}
       Then %{I should see "11" in grid row 1 column 2 within ".site_info_window .inv_grid"}

@@ -332,16 +332,18 @@ Feature: Inventory creation on sites
     Then the "Name" field should contain "Copy of Medical Inventory"
     And the "Source" field should contain "CDC"
     And the "Inventory" checkbox should be checked
-    And I should see "Surgical Mask" in grid row 1 column name_column within ".itemGrid"
-    And I should see "10" in grid row 1 column 2 within ".itemGrid"
-    And I should see "Cold Vaccine" in grid row 2 column name_column within ".itemGrid"
-    And I should see "100" in grid row 2 column 2 within ".itemGrid"
+    Then the grid ".itemGrid" should contain:
+      | Name          | Quantity |
+      | Cold Vaccine  | 100      |
+      | Surgical Mask | 10       |
     And the "Template" checkbox should not be checked
     And I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
-    Then I should see "Medical Inventory" in grid row 2 within ".inventoryGrid"
-    Then I should see "Copy of Medical Inventory" in grid row 3 within ".inventoryGrid"
+    Then the grid ".inventoryGrid" should contain:
+      | Name                      |
+      | Medical Inventory         |
+      | Copy of Medical Inventory |
     And "Medical Inventory" should exist on site "Immunization Center" for scenario "Test" with source "CDC" and type "inventory"
     And "Medical Inventory" on site "Immunization Center" for scenario "Test" should have the following items:
       | name          | category         | quantity | consumable |

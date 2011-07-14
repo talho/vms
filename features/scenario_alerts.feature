@@ -224,6 +224,7 @@ Feature: Send alerts for different actions on scenarios
     And I click x-accordion-hd "Staff"
     And I drag staff "Add User (drag to site)" to "Malawi"
     And I fill in "User" with "Atticus"
+#TODO: can't find atticus element
     And I select "Atticus Finch" from ext combo "User"
     When I press "Save"
     And I wait for the "Saving..." mask to go away
@@ -276,6 +277,7 @@ Feature: Send alerts for different actions on scenarios
     And I click x-accordion-hd "Staff"
     And I drag staff "Add User (drag to site)" to "Malawi"
     And I fill in "User" with "Atticus"
+#TODO: can't find atticus element
     And I select "Atticus Finch" from ext combo "User"
     When I press "Save"
     And I wait for the "Saving..." mask to go away

@@ -60,7 +60,6 @@ Given /^a team "([^\"]*)"( assigned to site "(?:[^\"]*)" scenario "(?:[^\"]*)")?
   table.raw.each do |row|
     users << User.find_by_display_name(row[0])
   end
-
   type = site_instance.nil? ? 'group' : 'audience'
   aud = Factory.create(type.to_sym, :name => team_name, :users => users, :scope => 'Team', :owner_id => current_user.id)
   unless site_instance.nil?
