@@ -121,8 +121,6 @@ Feature: Scen Access Control
       | name   |
       | Edit   |
       | Delete |
-#TODO: cannot find View Details   
-    And I suspend cucumber
     When I click x-menu-item "View Details"
     Then the "View POD/Inventory" window should be open
     And I should see "Close" within ".x-btn"
