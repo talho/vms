@@ -39,7 +39,7 @@ Talho.VMS.Scenario.Manager.View.List = Ext.extend(Ext.Panel, {
       }
     });
     
-    var date_renderer = Ext.util.Format.dateRenderer('n/d/y, H:i A');
+    var date_renderer = Ext.util.Format.dateRenderer('n/d/y, g:i A');
     
     this.items = [
       {xtype: 'actionbutton', region: 'north', text: 'Create New Scenario', scope: this, handler: function(){this.fireEvent('create');}, iconCls: 'vms-scenario-create'},

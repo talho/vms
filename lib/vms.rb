@@ -27,7 +27,7 @@ $menu_config[:vms] = <<EOF
             {name: 'Site Administration', win:{id: 'vms_site_admin', title:'Site Administration', initializer: 'Talho.VMS.AdministerSites'}}"
     nav += "," if current_user.vms_volunteer?
   end
-  nav += "{name: 'My Volunteer Profile', tab:{id: 'vms_user_profile', title:'Volutneer Profile'}}" if current_user.vms_volunteer?
+  nav += "{name: 'My Volunteer Profile', tab:{id: 'vms_user_profile', title:'My Volunteer Profile', initializer: 'Talho.VMS.User.Profile'}}" if current_user.vms_volunteer?
   nav += "]}"
 EOF
 

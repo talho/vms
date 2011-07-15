@@ -35,3 +35,29 @@ Then /^"([^\"]*)" should( not)? receive a VMS email(?: with)?(?: title "([^\"]*)
   email.should_not be_nil if neg.nil?
   email.should be_nil if !neg.nil?
 end
+
+Given /^"([^\"]*)" has received the following alert for scenario "([^"]*)":$/ do |user, scenario, table|
+  user = User.find_by_display_name(user)
+  h = table.rows_hash
+  al_type = h['type'].constantize
+  alert = al_type.new :message => h['message'], :title => h['title'], :created_at => Time.now
+  alert.scenario_id = Vms::Scenario.find_by_name(scenario).id
+  alert.audiences << (Audience.new :users => [user])
+
+  if al_type == VmsExecutionAlert
+    # add find the roles option and add those roles
+    role_names = h['roles'].split(',')
+    role_names.each do |role_name|
+      alert.vms_volunteer_roles << (Vms::VolunteerRole.new :volunteer => user, :role => Role.find_by_name(role_name) )
+    end
+  end
+
+  alert.save!
+end
+
+When /^the user "([^\"]*)" should have responded to the alert "([^\"]*)" with ([0-9]*)$/ do |user_name, alert_title, value|
+  alert = Alert.find_by_title(alert_title)
+  alert = alert.alert_type.constantize.find(alert) # cast the alert into the expected alert_type
+  aa = alert.alert_attempts.find_by_user_id(User.find_by_display_name(user_name) )
+  aa.call_down_response.to_i.should == value.to_i
+end

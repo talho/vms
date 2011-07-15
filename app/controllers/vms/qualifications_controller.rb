@@ -85,7 +85,9 @@ class Vms::QualificationsController < ApplicationController
   end
   
   def list
-    tags = (User.tag_counts_on(:qualifications) + Vms::ScenarioSite.tag_counts_on(:qualifications) + Vms::RoleScenarioSite.tag_counts_on(:qualifications)).uniq
+    filter = '%' + (params[:query] || '') + '%'
+    opts = {:conditions => ["name LIKE ?", filter.downcase]}
+    tags = (User.tag_counts_on(:qualifications, opts) + Vms::ScenarioSite.tag_counts_on(:qualifications, opts) + Vms::RoleScenarioSite.tag_counts_on(:qualifications, opts)).uniq
     
     respond_to do |format|
       format.json { render :json => tags.as_json }

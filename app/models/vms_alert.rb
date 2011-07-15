@@ -46,9 +46,12 @@ class VmsAlert < Alert
     super(options)
   end
   
+  def formatted_message(user = nil)
+    self.message
+  end
+  
   private
   def set_alert_type
-    debugger
     self[:alert_type] = "VmsAlert"
   end
   
