@@ -12,7 +12,7 @@ Talho.VMS.Scenario.Manager.Controller = Ext.extend(Ext.util.Observable, {
     this.editing = false;
     
     // Initialize it with a new scenario list view
-    this.columnPanel = new Talho.VMS.Scenario.Manager.View.ColumnLayout({});
+    this.columnPanel = new Talho.VMS.ux.ColumnPanel({title: 'Manage Scenarios'});
     
     this.columnPanel.setColumn1(new Talho.VMS.Scenario.Manager.View.List({
       listeners: {

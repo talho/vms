@@ -6,7 +6,7 @@ Talho.VMS.User.Profile.Controller = Ext.extend(Ext.util.Observable, {
     Ext.apply(this, config);
     Talho.VMS.User.Profile.Controller.superclass.constructor.apply(this, arguments);
     
-    this.columnPanel = new Talho.VMS.User.Profile.View.ColumnLayout({
+    this.columnPanel = new Talho.VMS.ux.ColumnPanel({
       title: config['title'] || 'My Volunteer Profile'
     });
     
