@@ -22,7 +22,7 @@ Ext.ns("Talho.VMS");
 
     registeredCheckin: function(form){
       this.checkInOutButton.disable();
-      var params = {'scenario_site_id':SCENARIO_SITE_ID};
+      var params = {'id':SCENARIO_SITE_ID};
       var record = this.volunteersGrid.getSelectionModel().getSelected();
       if (record != null && record.data['type'] == 'walkup' ){
        // params['walkup_signout'] = true;
@@ -63,7 +63,7 @@ Ext.ns("Talho.VMS");
       }
       if (valid) {
         this.walkupCheckinButton.disable();
-        params['scenario_site_id'] = SCENARIO_SITE_ID;
+        params['id'] = SCENARIO_SITE_ID;
         form.getForm().submit({
           scope: this,
           params: params,

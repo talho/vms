@@ -3,7 +3,7 @@ class Vms::KiosksController < ApplicationController
   skip_before_filter :login_required
   before_filter :vms_session_required, :except => [:registered_checkin, :walkup_checkin]
   before_filter :vms_site_admin_required, :except => [:index, :registered_checkin, :walkup_checkin]
-  before_filter :vms_active_scenario_required, :except => [:index, :registered_checkin, :walkup_checkin]
+  before_filter :vms_active_scenario_required, :except => [:index]
 
   def show
     @ssite = Vms::ScenarioSite.find(params['id'])
@@ -43,7 +43,7 @@ class Vms::KiosksController < ApplicationController
         format.json{ render :json=> {:success => true} }
       end
     else
-      @ssite = Vms::ScenarioSite.find(params['scenario_site_id'])
+      @ssite = Vms::ScenarioSite.find(params['id'])
       @user = User.authenticate(params['email'], params['password'])
       if @user.nil? || @ssite.nil?
         success = false
@@ -61,7 +61,7 @@ class Vms::KiosksController < ApplicationController
   end
 
   def walkup_checkin
-    @ssite = Vms::ScenarioSite.find(params['scenario_site_id'])
+    @ssite = Vms::ScenarioSite.find(params['id'])
     if params['walkup_new_account']
       #TODO: detect existing email and prompt for normal checkin
       #TODO: catch validation errors and pass them to EXT
@@ -113,6 +113,7 @@ class Vms::KiosksController < ApplicationController
         session[:vms_user_id] = session[:user_id]
         session.delete(:user_id)
       else
+        flash[:error] = "You must sign in to access this page"
         redirect_to sign_in_path 
       end
     end
@@ -142,9 +143,14 @@ class Vms::KiosksController < ApplicationController
   end
 
   def vms_active_scenario_required
-    unless Vms::ScenarioSite.find(params['id']).scenario.active?
-      flash[:error] = "That scenario is not currently active"
-      redirect_to kiosk_index_path
+    if params['id']
+      unless Vms::ScenarioSite.find(params['id']).scenario.active?
+        flash[:error] = "That scenario is not currently active"
+        redirect_to kiosk_index_path
+      end
+    else
+      flash[:error] = "Invalid Action."
+      redirect_to ext_path
     end
   end
   
