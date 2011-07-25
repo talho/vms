@@ -4,27 +4,36 @@ class Vms::UserQualificationsController < ApplicationController
   after_filter :change_include_root_back
   
   def index
+    user = current_user
+    user = User.find(params[:user_id]) unless params[:user_id].nil?
+    
     respond_to do |format|
-      format.json {render :json => current_user.qualifications.all.as_json }
+      format.json {render :json => user.qualifications.all.as_json }
     end
   end
   
   def create
+    user = current_user
+    user = User.find(params[:user_id]) unless params[:user_id].nil?
+    
     respond_to do |format|
       name = params[:name]
       if name.blank?
         format.json {render :json => {:success => false, :message => "Qualification name cannot be blank."}, :status => 400}
       else      
-        current_user.qualification_list << name.downcase
-        current_user.save
-        format.json {render :json => current_user.qualifications.find_by_name(name.downcase).as_json.merge(:success => true) }
+        user.qualification_list << name.downcase
+        user.save
+        format.json {render :json => user.qualifications.find_by_name(name.downcase).as_json.merge(:success => true) }
       end
     end
   end
   
   def destroy
-    current_user.qualifications.delete(current_user.qualifications.find(params[:id]))
-    current_user.save
+    user = current_user
+    user = User.find(params[:user_id]) unless params[:user_id].nil?
+    
+    user.qualifications.delete(user.qualifications.find(params[:id]))
+    user.save
     respond_to do |format|
       format.json {render :json => {:success => true}}
     end

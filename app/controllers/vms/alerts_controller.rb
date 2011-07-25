@@ -22,6 +22,26 @@ class Vms::AlertsController < ApplicationController
     end
   end
   
+  def create
+    # create a new vms alert. This can either be a base VmsAlert or a VmsStatusCheckAlert
+    
+    # Find out which alert it is
+    alert = (params[:alert_type] || "VmsAlert").constantize.default_alert
+    alert.title = params[:title] unless params[:title].blank?
+    alert.message = params[:message] unless params[:message].blank?
+    users = params[:user_ids].map(&:to_i) # push the user ids to int, just to avoid issues
+    alert.audiences << (Audience.new :user_ids => users)
+    alert.author = current_user
+    
+    respond_to do |format|
+      if alert.save
+        format.json {render :json => {:success => true}}
+      else
+        format.json {render :json => {:success => false, :errors => alert.errors}, :status => 400 }
+      end
+    end
+  end
+  
   ## Acknowledge an alert for the user. Should be a resource member route
   def acknowledge
     respond_to do |format|
@@ -38,6 +58,25 @@ class Vms::AlertsController < ApplicationController
       else
         format.json {render :json => {:success => false, :msg => aa.errors}, :status => 400}
       end
+    end
+  end
+  
+  def status_checks
+    page = ( (params[:start]||0).to_i/(params[:limit]||50).to_i ) + 1
+    per_page = params[:limit] || 50
+    checks = VmsStatusCheckAlert.find_all_by_author_id(current_user.id).paginate(:page => page, :per_page => per_page)
+    
+    respond_to do |format|
+      format.json {render :json => {:status_checks => checks, :total => checks.total_entries}}
+    end
+  end
+  
+  def show
+    al = VmsStatusCheckAlert.find(params[:id])
+    al = al.alert_type.constantize.find(al)
+    
+    respond_to do |format|
+      format.json {render :json => {:alert_attempts => al.alert_attempts.as_json } }
     end
   end
   
