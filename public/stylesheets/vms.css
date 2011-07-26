@@ -184,6 +184,22 @@
   background-image: url(/stylesheets/vms/images/cc_icons/icon-scenario-create.png);
 }
 
+/* --------- Volunteer List -----------------------*/
+
+.vms-row-icon.vms-list-volunteers{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-list-volunteers.png);
+}
+.vms-row-icon.vms-list-status-checks{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-list-status-checks.png);
+}
+.vms-row-icon.vms-list-qualifications{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-list-qualifications.png);
+}
+.vms-row-icon.vms-list-edit-user{
+  background-image: url(/stylesheets/vms/images/cc_icons/icon-list-edit-user.png);
+}
+
+
 /* --------- Call Down Responses -------------------*/
 .vms-call-down-selected-response{
   background: #CCCCCC;

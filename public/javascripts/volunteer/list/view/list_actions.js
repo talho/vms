@@ -6,9 +6,9 @@ Talho.VMS.Volunteer.List.View.ListActions = Ext.extend(Ext.Panel, {
     this.addEvents('list_click', 'status_check_click', 'alert_click');
     this.items = [
       {xtype: 'panel', margins: '5', itemId: 'body_panel', region: 'center', layout: 'anchor', items: [
-        {xtype: 'actionbutton', text: 'Volunteer List', itemId: 'Volunteer List', anchor: '100%', scope: this, handler: function(){this.fireEvent('list_click')}},
-        {xtype: 'actionbutton', text: 'Status Checks', itemId: 'Status Checks', anchor: '100%', scope: this, handler: function(){this.fireEvent('status_check_click')}},
-        {xtype: 'actionbutton', text: 'Alert Volunteers', itemId: 'Alert', anchor: '100%', scope: this, handler: function(){this.fireEvent('alert_click')}}
+        {xtype: 'actionbutton', text: 'Volunteer List', itemId: 'Volunteer List', anchor: '100%', scope: this, handler: function(){this.fireEvent('list_click')}, iconCls: 'vms-list-volunteers'},
+        {xtype: 'actionbutton', text: 'Status Checks', itemId: 'Status Checks', anchor: '100%', scope: this, handler: function(){this.fireEvent('status_check_click')}, iconCls: 'vms-list-status-checks'},
+        {xtype: 'actionbutton', text: 'Alert Volunteers', itemId: 'Alert', anchor: '100%', scope: this, handler: function(){this.fireEvent('alert_click')}, iconCls: 'vms-control-alert'}
       ]}
     ];
     

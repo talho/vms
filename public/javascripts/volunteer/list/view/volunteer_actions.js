@@ -7,8 +7,8 @@ Talho.VMS.Volunteer.List.View.VolunteerActions = Ext.extend(Ext.Panel, {
     
     this.items = [
       {xtype: 'panel', margins: '5', region: 'center', layout: 'anchor', items: [
-        {xtype: 'actionbutton', margins: '5', anchor: '100%', text: 'Edit Volunteer (new tab)', scope: this, handler: function(){this.fireEvent('edit_volunteer_click', this.record);}},
-        {xtype: 'actionbutton', margins: '5', anchor: '100%', text: 'View/Modify Volunteer Qualifications', scope: this, handler: this.volunteerQualifications_click}
+        {xtype: 'actionbutton', margins: '5', anchor: '100%', text: 'Edit Volunteer (new tab)', scope: this, handler: function(){this.fireEvent('edit_volunteer_click', this.record);}, iconCls: 'vms-list-edit-user'},
+        {xtype: 'actionbutton', margins: '5', anchor: '100%', text: 'View/Modify Volunteer Qualifications', scope: this, handler: this.volunteerQualifications_click, iconCls: 'vms-list-qualifications'}
       ]}
     ];
     
