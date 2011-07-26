@@ -42,6 +42,10 @@
   border-color: #CCC;
 }
 
+.vms-row-button-selected{
+  background-color: #CCC;
+}
+
 /* ------------- Drag Proxy tool display ------------ */
 .x-grid-dd-wrap .vms-row-icon{
   position: inherit;

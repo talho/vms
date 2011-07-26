@@ -1,6 +1,6 @@
-Ext.ns('Talho.VMS.User.Profile.View')
+Ext.ns('Talho.VMS.ux')
 
-Talho.VMS.User.Profile.View.ColumnLayout = Ext.extend(Ext.Panel, {
+Talho.VMS.ux.ColumnPanel = Ext.extend(Ext.Panel, {
   layout: 'hbox',
   closable: true,
   layoutConfig: {
@@ -8,8 +8,8 @@ Talho.VMS.User.Profile.View.ColumnLayout = Ext.extend(Ext.Panel, {
     defaultMargins: '5'
   },
   initComponent: function(){
-    this.items = [{xtype:'box', flex: 1},{xtype:'box', flex: 1}, {xtype: 'box', flex: 1}]
-    Talho.VMS.User.Profile.View.ColumnLayout.superclass.initComponent.apply(this, arguments);
+    this.items = [{xtype:'box', flex: 1},{xtype:'box', flex: 1}, {xtype: 'box', flex: 1}];
+    Talho.VMS.ux.ColumnPanel.superclass.initComponent.apply(this, arguments);
   },
   getColumn1: function(){
     return this.getComponent(0);

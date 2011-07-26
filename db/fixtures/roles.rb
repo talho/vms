@@ -1,5 +1,5 @@
 p 'Writing Roles'
-r = Role.find_or_create_by_name_and_application('Admin', 'vms')
+r = Role.find_or_create_by_name_and_approval_required_and_user_role_and_application('Admin', true, false, 'vms')
 p "#{r.name} - #{r.application}"
  
 j = Jurisdiction.find_by_name("Angelina") #set up a bunch of users in Angelina county in order to provide a vms test bed

@@ -50,12 +50,13 @@ class VmsAlert < Alert
     self.message
   end
   
+  protected
+  def create_email_alert_device_type
+    alert_device_types << AlertDeviceType.new(:alert_id => self.id, :device => "Device::EmailDevice") unless alert_device_types.map(&:device).include?("Device::EmailDevice")
+  end
+  
   private
   def set_alert_type
     self[:alert_type] = "VmsAlert"
-  end
-  
-  def create_email_alert_device_type
-    alert_device_types << AlertDeviceType.new(:alert_id => self.id, :device => "Device::EmailDevice") unless alert_device_types.map(&:device).include?("Device::EmailDevice")
   end
 end

@@ -6,6 +6,9 @@ Talho.VMS.User.Profile.View.Qualifications = Ext.extend(Ext.Panel, {
   layout: 'border',
   initComponent: function(){
     this.addEvents('qual_selected', 'qual_removed')
+    var base_params = {};
+    if(this.record) base_params['user_id'] = this.record.get('id');
+    
     this.items = [
       {xtype: 'box', html: '<h1 style="text-align:center;">Qualifications</h1>', region: 'north', margins: '5'},
       {xtype: 'container', region: 'south', itemId: 'south_container', layout: 'form', margins: '5', labelAlign: 'top', items:[
@@ -24,7 +27,7 @@ Talho.VMS.User.Profile.View.Qualifications = Ext.extend(Ext.Panel, {
         ]}
       ]},
       {xtype: 'grid', cls: 'vms-qualification-grid', margins: '5', region: 'center', itemId: 'qual_grid', sm: Ext.grid.AbstractSelectionModel(), store: new Ext.data.JsonStore({fields: Talho.VMS.Model.Qualification,
-          idProperty: 'id', url: '/vms/user_qualifications.json', autoLoad: true, autoSave: false, restful: true,
+          idProperty: 'id', url: '/vms/user_qualifications.json', autoLoad: true, autoSave: false, restful: true, baseParams: base_params,
           listeners: {
             scope: this,
             'beforesave': function(){

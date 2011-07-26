@@ -31,5 +31,6 @@ ActionController::Routing::Routes.draw do |map|
   map.inventory_item_categories 'vms/inventory_item_categories.:format', :controller => 'vms/inventories', :action => 'categories'
   map.qualification_list 'vms/qualifications.:format', :controller => 'vms/qualifications', :action => 'list'
   map.resources :vms_user_qualifications, :as => 'vms/user_qualifications', :controller => 'vms/user_qualifications', :only => [:index, :create, :destroy]
-  map.resources :vms_alerts, :as => 'vms/alerts', :controller => 'vms/alerts', :only => [:index], :member => {:acknowledge => :post}
+  map.resources :vms_alerts, :as => 'vms/alerts', :controller => 'vms/alerts', :only => [:index, :create, :show], :member => {:acknowledge => :post}, :collection => [:status_checks]
+  map.resources :vms_volunteers, :as => 'vms/volunteers', :controller => 'vms/volunteers', :only => [:index]
 end
