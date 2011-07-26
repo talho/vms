@@ -2,6 +2,7 @@ Ext.ns('Talho.VMS.Volunteer.List.View')
 
 Talho.VMS.Volunteer.List.View.List = Ext.extend(Ext.Panel, {
   layout: 'border',
+  cls: 'volunteerGrid',
   initComponent: function(){
     this.addEvents('volunteer_select');
     

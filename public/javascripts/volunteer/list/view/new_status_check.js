@@ -2,6 +2,7 @@ Ext.ns('Talho.VMS.Volunteer.List.View');
 
 Talho.VMS.Volunteer.List.View.NewStatusCheck = Ext.extend(Ext.Panel, {
   layout: 'border',
+  cls: 'newStatusCheck',
   initComponent: function(){
     this.addEvents('submit_new_status_check', 'cancel');
     this.items =  [
@@ -9,7 +10,7 @@ Talho.VMS.Volunteer.List.View.NewStatusCheck = Ext.extend(Ext.Panel, {
       {xtype: 'volunteerlist', itemId: 'vol_list', margins: '5', region: 'center', chooseMode: true},
       {xtype: 'container', itemId: 'south', margins: '5', region: 'south', layout: 'anchor', items: [
         {xtype: 'box', html: '<h1 style="text-align:center;">Custom Message</h1>'},
-        {xtype: 'textarea', itemId: 'custom_msg', height: 150, anchor: '100%'},
+        {xtype: 'textarea', itemId: 'custom_msg', name: 'custom_message', height: 150, anchor: '100%'},
         {xtype: 'container', layout: 'toolbar', buttonAlign: 'right', anchor: '100%', cls: 'x-panel-btns', items: [
           {xtype: 'button', text: 'Send Status Check Alert', scope: this, handler: this.send_status_check},
           {xtype: 'button', text: 'Cancel', scope: this, handler: function(){this.fireEvent('cancel');}}

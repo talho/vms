@@ -2,6 +2,7 @@ Ext.ns('Talho.VMS.Volunteer.List.View');
 
 Talho.VMS.Volunteer.List.View.StatusChecks = Ext.extend(Ext.Panel, {
   layout: 'border',
+  cls: 'statusCheckListPanel',
   initComponent: function(){
     this.addEvents('new_status_check', 'status_check_select');
     
@@ -9,7 +10,7 @@ Talho.VMS.Volunteer.List.View.StatusChecks = Ext.extend(Ext.Panel, {
     
     this.items = [
       {xtype: 'box', region: 'north', margins: '5', html: '<h1 style="text-align:center;">Status Checks</h1>'},
-      {xtype: 'grid', itemId: 'grid', region: 'center', margins: '5', buttons: [
+      {xtype: 'grid', cls: 'statusChecksGrid', itemId: 'grid', region: 'center', margins: '5', buttons: [
           {text: 'New Status Check', scope: this, handler: function(){this.fireEvent('new_status_check');}}
         ],
         store: new Ext.data.JsonStore({fields: ['id', {name:'date', mapping: 'created_at'}],

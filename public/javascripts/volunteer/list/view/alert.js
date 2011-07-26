@@ -2,6 +2,7 @@ Ext.ns('Talho.VMS.Volunteer.List.View');
 
 Talho.VMS.Volunteer.List.View.Alert = Ext.extend(Ext.Panel, {
   layout: 'border',
+  cls: "customAlertPanel",
   initComponent: function(){
     this.addEvents('send_alert');
     
