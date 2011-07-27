@@ -105,7 +105,7 @@ class Vms::SitesController < ApplicationController
 
   def user_active_sites
     active_ssites = current_user.vms_active_scenario_sites
-    ssites = active_ssites.collect{ |s| {:scenario => s.scenario.name, :name => s.site.name, :id => s.site.id, :address => s.site.address} }
+    ssites = active_ssites.collect{ |s| {:scenario => s.scenario.name, :name => s.site.name, :id => s.id, :address => s.site.address} }
     respond_to do |format|
       format.json {render :json => ssites }
     end
