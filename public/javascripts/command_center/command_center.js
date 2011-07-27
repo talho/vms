@@ -164,12 +164,12 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
           itemId: 'map',
           bodyCssClass: 'google_map',
           xtype: 'gmappanel',
-          zoomLevel: 10,
+          zoomLevel: 6,
           gmapType: 'map',
           mapConfOpts: ['enableScrollWheelZoom','enableDoubleClickZoom','enableDragging'],
           mapControls: ['GSmallMapControl','GMapTypeControl','NonExistantControl'],
           setCenter: {
-              geoCodeAddr: 'Austin, Tx, USA'
+              geoCodeAddr: 'Senterfitt, Tx, USA'
           },
           listeners: {
             scope: this,
@@ -651,6 +651,7 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
         break;
       case 'team': this.addTeamToSite(record, site);
         break;
+      case 'auto_user':
       case 'staff': this.addUserToSite(record, site);
         break;
       case 'qual': this.addQualificationToSite(record, site);
