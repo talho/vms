@@ -24,6 +24,13 @@ Talho.VMS.User.Profile.View.AlertDetail = Ext.extend(Ext.Panel, {
         {xtype: 'panel', itemId: 'call_down_panel', cls: 'vms-alert-detail-call-downs', region: 'south', margins: '5', items: calldowns }
       );
     }
+    else if(this.record.get('acknowledge') === true){
+      this.items.push(
+        {xtype: 'panel', itemId: 'call_down_panel', cls: 'vms-alert-detail-call-downs', region: 'south', margins: '5', items: [
+          {xtype: 'actionbutton', text: 'Acknowledge', cls: (this.record.get('acknowledged_at') !== null) ? 'vms-call-down-selected-response' : '', iconCls: 'vms-call-down-positive', scope: this, handler: this.callDownButton_click, call_down_value: 1}
+        ]}
+      );
+    }
       
     Talho.VMS.User.Profile.View.AlertDetail.superclass.initComponent.apply(this, arguments);
     

@@ -16,6 +16,11 @@ class VmsStatusCheckAlert < VmsAlert
     VmsStatusCheckAlert.new(:title => title, :message => message, :created_at => Time.zone.now, :acknowledge => true)
   end
   
+  def formatted_message(user)
+    jurs = build_jurisdictions_string(user)
+    "#{self.author.display_name} has initiated a status check for the #{jurs} jurisdiction(s). Please acknowledge that you have received this message and still wish to volunteer in #{jurs}."
+  end
+  
   def to_xml()
     options = {:Messages => {}, :Recipients => {}, :IVRTree => {} }
     
@@ -55,9 +60,8 @@ class VmsStatusCheckAlert < VmsAlert
           (s.devices.find_all_by_type(self.alert_device_types.map(&:device))).each do |device|
             rcpt.Device(:id => device.id, :device_type =>  device.class.display_name) do |d|
               d.URN device.URN
-              vols = s.jurisdictions.vms_volunteer.map(&:name)
-              vols.last.insert(0, 'and ') if vols.count > 1
-              d.Message(:name => 'juris') {|msg| msg.Value vols.join(vols.count == 2 ? ' ' : ', ')}
+              vols = build_jurisdictions_string(s)
+              d.Message(:name => 'juris') {|msg| msg.Value vols}
             end
           end
         end
@@ -76,4 +80,9 @@ class VmsStatusCheckAlert < VmsAlert
     self[:acknowledge] = true
   end
  
+  def build_jurisdictions_string(user)
+    jurs = user.jurisdictions.vms_volunteer.map(&:name)
+    jurs.last.insert(0, 'and ') if jurs.count > 1
+    jurs = jurs.join(jurs.count == 2 ? ' ' : ', ')
+  end
 end

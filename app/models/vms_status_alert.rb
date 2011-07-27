@@ -13,7 +13,7 @@ class VmsStatusAlert < VmsAlert
   end
   
   def formatted_message(user)
-    staff = self.scenario.staff.find_by_user_id(user)
+    staff = self.scenario.staff.find_by_user_id(user) unless self.scenario.nil?
     staff.nil? ? self.message : "The status of the scenario has been modified. You are currently assigned to site #{staff.site.name} at #{staff.site.address}."
   end
   

@@ -76,6 +76,8 @@ Talho.VMS.User.Profile.Controller = Ext.extend(Ext.util.Observable, {
       url: '/vms/alerts/' + alert.get('id') + '/acknowledge.json',
       params: {response: val},
       success: function(){
+        alert.set('acknowledged_at', new Date());
+        alert.set('call_down_response', val);
         detail.saveMask.hide();
         detail.setSelectedCallDown(val);
       }

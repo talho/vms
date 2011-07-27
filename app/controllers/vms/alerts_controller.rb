@@ -6,7 +6,7 @@ class Vms::AlertsController < ApplicationController
   def index
     page = ( (params[:start]||0).to_i/(params[:limit]||10).to_i ) + 1
     per_page = params[:limit] || 10
-    aas = current_user.alert_attempts.find_all_by_alert_type(['VmsAlert', 'VmsStatusAlert', 'VmsExecutionAlert']).paginate(:page => page, :per_page => per_page)
+    aas = current_user.alert_attempts.find_all_by_alert_type(['VmsAlert', 'VmsStatusAlert', 'VmsExecutionAlert', 'VmsStatusCheckAlert']).paginate(:page => page, :per_page => per_page)
     
     # reformat the alert object so that the json comes back as expected
     aas.each do |aa|
@@ -14,11 +14,12 @@ class Vms::AlertsController < ApplicationController
      aa[:message] = aa.alert.formatted_message(current_user)
      aa[:author] = aa.alert.author.display_name if aa.alert.author
      aa[:calldowns] = aa.alert.call_downs(current_user) if aa.alert_type.constantize == VmsExecutionAlert
-     aa[:scenario_name] = aa.alert.scenario.name
+     aa[:scenario_name] = aa.alert.scenario.name if aa.alert.scenario
+     aa[:acknowledge] = aa.alert.acknowledge
     end
     
     respond_to do |format|
-      format.json {render :json => {:alerts => aas.map{|a| a.as_json(:only => [:id, :acknowledged_at, :created_at, :call_down_response, :alert_type, :name, :message, :author, :calldowns, :scenario_name])}, :total => aas.total_entries } }
+      format.json {render :json => {:alerts => aas.map{|a| a.as_json(:only => [:id, :acknowledged_at, :created_at, :call_down_response, :alert_type, :name, :message, :author, :calldowns, :scenario_name, :acknowledge])}, :total => aas.total_entries } }
     end
   end
   
