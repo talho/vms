@@ -36,9 +36,10 @@ Talho.VMS.Volunteer.List.View.VolunteerList = Ext.extend(Ext.grid.GridPanel, {
       store: new Ext.data.JsonStore({
         fields: Talho.VMS.Model.Volunteer, 
         idProperty: 'id', 
-        url: '/vms/volunteers.json', 
-        autoLoad: true,
+        url: '/vms/volunteers.json',
         totalProperty: 'total',
+        restful: true,
+        autoLoad: false,
         root: 'vols'
       }),
       loadMask: true,
@@ -53,6 +54,16 @@ Talho.VMS.Volunteer.List.View.VolunteerList = Ext.extend(Ext.grid.GridPanel, {
         {text: 'Select None', scope: this, handler: function(){this.getSelectionModel().clearSelections();}}
       ];
     }
+    else{
+      var page_size = 20;
+      this.bbar = new Ext.PagingToolbar({
+        store: this.store,
+        pageSize: page_size
+      });
+      this.store.baseParams = {paged: true, start: 0, limit: page_size};
+    }
+    
+    this.on('afterrender', function(){this.getStore().load();}, this, {delay: 1}); 
     
     Talho.VMS.Volunteer.List.View.VolunteerList.superclass.initComponent.apply(this, arguments);
     
