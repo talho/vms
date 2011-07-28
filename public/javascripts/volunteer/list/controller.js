@@ -18,7 +18,7 @@ Talho.VMS.Volunteer.List.Controller = Ext.extend(Ext.util.Observable, {
     }))
     
     this.columnPanel.on('afterrender', function(){this.showVolunteerList();}, this, {delay: 1, once: true});
-    Talho.VMS.Volunteer.List.Controller.superclass.constructor.apply(this, config);
+    Talho.VMS.Volunteer.List.Controller.superclass.constructor.apply(this, arguments);
   },
   
   showVolunteerList: function(){

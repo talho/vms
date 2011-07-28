@@ -5,6 +5,8 @@ class VmsStatusAlert < VmsAlert
   
   has_many :recipients, :class_name => "User", :finder_sql => 'SELECT users.* FROM users, targets, targets_users WHERE targets.item_type=\'VmsStatusAlert\' AND targets.item_id=#{id} AND targets_users.target_id=targets.id AND targets_users.user_id=users.id'
    
+  has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.scenario.name} - #{x.to_s}" }, :app => 'vms' }
+  
   def self.default_alert(options = {})
     options[:title] ||= "VMS Status Alert"
     options[:message] ||= "The status of the scenario has been modified."

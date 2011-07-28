@@ -9,8 +9,6 @@ class Vms::ScenarioSite < ActiveRecord::Base
   belongs_to :site_admin, :class_name => "User"
   before_update :check_state_for_alert_need
 
-
-
   STATES = {:inactive => 1, :active => 2}
 
   has_many :inventories, :class_name => "Vms::Inventory"
@@ -21,6 +19,8 @@ class Vms::ScenarioSite < ActiveRecord::Base
   has_many :users, :through => :staff
   has_many :teams, :class_name => "Vms::Team", :autosave => true
   belongs_to :site_admin, :class_name => "User"
+
+  has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.to_s}" }, :app => 'vms' }
   
   def as_json (options = {})
     options[:include] = {} if options[:include].nil?
@@ -87,7 +87,7 @@ class Vms::ScenarioSite < ActiveRecord::Base
   end
 
   def to_s
-    Vms::Site.find(site_id).name  + ': ' + Vms::Scenario.find(scenario_id).name
+    site.name  + ': ' + scenario.name
   end
 
   private

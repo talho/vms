@@ -21,7 +21,6 @@ Feature: Modify Roles for VMS Sites
       | name                | address                                 | lat       | lng       | status | scenario |
       | Immunization Center | 1303 Atkinson Dr, Lufkin, TX 75901, USA | 31.347573 | -94.71391 | active | Test     |
     When I open the "Test" scenario
-    And I click x-accordion-hd "Roles"
     When I drag "Add Role" to the "Immunization Center" site
     Then the "Modify Roles" window should be open
     When I fill in "Select Role" with "Chief"
@@ -42,7 +41,6 @@ Feature: Modify Roles for VMS Sites
       | Immunization Center | 1303 Atkinson Dr, Lufkin, TX 75901, USA | 31.347573 | -94.71391 | active | Test     |
     Given the site "Immunization Center" for scenario "Test" has the role "Border Health Director"
     When I open the "Test" scenario
-    And I click x-accordion-hd "Roles"
     When I drag "Add Role" to the "Immunization Center" site
     Then the "Modify Roles" window should be open
     When I fill in "Select Role" with "Chief"
@@ -64,7 +62,6 @@ Feature: Modify Roles for VMS Sites
       | Malawi Center       | Kenyatta, Lilongwe, Malawi              | -13.962475513490757 | 33.7866090623169 | active | Test     |
     Given the site "Malawi Center" for scenario "Test" has the role "Border Health Director"
     When I open the "Test" scenario
-    And I click x-accordion-hd "Roles"
     When I drag "Border Health Director" to the "Immunization Center" site
     Then the "Modify Roles" window should be open
     And I press "Add Role"
@@ -83,7 +80,6 @@ Feature: Modify Roles for VMS Sites
     Given the site "Immunization Center" for scenario "Test" has the role "Border Health Director"
     And the site "Immunization Center" for scenario "Test" has the role "Chief Veterinarian"
     When I open the "Test" scenario
-    And I click x-accordion-hd "Roles"
     When I drag "Add Role" to the "Immunization Center" site
     Then the "Modify Roles" window should be open
     When I press "Cancel" within ".addRolePanel"
@@ -117,7 +113,6 @@ Feature: Modify Roles for VMS Sites
     Given the site "Immunization Center" for scenario "Test" has the role "Border Health Director"
     And the site "Immunization Center" for scenario "Test" has the role "Chief Veterinarian"
     When I open the "Test" scenario
-    And I click x-accordion-hd "Roles"
     When right click the "Immunization Center" role group header
     And I click x-menu-item "Edit"
     Then the "Modify Roles" window should be open
@@ -139,7 +134,6 @@ Feature: Modify Roles for VMS Sites
     Given the site "Immunization Center" for scenario "Test" has the role "Border Health Director"
     And the site "Immunization Center" for scenario "Test" has the role "Chief Veterinarian"
     When I open the "Test" scenario
-    And I click x-accordion-hd "Roles"
     When right click the "Chief Veterinarian" role
     And I click x-menu-item "Edit"
     Then the "Modify Roles" window should be open
@@ -161,7 +155,6 @@ Feature: Modify Roles for VMS Sites
     Given the site "Immunization Center" for scenario "Test" has the role "Border Health Director"
     And the site "Immunization Center" for scenario "Test" has the role "Chief Veterinarian"
     When I open the "Test" scenario
-    And I click x-accordion-hd "Roles"
     When right click the "Chief Veterinarian" role
     And I click x-menu-item "Remove"
     Then the "Modify Roles" window should be open
@@ -182,7 +175,6 @@ Feature: Modify Roles for VMS Sites
       | Malawi Center       | Kenyatta, Lilongwe, Malawi              | -13.962475513490757 | 33.7866090623169 | active | Test     |
     Given the site "Malawi Center" for scenario "Test" has the role "Border Health Director"
     When I open the "Test" scenario
-    And I click x-accordion-hd "Roles"
     And I drag role group "Malawi Center" to "Immunization Center"
     Then the "Modify Roles" window should be open
     When I wait for the "Loading..." mask to go away
@@ -205,7 +197,6 @@ Feature: Modify Roles for VMS Sites
     Given the site "Malawi Center" for scenario "Test" has the role "Border Health Director"
     Given the site "Immunization Center" for scenario "Test" has the role "Chief Veterinarian"
     When I open the "Test" scenario
-    And I click x-accordion-hd "Roles"
     And I drag role group "Malawi Center" to "Immunization Center"
     Then the "Modify Roles" window should be open
     When I wait for the "Loading..." mask to go away

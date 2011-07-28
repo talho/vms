@@ -24,10 +24,12 @@ module Vms
     module ClassMethods
     end
     
+    # TODO: Converte this to a has_many relationship
     def vms_scenario_sites
       Vms::ScenarioSite.find(:all, :conditions => {:site_admin_id => id}, :order => 'id DESC')
     end
 
+    # TODO: Converte this to a has_many relationship
     def vms_active_scenario_sites
       Vms::ScenarioSite.find(:all, :conditions => ['site_admin_id = ? AND scenario_id IN (?)', id, Vms::Scenario.active.map(&:id) ], :order => 'id DESC')
     end

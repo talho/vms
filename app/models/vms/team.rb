@@ -7,6 +7,8 @@ class Vms::Team < ActiveRecord::Base
 
   after_create :make_staff
 
+  has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.name} - #{x.to_s}" }, :app => 'vms' }
+  
   def name
     audience.name
   end                                       
@@ -27,7 +29,7 @@ class Vms::Team < ActiveRecord::Base
   end
 
   def to_s
-     audience.recipients.count.to_s + ' member team: ' + Vms::ScenarioSite.find(scenario_site_id).to_s
+     self.audience.recipients.count.to_s + ' member team: ' + self.scenario_site.to_s
   end
 
   def make_staff

@@ -7,6 +7,8 @@ class Vms::Inventory::ItemInstance < ActiveRecord::Base
   
   validates_presence_of :item
   
+  has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.item_collection.to_s} - #{x.item.name}" }, :app => 'vms' }
+  
   def as_json(options = {})
     json = super(options)
     ( json.key?("item_instance") ? json["item_instance"] : json).merge!( {:name => item.name, :category_id => item.item_category_id, :category => (item.item_category ? item.item_category.name : nil), 

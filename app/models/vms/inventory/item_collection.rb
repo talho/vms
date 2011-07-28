@@ -11,4 +11,10 @@ class Vms::Inventory::ItemCollection < ActiveRecord::Base
   end
   
   STATUS = {:available => 1, :assigned => 2}
+  
+  has_paper_trail :meta => { :item_desc  => Proc.new { |x| x.to_s }, :app => 'vms' }
+  
+  def to_s
+    (!self.inventory.nil? ? self.inventory.name : '') + (!self.user.nil? ? " - #{self.user.to_s}" : '')
+  end
 end

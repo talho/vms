@@ -6,6 +6,8 @@ class Vms::UserRight < ActiveRecord::Base
   
   PERMISSIONS = {:reader => 1, :admin => 2, :owner => 3}
   
+  has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.to_s}" }, :app => 'vms' }
+  
   def as_json(options = {})
     json = super(options)
     ( json.key?("user_right") ? json["user_right"] : json).merge!( 

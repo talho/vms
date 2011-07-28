@@ -14,6 +14,8 @@ class Vms::Staff < ActiveRecord::Base
 
   before_destroy :remove_site_admin_status
 
+  has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.scenario_site.to_s} - #{x.to_s}" }, :app => 'vms' }
+
   def as_json(options = {})
     json = super(options)
     ( json.key?("staff_instance") ? json["staff_instance"] : (json.key?('staff') ? json['staff'] : json) ).merge!( 

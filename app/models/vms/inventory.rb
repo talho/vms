@@ -35,6 +35,8 @@ class Vms::Inventory < ActiveRecord::Base
       end
     end
     
+    has_paper_trail :meta => { :item_desc  => Proc.new { |x| x.to_s }, :app => 'vms' }
+    
     def clone
       #create new inventory with the attributes of the old
       inv = Vms::Inventory.new(self.attributes)

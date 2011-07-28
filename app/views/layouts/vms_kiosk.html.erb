@@ -5,10 +5,10 @@
 
   <title>TXPhin Volunteer Management System</title>
   
-  <%= stylesheet_link_tag 'resources/css/ext-all', 'redesign/master', 'vms/vms', :cache => true %>
+  <%= stylesheet_link_tag 'resources/css/ext-all', 'redesign/master', 'vms/vms', :cache => 'kiosk' %>
 
   <% unless @ssite.blank? %>
-    <%= javascript_include_tag 'ext/adapter/ext/ext-base', 'ext/ext-all-debug', 'vms/kiosk/kiosk_check_in', 'ext_extensions/validations', :cache=>true %>
+    <%= javascript_include_tag 'ext/adapter/ext/ext-base', 'ext/ext-all-debug', 'vms/kiosk/kiosk_check_in', 'ext_extensions/validations', :cache=>'kiosk' %>
     <script type="text/javascript">
     Ext.BLANK_IMAGE_URL = '/images/s.gif';
     var TARGET_DIV_ID = 'checkin-ext-wrapper';

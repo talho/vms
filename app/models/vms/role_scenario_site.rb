@@ -8,6 +8,8 @@ class Vms::RoleScenarioSite < ActiveRecord::Base
   belongs_to :scenario_site, :class_name => "Vms::ScenarioSite"
   has_one :site, :through => :scenario_site, :class_name => "Vms::Site"
   
+  has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.to_s}" }, :app => 'vms' }
+  
   def as_json(options = {})
     json = super(options)
     ( json.key?("role_scenarios_site_instance") ? json["role_scenarios_site_instance"] : json).merge!( 
@@ -21,6 +23,6 @@ class Vms::RoleScenarioSite < ActiveRecord::Base
   end
 
   def to_s
-    pluralize(count, Role.find(role_id).to_s) +  ': ' + Vms::ScenarioSite.find(scenario_site_id).to_s
+    pluralize(count, role.to_s) +  ': ' + scenario_site.to_s
   end
 end
