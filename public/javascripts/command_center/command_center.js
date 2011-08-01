@@ -440,6 +440,13 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   },
   
   loadScenario_success: function(response, options){
+    if(Ext.isObject(response) && response.status === false && this.initial_load_complete !== true){
+      // There was an error in the polling provider. If this is the initial load, we need to alert the user and close the tab.
+      Ext.Msg.alert('Sorry, you cannot access the selected scenario. If you believe you have received this message in error, please contact your administrator.');
+      this.ownerCt.remove(this, true);
+      return;
+    }
+    
     this.initial_load_complete = true;
     if(this.loadMask) this.loadMask.hide();
     

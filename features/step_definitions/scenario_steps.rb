@@ -77,3 +77,8 @@ When /^I drag "([^\"]*)" to "([^\"]*)" in the (.*) grid$/ do |item_name, dest_na
   command_center.#{item_type}Grid.dropTarget.notifyDrop(null, e, data);
   ")
 end
+
+When /^I force open the "([^\"]*)" scenario command center$/ do |scenario_name|
+  scenario = Vms::Scenario.find_by_name(scenario_name)
+  force_open_tab("Command Center - #{scenario_name}", "", "{title: 'Command Center - #{scenario.name}', scenarioId: #{scenario.id}, scenarioName: '#{scenario.name}', initializer: 'Talho.VMS.CommandCenter', id: 'scenario#{scenario.id}'}")
+end

@@ -182,3 +182,13 @@ Feature: Scen Access Control
     When I press "Save"
     Then I should see "Immunization Center" in grid row 2 within ".siteGrid"
     And the site "Immunization Center" should exist at "1303 Atkinson Dr, Lufkin, TX 75901, USA", "31.347573", "-94.71391"
+
+  Scenario: Ensure an admin of one jurisdiction cannot access the command center of another jurisdiction
+    Given I have the scenarios "Test"
+    When I sign out
+    And I am logged in as "atticus@example.com"
+    And I wait for the "Loading PHIN" mask to go away
+    And I force open the "Test" scenario command center
+    Then I should see "Sorry, you cannot access the selected scenario. If you believe you have received this message in error, please contact your administrator."
+    And I press "OK"
+    And the "Command Center - Test" tab should not be open
