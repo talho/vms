@@ -139,7 +139,7 @@ class Vms::ScenariosController < ApplicationController
     end
     
     if @scenario.template?
-      @scenario = @scenario.clone({:state => Vms::Scenario::STATES[:executing]})
+      @scenario = @scenario.deep_clone({:state => Vms::Scenario::STATES[:executing]})
     else
       @scenario.update_attributes :state => Vms::Scenario::STATES[:executing]
     end
@@ -215,7 +215,7 @@ class Vms::ScenariosController < ApplicationController
       format.json {render :json => {:success => false}, :status => 400 }
     end if params[:state].to_i < 1 || params[:state].to_i > 5 # we want to fail this transaction if they didn't provide a valid state
     
-    @scenario = @scenario.clone({:state => params[:state].to_i})
+    @scenario = @scenario.deep_clone({:state => params[:state].to_i})
     
     respond_to do |format|
       format.json {render :json => {:success => true, :scenario => @scenario} }

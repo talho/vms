@@ -370,21 +370,33 @@ Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {
   },
   
   buildPollingProvider: function(){
-    Ext.Direct.addProvider({
-      type: 'polling',
-      url: '/vms/scenarios/' + this.scenarioId,
-      id: 'command_center_polling_provider-' + this.scenarioId,
-      interval: 15000,
-      listeners: {
-        scope: this,
-        beforepoll: function(){
-          return true;
-        },
-        data: function(pp, evt){
-          this.loadScenario_success(evt);
+    var prov_name = 'command_center_polling_provider-' + this.scenarioId;
+    if(Ext.Direct.getProvider(prov_name)){
+      Ext.Direct.getProvider(prov_name).connect();
+    }
+    else {
+      Ext.Direct.addProvider({
+        type: 'polling',
+        url: '/vms/scenarios/' + this.scenarioId,
+        id: 'command_center_polling_provider-' + this.scenarioId,
+        interval: 15000,
+        listeners: {
+          scope: this,
+          beforepoll: function(){
+            return true;
+          },
+          data: function(pp, evt){
+            // Add check to ensure that this command center is even still rendered. This is a bug that keeps the poller alive if you close the tab while a poll is running
+            if(this.ownerCt === undefined){
+              this.destroy();
+            }
+            else{
+              this.loadScenario_success(evt);
+            }
+          }
         }
-      }
-    });
+      });
+    }
   },
   
   destroy: function(){

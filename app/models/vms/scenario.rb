@@ -86,9 +86,8 @@ class Vms::Scenario < ActiveRecord::Base
     walkups.inject(staff.uniq.to_a){|s,w| s.push(w)}
   end
   
-  def clone(opts = {})
+  def deep_clone(opts = {})
     # In this method, we're needing to do a complete clone of all of the attached values. This means that we have to copy any site_instances as new instances and all of those connections as new as well
-    
     scenario = Vms::Scenario.new(self.attributes)
     scenario.attributes = opts
     scenario.created_at = scenario.updated_at = Time.now
