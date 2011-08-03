@@ -3,7 +3,7 @@ class Vms::VolunteersController < ApplicationController
   after_filter :change_include_root_back
   
   def index
-    vols = current_user.jurisdictions.vms_admin.map(&:vms_volunteers).flatten.uniq.sort {|a, b| a[:display_name] <=> b[:display_name]}
+    vols = current_user.jurisdictions.vms_admin.map(&:vms_volunteers).flatten.uniq.sort {|a, b| a[:last_name] <=> b[:last_name]}
     
     paging = !params[:start].nil? || params[:paged] == 'true'
     if paging
