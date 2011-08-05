@@ -17,6 +17,8 @@ ActionController::Routing::Routes.draw do |map|
     scenarios.quals 'qualifications.:format', :controller => 'vms/qualifications', :action => 'index'
   end
 
+  map.resources :vms_users, :as=> 'vms/users', :controller=> 'vms/users', :only=> [:new, :create]
+  # no app linking for now....   :collection => { :link_app => :put, :link_app_page => :get } 
   map.vms_session_new 'vms/session/new', :controller => "vms/sessions", :action => 'new', :conditions => { :method => :get }
   map.vms_session_create 'vms/session/create', :controller => "vms/sessions", :action => 'create', :conditions => { :method => :post }
   map.vms_session_destroy 'vms/session/destroy', :controller => "vms/sessions", :action => 'destroy'#, :conditions => { :method => :get }

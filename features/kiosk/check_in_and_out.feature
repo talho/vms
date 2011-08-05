@@ -118,3 +118,23 @@ Feature: Checking in and out of a VMS site
     Then I should see "Bob Dobbs" within ".vms-checked-in"
     And I should not see the image "/stylesheets/vms/images/walkup-icon.png"
     And "Bob Dobbs" should be checked in to "Mirrorball Mountain" for scenario "Di Scopare Ti"
+
+  Scenario: Normal users and walkup users living together in harmony
+    Given I should not see "Bob Dobbs"
+    When I fill in "First Name" with "Bob"
+    And I fill in "Last Name" with "Dobbs"
+    And I uncheck "Create a TxPhin Account?"
+    And I press "Check In" within ".vms-kiosk-walkup-panel"
+    And I wait for the "Loading..." mask to go away
+    And I press "OK" within ".x-window"
+
+    And I should see the image "/stylesheets/vms/images/walkup-icon.png"
+    When I select the "Ned Neiderlander" grid row
+    And I fill in "Password" with "Password1"
+    And I press "Check In" within ".vms-kiosk-registered-panel"
+    And I wait for the "Loading..." mask to go away
+     
+    Then I should see "Bob Dobbs" within ".vms-checked-in"
+    And I should see "Ned Neiderlander" within ".vms-checked-in"
+    And "Ned Neiderlander" should be checked in to "Mirrorball Mountain" for scenario "Di Scopare Ti"
+    And "Bob Dobbs" should be checked in as a walk-up volunteer at "Mirrorball Mountain" for scenario "Di Scopare Ti"
