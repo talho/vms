@@ -55,6 +55,7 @@ class VmsAlert < Alert
   protected
   def create_email_alert_device_type
     alert_device_types << AlertDeviceType.new(:alert_id => self.id, :device => "Device::EmailDevice") unless alert_device_types.map(&:device).include?("Device::EmailDevice")
+    alert_device_types << AlertDeviceType.new(:alert_id => self.id, :device => "Device::ConsoleDevice") unless alert_device_types.map(&:device).include?("Device::ConsoleDevice")
   end
   
   private

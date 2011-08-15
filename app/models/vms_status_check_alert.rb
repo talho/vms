@@ -1,5 +1,7 @@
 
 class VmsStatusCheckAlert < VmsAlert
+  include ActionController::UrlWriter
+  
   acts_as_MTI
   set_table_name 'view_status_check_vms_alerts'
   before_create :create_email_alert_device_type, :set_alert_type, :set_acknowledge
@@ -35,6 +37,8 @@ class VmsStatusCheckAlert < VmsAlert
       messages.Message(:name => 'msg3') {|msg| msg.Value "."}
       
       messages.Message(:name => 'custom_msg') {|msg| msg.Value "\n\n#{self.message}"} unless self.message.blank?
+      
+      messages.Message(:name => 'alert_url') {|msg| msg.Value ''}
     end
     
     options[:IVRTree][:override] = Proc.new do |ivrtree|
@@ -51,19 +55,25 @@ class VmsStatusCheckAlert < VmsAlert
           end
           root_node.ContextNode do |ctxt|
             ctxt.operation 'prompt'
+            ctxt.response(:ref => 'alert_url')
+            ctxt.ContextNode(:operation => 'display') do |ictxt|
+              ictxt.response() {|resp| resp.Value "Acknowledge this status check alert."}
+            end
           end
         end
       end
     end
         
     options[:Recipients][:override] = Proc.new do |rcpts|
-      User.find_each(:joins => "INNER JOIN targets_users ON targets_users.user_id=users.id INNER JOIN targets ON targets_users.target_id=targets.id AND targets.item_type='#{self.class.to_s}'", :conditions => ['targets.item_id = ?', self.id]) do |s|
-        rcpts.Recipient(:id => s.id, :givenName => s.first_name, :surname => s.last_name, :display_name => s.display_name) do |rcpt|
-          (s.devices.find_all_by_type(self.alert_device_types.map(&:device))).each do |device|
-            rcpt.Device(:id => device.id, :device_type =>  device.class.display_name) do |d|
-              d.URN device.URN
-              vols = build_jurisdictions_string(s)
+     self.alert_attempts.each do |aa|
+        rcpts.Recipient(:id => aa.user_id, :givenName => aa.user.first_name, :surname => aa.user.last_name, :display_name => aa.user.display_name) do |rcpt|
+          (aa.user.devices.find_all_by_type(self.alert_device_types.map(&:device)) | [Device::ConsoleDevice.new]).each do |device|
+            rcpt.Device(:device_type =>  device.class.display_name) do |d|
+              d.URN device.URN if device.methods.include?("URN")
+              vols = build_jurisdictions_string(aa.user)
               d.Message(:name => 'juris') {|msg| msg.Value vols}
+              url = alert_with_token_url :id => aa.alert_id, :token => aa.token, :host => HOST
+              d.Message(:name => 'alert_url'){|msg| msg.Value url}
             end
           end
         end

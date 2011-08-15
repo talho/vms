@@ -1,9 +1,10 @@
 
 class VmsExecutionAlert < VmsAlert
+  include ActionController::UrlWriter
   acts_as_MTI
   set_table_name 'view_execution_vms_alerts'
   
-  before_create :before_vol_roles
+  before_create :before_vol_roles, :set_defaults
   after_create :after_vol_roles
   
   has_many :vms_volunteer_roles, :class_name => "Vms::VolunteerRole", :foreign_key => :alert_id, :autosave => true
@@ -66,7 +67,7 @@ class VmsExecutionAlert < VmsAlert
           role_names << role_name
           messages.Message(:name => "#{role_name}_list") {|msg| msg.Value "#{roles.map(&:name).join(', ')}"}
           messages.Message(:name => "#{role_name}_opts") do |msg|
-            msg.Value self.call_downs(vol, roles).map{|cd| cd[:msg]}.join('\n')
+            msg.Value self.call_downs(vol, roles).map{|cd| cd[:msg]}.join("\n")
           end
         end
       end
@@ -78,12 +79,15 @@ class VmsExecutionAlert < VmsAlert
     options[:Recipients][:override] = Proc.new do |rcpts|
        vols.each do |recipient|
         rcpts.Recipient(:id => recipient.id, :givenName => recipient.first_name, :surname => recipient.last_name, :display_name => recipient.display_name) do |rcpt|
-          (recipient.devices.find_all_by_type(self.alert_device_types.map(&:device))).each do |device|
-            rcpt.Device(:id => device.id, :device_type =>  device.class.display_name) do |d|
-              d.URN device.URN
+          (recipient.devices.find_all_by_type(self.alert_device_types.map(&:device)) | [Device::ConsoleDevice.new]).each do |device|
+            rcpt.Device(:id => device.methods.include?('attributes') ? device.id : '', :device_type =>  device.class.display_name) do |d|
+              d.URN device.URN if device.methods.include?("URN")
               role_name = build_role_name(vhash[recipient])
               d.Message(:name => 'role_list', :ref => "#{role_name}_list")
               d.Message(:name => 'role_opts', :ref => "#{role_name}_opts")
+              aa = self.alert_attempts.find_by_user_id(recipient.id)
+              url = alert_with_token_url :id => self.id, :token => aa.token, :host => HOST
+              d.Message(:name => 'alert_url'){|msg| msg.Value url}
             end
           end
         end if vol_role_hash[recipient]
@@ -99,6 +103,13 @@ class VmsExecutionAlert < VmsAlert
             ctxt.response(:ref => 'role_list')
             ctxt.response(:ref => 'msg_body_2')
             ctxt.response(:ref => 'role_opts')
+          end
+          rootnode.ContextNode do |ctxt|
+            ctxt.operation 'prompt'
+            ctxt.response(:ref => 'alert_url')
+            ctxt.ContextNode(:operation => 'display') do |ictxt|
+              ictxt.response() {|ppt| ppt.Value 'Select a response.' }
+            end
           end
         end
       end
@@ -123,6 +134,10 @@ class VmsExecutionAlert < VmsAlert
   
   def build_role_name(roles)
     "Roles_" + roles.sort_by{|a,b| a.id <=> (b.nil? ? nil : b.id)}.map(&:id).join('_')
+  end
+  
+  def set_defaults
+    self.acknowledge = true
   end
   
 end
