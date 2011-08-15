@@ -1,0 +1,32 @@
+<%= f.error_messages %>
+<table>
+  <tr>
+    <td><%= f.label(:first_name, "First Name *") %><br /><%= f.text_field(:first_name) %></td>
+    <td><%= f.label(:last_name, "Last Name *") %><br/><%= f.text_field(:last_name) %></td>
+  </tr>
+  <tr>
+    <td><%= f.label(:email, "Email Address *") %><br/><%= f.text_field(:email) %></td>
+    <td><%= f.label(:display_name, "Preferred name to be displayed") %><br/><%= f.text_field(:display_name) %></td>
+  </tr>
+  <tr>
+    <td colspan="2"><%= f.label :password, "Password *" %><b> (Must be 6 characters long, with at least 1 digit and 1 capital.)</b><br/><%= f.password_field(:password) %></td>
+  </tr>
+  <tr>
+    <td><%= f.label(:password_confirmation,"Password Confirmation") %><br/><%= f.password_field(:password_confirmation) %></td>
+    <td><%= f.label(:title, "Job title") %><br/><%= f.text_field(:title) %></td>
+  </tr>
+  <tr>
+    <td><%= f.label(:phone, "Office Phone") %><br/><%= f.text_field(:phone, :class => "phone") %></td>
+    <td><%= f.label(:home_phone, "Home Phone") %><br/><%= f.text_field(:home_phone, :class => "home_phone") %></td>
+  </tr>
+  <tr>
+    <td><%= f.label(:mobile_phone, "Mobile Phone") %><br/><%= f.text_field(:mobile_phone, :class => "mobile_phone") %></td>
+    <td><%= f.label(:fax, "Fax") %><br/><%= f.text_field(:fax, :class => "fax") %></td>
+  </tr>
+  <tr>
+    <td><%= f.label(:vms_jurisdiction_id, "Home County *") %><br/><%= f.collection_select :vms_jurisdiction_id, @jurisdictions, :id, :name, :prompt=>"Select Your County"%></td>
+    <td><%= f.label(:preferred_language, "Preferred language") %><br/><%= f.select(:preferred_language, ["English","Spanish"]) %></td>
+  </tr>
+</table>
+
+

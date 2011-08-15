@@ -26,7 +26,7 @@ Ext.ns("Talho.VMS");
       var record = this.volunteersGrid.getSelectionModel().getSelected();
       if (record != null && record.data['type'] == 'walkup' ){
        // params['walkup_signout'] = true;
-        params['walkup_id'] = record['id'];
+        params['walkup_id'] = record['id'].split(":")[1];
       }
       form.getForm().submit({
         params: params,

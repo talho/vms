@@ -1,0 +1,8 @@
+<h1>VMS Volunteer sign-up form (* = Required field)</h1><br/>
+
+<% form_for @user, :url => vms_users_path do |f| %>
+  <%= render 'new_vms_user_form', :f => f, :user => @user %>
+  <p>
+    <%= f.submit 'Sign Up' %> or <%= link_to 'Cancel', sign_in_path %>
+  </p>
+<% end %>
