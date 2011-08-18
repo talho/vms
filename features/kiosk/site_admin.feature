@@ -37,12 +37,10 @@ Feature: Accessing site check-in kiosks from the phin app
     And  "bartleby@example.com" is the site administrator for "Taco Drop-Off" in "Pajama Jammy Jam"
     And I am logged in as "bartleby@example.com"
     And I go to the ext dashboard page
-    And I navigate to "Apps > VMS > Site Administration"
-    Then I should not see "Triage Station 2" within ".x-window-body"
-    And I should not see "Taco Drop-Off" within ".x-window-body"
-    And I press "Cancel"
-
+    And I navigate to "Apps > VMS"
+    Then I should not see "Site Administration"
     When scenario "Pajama Jammy Jam" is "executing"
+    And I go to the ext dashboard page
     And I navigate to "Apps > VMS > Site Administration"
     Then I should not see "Triage Station 2" within ".x-window-body"
     And I should see "Taco Drop-Off" within ".x-window-body"

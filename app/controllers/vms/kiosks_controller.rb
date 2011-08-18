@@ -104,10 +104,10 @@ class Vms::KiosksController < ApplicationController
         end
       rescue
         respond_to do |format|
-            format.html {
-              flash[:error] = "You must sign in to access this page"
-              redirect_to vms_session_new_path
-            }
+          format.html {
+            flash[:error] = "You must sign in to access this page"
+            redirect_to vms_session_new_path
+          }
         end
       end
     else
@@ -116,7 +116,7 @@ class Vms::KiosksController < ApplicationController
         session.delete(:user_id)
       else
         flash[:error] = "You must sign in to access this page"
-        redirect_to sign_in_path 
+        redirect_to new_session_path
       end
     end
   end
@@ -124,22 +124,22 @@ class Vms::KiosksController < ApplicationController
   def vms_site_admin_required
     user = User.find(session[:vms_user_id])
     if user.is_vms_scenario_site_admin?
-       if user.is_vms_scenario_site_admin_for?( Vms::ScenarioSite.find(params['id']) )
-         return true
-       else
-         respond_to do |format|
-           format.html {
-              flash[:error] = "You are not the Administrator for that site"
-              redirect_to kiosk_index_path
-           }
-         end        
+      if user.is_vms_scenario_site_admin_for?( Vms::ScenarioSite.find(params['id']) )
+        return true
+      else
+       respond_to do |format|
+         format.html {
+          flash[:error] = "You are not the Administrator for that site"
+          redirect_to kiosk_index_path
+         }
        end
+      end
     else
       respond_to do |format|
-          format.html {
-            flash[:error] = "You are not a VMS Site Administrator"
-            redirect_to ext_path
-          }
+        format.html {
+          flash[:error] = "You are not a VMS Site Administrator"
+          redirect_to new_session_path
+        }
       end
     end
   end
@@ -152,7 +152,7 @@ class Vms::KiosksController < ApplicationController
       end
     else
       flash[:error] = "Invalid Action."
-      redirect_to ext_path
+      redirect_to new_session_path
     end
   end
   
