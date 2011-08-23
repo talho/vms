@@ -28,7 +28,7 @@ Then /^"([^\"]*)" should( not)? receive a VMS email(?: with)?(?: title "([^\"]*)
     end
 
     status &&= email.subject =~ /#{Regexp.escape(title)}/ unless title.nil?
-    status &&= email.body =~ /#{Regexp.escape(message.gsub(/\\n/, "\n"))}/ unless message.nil?
+    status &&= email.body.gsub(/<br ?\/>/, '') =~ /#{Regexp.escape(message.gsub(/\\n/, "\n"))}/ unless message.nil?
     status
   end
   
