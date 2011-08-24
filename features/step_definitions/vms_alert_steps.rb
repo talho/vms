@@ -41,6 +41,7 @@ Given /^"([^\"]*)" has received the following alert for scenario "([^"]*)":$/ do
   h = table.rows_hash
   al_type = h['type'].constantize
   alert = al_type.new :message => h['message'], :title => h['title'], :created_at => Time.now
+  alert.author = User.find_by_display_name(h['author']) if h['author']
   alert.scenario_id = Vms::Scenario.find_by_name(scenario).id
   alert.audiences << (Audience.new :users => [user])
 
@@ -63,17 +64,45 @@ Then /^the user "([^\"]*)" should have responded to the alert "([^\"]*)" with ([
 end
 
 Then /^the "([^\"]*)" email should contain an acknowledgement link$/ do |name|
-  al = Alert.find_by_name(name)
+  al = Alert.find_by_title(name)
   al = al.alert_type.constantize.find(al)
 
   class InnerUrlBuilder
     include ActionController::UrlWriter
-    def alert_url(parms)
+    def get_alert_url(parms)
       alert_url parms
     end
   end
 
-  aa = al.alert_attempts.first
-  url = InnerUrlBuilder.new.alert_url(:id => al.id, :host => HOST)
+  url = InnerUrlBuilder.new.get_alert_url(:id => al.id, :host => HOST)
+  email = ActionMailer::Base.deliveries.detect do |email|
+    status = true
+    status &&= email.subject =~ /#{Regexp.escape(al.title)}/
+    status &&= email.body.gsub(/<br ?\/>/, '') =~ /#{Regexp.escape(url.gsub(/\\n/, "\n"))}/
+    status
+  end
 
+  email.should_not be_nil
+end
+
+When /^I visit the "([^\"]*)" acknowledgement link (with|without) login$/ do |name, login_requirement|
+  al = Alert.find_by_title(name)
+  al = al.alert_type.constantize.find(al)
+
+  class InnerUrlBuilder
+    include ActionController::UrlWriter
+    def get_alert_path(parms)
+      alert_path parms
+    end
+    def get_alert_with_token_path(parms)
+      alert_with_token_path parms
+    end
+  end
+
+  if login_requirement == "without"
+    url = InnerUrlBuilder.new.get_alert_with_token_path(:id => al.id, :token => al.alert_attempts.first.token, :host => HOST)
+  else
+    url = InnerUrlBuilder.new.get_alert_path(:id => al.id, :host => HOST)
+  end
+  visit url
 end
