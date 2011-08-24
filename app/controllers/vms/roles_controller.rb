@@ -1,10 +1,9 @@
 class Vms::RolesController < ApplicationController
   include Vms::PopulateScenario
   
-  before_filter :non_public_role_required, :change_include_root
+  before_filter :non_public_role_required
   before_filter :initialize_scenario, :only => [:index, :show]
   before_filter :initialize_protected_scenario, :only => [:update]
-  after_filter :change_include_root_back
   
   def index
     @instances = @scenario.site_instances.find(:all, :include => {:role_scenario_sites => [:role, :site]})

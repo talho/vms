@@ -3,8 +3,7 @@ class Vms::SitesController < ApplicationController
   
   before_filter :initialize_scenario, :only => [:index, :show, :existing]
   before_filter :initialize_protected_scenario, :only => [:create, :edit, :update, :destroy]
-  before_filter :non_public_role_required, :change_include_root
-  after_filter :change_include_root_back
+  before_filter :non_public_role_required
   
   def index
     @site_instances = @scenario.site_instances

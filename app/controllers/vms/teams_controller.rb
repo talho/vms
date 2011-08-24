@@ -1,10 +1,9 @@
 class Vms::TeamsController < ApplicationController
   include Vms::PopulateScenario
   
-  before_filter :non_public_role_required, :change_include_root
+  before_filter :non_public_role_required
   before_filter :initialize_scenario, :only => [:index, :show]
   before_filter :initialize_protected_scenario, :only => [:create, :edit, :update, :destroy]
-  after_filter :change_include_root_back
   
   def index
     @teams = @scenario.teams.find(:all, :include => {:audience => [:users]})

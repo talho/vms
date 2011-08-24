@@ -61,3 +61,19 @@ Then /^the user "([^\"]*)" should have responded to the alert "([^\"]*)" with ([
   aa = alert.alert_attempts.find_by_user_id(User.find_by_display_name(user_name) )
   aa.call_down_response.to_i.should == value.to_i
 end
+
+Then /^the "([^\"]*)" email should contain an acknowledgement link$/ do |name|
+  al = Alert.find_by_name(name)
+  al = al.alert_type.constantize.find(al)
+
+  class InnerUrlBuilder
+    include ActionController::UrlWriter
+    def alert_url(parms)
+      alert_url parms
+    end
+  end
+
+  aa = al.alert_attempts.first
+  url = InnerUrlBuilder.new.alert_url(:id => al.id, :host => HOST)
+
+end

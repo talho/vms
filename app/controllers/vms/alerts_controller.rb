@@ -1,6 +1,5 @@
 class Vms::AlertsController < ApplicationController  
-  before_filter :non_public_role_required, :change_include_root
-  after_filter :change_include_root_back
+  before_filter :non_public_role_required
   
   ## List the alerts for a current user. Handle paging requests
   def index

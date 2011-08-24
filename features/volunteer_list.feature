@@ -128,7 +128,7 @@ Feature: Volunteer List
     And I wait for the "Saving..." mask to go away
     Then I should not see "Volunteers" within ".newStatusCheck"
     And I should see 1 row in grid "statusChecksGrid"
-    And "atticus@example.com" should receive a VMS email with title "Volunteer Status Check" message "Ad Min has initiated a status check for the Angelina County jurisdiction(s). Please acknowledge that you have received this message and still wish to volunteer in Angelina County.\n\nCustom Message"
+    And "atticus@example.com" should receive a VMS email with title "Volunteer Status Check" message "Ad Min has initiated a status check for the Angelina County jurisdiction(s). Please acknowledge that you have received this message and still wish to volunteer in Angelina County.</p>\n\n<p>Custom Message"
 
   Scenario: View list of status check responses
     Given a status check alert created on "4/11/11 10:45:00" for:

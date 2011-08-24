@@ -42,5 +42,9 @@ ActionView::Helpers::AssetTagHelper.register_javascript_expansion(
 ActionView::Helpers::AssetTagHelper.register_stylesheet_expansion(
   :vms => [ "vms/vms" ])
 
+$public_roles = [] unless defined?($public_roles)
+r = Role.find_by_name_and_application('Volunteer', 'vms')
+$public_roles << r.id unless r.nil?
+
 module Vms
 end

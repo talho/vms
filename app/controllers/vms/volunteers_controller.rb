@@ -1,6 +1,5 @@
 class Vms::VolunteersController < ApplicationController  
-  before_filter :non_public_role_required, :change_include_root
-  after_filter :change_include_root_back
+  before_filter :non_public_role_required
   
   def index
     vols = current_user.jurisdictions.vms_admin.map(&:vms_volunteers).flatten.uniq.sort {|a, b| a[:last_name] <=> b[:last_name]}
