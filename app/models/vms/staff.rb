@@ -28,7 +28,7 @@ class Vms::Staff < ActiveRecord::Base
 
   def self.send_removed_message(users, scenario)
     if(scenario.executing? && users.count > 0)
-      alert = VmsAlert.new :scenario => scenario, :author => scenario.users.owner, :audiences => [Audience.new :users => users], :title => "You have been unassigned",
+      alert = VmsAlert.new :scenario => scenario, :author => scenario.users.owner, :audiences => [Audience.new( :users => users)], :title => "You have been unassigned",
               :message => "You have been unassigned from your volunteer site and not reassigned to a different. You will be notified if you are reassigned later."
       alert.save
     end
@@ -36,7 +36,7 @@ class Vms::Staff < ActiveRecord::Base
   
   def self.send_added_message(staff, site_instance)
     if(site_instance.scenario.executing? && staff.count > 0)
-      alert = VmsAlert.new :scenario => site_instance.scenario, :author => site_instance.scenario.users.owner, :audiences => [Audience.new :users => staff.map(&:user)], :title => "You have been assigned to a site",
+      alert = VmsAlert.new :scenario => site_instance.scenario, :author => site_instance.scenario.users.owner, :audiences => [Audience.new( :users => staff.map(&:user))], :title => "You have been assigned to a site",
               :message => "You have been assigned to #{site_instance.site.name} at #{site_instance.site.address}. Please make your way there now, if you are not already, and check-in when you arrive."
       alert.save
     end

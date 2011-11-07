@@ -7,7 +7,7 @@ Given /^([^ ]*) (?:have|has) the scenarios? "([^\"]*)"$/ do |email, scenarios|
   scenarios = scenarios.split(',')
   scenarios.each do |scenario|
     Factory(:scenario, :name => scenario.strip,
-            :user_rights => [ Vms::UserRight.new :user => user, :permission_level => Vms::UserRight::PERMISSIONS[:owner]] )
+            :user_rights => [ Vms::UserRight.new( :user => user, :permission_level => Vms::UserRight::PERMISSIONS[:owner])] )
   end
 end
 When /^I open the "([^\"]*)" scenario$/ do |name|

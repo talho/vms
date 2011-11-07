@@ -80,8 +80,8 @@ class VmsExecutionAlert < VmsAlert
        vols.each do |recipient|
         rcpts.Recipient(:id => recipient.id, :givenName => recipient.first_name, :surname => recipient.last_name, :display_name => recipient.display_name) do |rcpt|
           (recipient.devices.find_all_by_type(self.alert_device_types.map(&:device)) | [Device::ConsoleDevice.new]).each do |device|
-            rcpt.Device(:id => device.methods.include?('attributes') ? device.id : '', :device_type =>  device.class.display_name) do |d|
-              d.URN device.URN if device.methods.include?("URN")
+            rcpt.Device(:id => device.respond_to?('attributes') ? device.id : '', :device_type =>  device.class.display_name) do |d|
+              d.URN device.URN if device.respond_to?("URN")
               role_name = build_role_name(vhash[recipient])
               d.Message(:name => 'role_list', :ref => "#{role_name}_list")
               d.Message(:name => 'role_opts', :ref => "#{role_name}_opts")

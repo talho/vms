@@ -178,10 +178,10 @@ Feature: Scen Access Control
     Then I should see "New Site"
     When I drag the "New Site" site to the map at "31.347573", "-94.71391"
     And I fill in "Name" with "Immunization Center"
-    Then the "Address" field should contain "1303 Atkinson Dr, Lufkin, Texas 75901, United States"
+    Then the "Address" field should contain "1303 Atkinson Dr, Lufkin, TX 75901, USA"
     When I press "Save"
     Then I should see "Immunization Center" in grid row 2 within ".siteGrid"
-    And the site "Immunization Center" should exist at "1303 Atkinson Dr, Lufkin, Texas 75901, United States", "31.347573", "-94.71391"
+    And the site "Immunization Center" should exist at "1303 Atkinson Dr, Lufkin, TX 75901, USA", "31.347573", "-94.71391"
 
   Scenario: Ensure an admin of one jurisdiction cannot access the command center of another jurisdiction
     Given I have the scenarios "Test"

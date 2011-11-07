@@ -69,7 +69,7 @@ class VmsStatusCheckAlert < VmsAlert
         rcpts.Recipient(:id => aa.user_id, :givenName => aa.user.first_name, :surname => aa.user.last_name, :display_name => aa.user.display_name) do |rcpt|
           (aa.user.devices.find_all_by_type(self.alert_device_types.map(&:device)) | [Device::ConsoleDevice.new]).each do |device|
             rcpt.Device(:device_type =>  device.class.display_name) do |d|
-              d.URN device.URN if device.methods.include?("URN")
+              d.URN device.URN if device.respond_to?("URN")
               vols = build_jurisdictions_string(aa.user)
               d.Message(:name => 'juris') {|msg| msg.Value vols}
               url = alert_with_token_url :id => aa.alert_id, :token => aa.token, :host => HOST

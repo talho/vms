@@ -27,6 +27,7 @@ Feature: Malicious VMS Kiosk tests
   Scenario: User cannot maliciously check into a non-active site
     Given I am logged in as "stabby@example.com"
     And I maliciously attempt to check in as "stabby@example.com" to site "Bomb Dispensary" in scenario "Spy vs Spy"
+    And I wait for 1 second
     Then I should see "That scenario is not currently active"
     And no user should be checked in to site "Bomb Dispensary" in scenario "Spy vs Spy"
     
