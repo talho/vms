@@ -1,7 +1,7 @@
 
 When /^backgroundrb has processed the vms alert responses$/ do
-  require 'vendor/plugins/backgroundrb/server/lib/bdrb_server_helper.rb'
-  require 'vendor/plugins/backgroundrb/server/lib/meta_worker.rb'
+  require 'bdrb_server_helper.rb'
+  require 'meta_worker.rb'
   require 'vendor/plugins/vms/lib/workers/watch_for_vms_execution_alert_responses_worker.rb'
   WatchForVmsExecutionAlertResponsesWorker.new.query
 end
