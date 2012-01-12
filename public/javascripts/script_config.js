@@ -21,4 +21,4 @@ Talho.ScriptManager.addInitializer('Talho.VMS.ManageScenarios', {js: '$(ext_exte
 Talho.ScriptManager.addInitializer('Talho.VMS.Scenario.Manager', {js: 'VMS_Scenario_Manager'});
 Talho.ScriptManager.addInitializer('Talho.VMS.AdministerSites', {js: '$(ext_extensions)/xActionColumn.js $(vms)/site/administer_sites.js'});
 Talho.ScriptManager.addInitializer('Talho.VMS.User.Profile', {js: 'VMS_User_Profile'});
-Talho.ScriptManager.addInitializer('Talho.VMS.Volunteer.List', {js: 'VMS_Volunteer_List'})
+Talho.ScriptManager.addInitializer('Talho.VMS.Volunteer.List', {js: 'VMS_Volunteer_List'});

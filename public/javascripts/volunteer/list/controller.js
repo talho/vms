@@ -87,7 +87,7 @@ Talho.VMS.Volunteer.List.Controller = Ext.extend(Ext.util.Observable, {
         'qual_removed': this.qualification_removed,
         'qual_selected': this.qualification_added
       },
-      buttons: [{text: 'Back', handler: this.volunteer_select.bind(this, [vol])}]
+      buttons: [{text: 'Back', handler: this.volunteer_select.createDelegate(this, [vol])}]
     }))
   },
   
