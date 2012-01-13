@@ -104,7 +104,12 @@ class Vms::TeamsController < ApplicationController
   end
     
   def destroy
-    @team = @scenario.site_instances.for_site(params[:vms_site_id]).teams.find(params[:id])
+    si = @scenario.site_instances.for_site(params[:vms_site_id])
+    @team = si.teams.find(params[:id])
+    @team.audience.recipients.each do | u |
+        #remove any members of this team from other sites staffs if they are not checked in
+        si.staff.find(:all, :conditions=>['user_id = ? AND checked_in = ? AND source = \'team\'', u.id, false]).each{ |s| s.destroy }
+    end
     
     respond_to do |format|
       if @team.destroy
