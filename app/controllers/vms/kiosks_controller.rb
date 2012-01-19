@@ -1,6 +1,6 @@
 class Vms::KiosksController < ApplicationController
 
-  skip_before_filter :login_required
+  skip_before_filter :authenticate
   before_filter :vms_session_required, :except => [:registered_checkin, :walkup_checkin]
   before_filter :vms_site_admin_required, :except => [:index, :registered_checkin, :walkup_checkin]
   before_filter :vms_active_scenario_required, :except => [:index]
@@ -32,7 +32,7 @@ class Vms::KiosksController < ApplicationController
   end
 
   def index
-    @user = User.find(session[:vms_user_id])
+    @user = User.find_by_remember_token(cookies[:vms_remember_token])
     @ssites = @user.vms_active_scenario_sites
     render :layout => 'vms_kiosk'
   end
@@ -91,15 +91,15 @@ class Vms::KiosksController < ApplicationController
   protected
 
   def vms_session_required
-    if !session[:user_id]
+    if !cookies[:remember_token]
       match = true
     else
-      match = session[:user_id] == session[:vms_user_id]
+      match = cookies[:remember_token] == cookies[:vms_remember_token]
     end
-    if session[:vms_user_id] && match
+    if cookies[:vms_remember_token] && match
       begin
-        if User.find(session[:vms_user_id])
-          session.delete(:user_id) if session[:user_id]   # nuke the Phin session when kiosk stuff is happening
+        if User.find_by_remember_token(cookies[:vms_remember_token])
+          cookies.delete(:remember_token) if cookies[:remember_token]   # nuke the Phin session when kiosk stuff is happening
           return true
         end
       rescue
@@ -111,9 +111,9 @@ class Vms::KiosksController < ApplicationController
         end
       end
     else
-      if session[:user_id]
-        session[:vms_user_id] = session[:user_id]
-        session.delete(:user_id)
+      if cookies[:remember_token]
+        cookies[:vms_remember_token] = cookies[:remember_token]
+        cookies.delete(:remember_token)
       else
         flash[:error] = "You must sign in to access this page"
         redirect_to new_session_path
@@ -122,7 +122,7 @@ class Vms::KiosksController < ApplicationController
   end
 
   def vms_site_admin_required
-    user = User.find(session[:vms_user_id])
+    user = User.find_by_remember_token(cookies[:vms_remember_token])
     if user.is_vms_scenario_site_admin?
       if user.is_vms_scenario_site_admin_for?( Vms::ScenarioSite.find(params['id']) )
         return true

@@ -8,7 +8,7 @@ class VmsStatusCheckAlert < VmsAlert
   
   has_many :recipients, :class_name => "User", :finder_sql => 'SELECT users.* FROM users, targets, targets_users WHERE targets.item_type=\'VmsStatusCheckAlert\' AND targets.item_id=#{id} AND targets_users.target_id=targets.id AND targets_users.user_id=users.id'
   
-  has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.to_s}" }, :app => 'vms' }
+  has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.to_s}" }, :app => Proc.new {|x| x.app} }
   
   def to_s
     title || ''
@@ -69,7 +69,7 @@ class VmsStatusCheckAlert < VmsAlert
         rcpts.Recipient(:id => aa.user_id, :givenName => aa.user.first_name, :surname => aa.user.last_name, :display_name => aa.user.display_name) do |rcpt|
           (aa.user.devices.find_all_by_type(self.alert_device_types.map(&:device)) | [Device::ConsoleDevice.new]).each do |device|
             rcpt.Device(:device_type =>  device.class.display_name) do |d|
-              d.URN device.URN if device.methods.include?("URN")
+              d.URN device.URN if device.respond_to?("URN")
               vols = build_jurisdictions_string(aa.user)
               d.Message(:name => 'juris') {|msg| msg.Value vols}
               url = alert_with_token_url :id => aa.alert_id, :token => aa.token, :host => HOST

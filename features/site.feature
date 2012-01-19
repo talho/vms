@@ -22,9 +22,9 @@ Feature: Test site creation for scenarios
     And the site "<name>" should exist at "<address>", "<lat>", "<lng>"
 
     Examples:
-    | name                | address                                              | lat                 | lng              |
-    | Immunization Center | 1303 Atkinson Dr, Lufkin, Texas 75901, United States | 31.347573           | -94.71391        |
-    | Malawi Expansion    | Kenyatta, Lilongwe, Malawi                           | -13.962475513490757 | 33.7866090623169 |
+    | name                | address                                 | lat                 | lng              |
+    | Immunization Center | 1303 Atkinson Dr, Lufkin, TX 75901, USA | 31.347573           | -94.71391        |
+    | Malawi Expansion    | Kenyatta, Lilongwe, Malawi              | -13.962475513490757 | 33.7866090623169 |
 
   Scenario: Copy a site from an active site
     Given the following sites exist:

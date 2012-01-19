@@ -138,7 +138,7 @@ class Vms::Scenario < ActiveRecord::Base
     al.save
     
     status_alert = VmsStatusAlert.default_alert(:title => "Scenario #{name} is now executing", :message => "Scenario #{name} is now executing.", 
-                                                :audiences => [Audience.new :users => all_users], :scenario => self, :author => current_user)
+                                                :audiences => [Audience.new(:users => all_users)], :scenario => self, :author => current_user)
     status_alert.save
   end
   handle_asynchronously :execute

@@ -1,7 +1,7 @@
 
 When /^backgroundrb has processed the vms alert responses$/ do
-  require 'vendor/plugins/backgroundrb/server/lib/bdrb_server_helper.rb'
-  require 'vendor/plugins/backgroundrb/server/lib/meta_worker.rb'
+  require 'bdrb_server_helper.rb'
+  require 'meta_worker.rb'
   require 'vendor/plugins/vms/lib/workers/watch_for_vms_execution_alert_responses_worker.rb'
   WatchForVmsExecutionAlertResponsesWorker.new.query
 end
@@ -14,7 +14,7 @@ When /^"([^\"]*)" has responded to a ([^ ]*)(?: with title "([^\"]*)")? with ([0
                                          :conditions => conditions)
   aa = AlertAttempt.find(aa.id)
 
-  aa.update_attributes :acknowledged_at => time.nil? ? Time.now : Time.parse(time), :call_down_response => count.to_i
+  aa.update_attributes :acknowledged_at => time.nil? ? Time.now : DateTime.strptime(time, '%m/%d/%y %H:%M:%S').change(:offset => 'CDT'), :call_down_response => count.to_i
 end
 
 Then /^"([^\"]*)" should( not)? receive a VMS email(?: with)?(?: title "([^\"]*)")?(?: message "([^"]*)")?$/ do |user_email, neg, title, message|
@@ -66,7 +66,7 @@ end
 Then /^the "([^\"]*)" email should contain an acknowledgement link$/ do |name|
   al = Alert.find_by_title(name)
   al = al.alert_type.constantize.find(al)
-
+  
   class InnerUrlBuilder
     include ActionController::UrlWriter
     def get_alert_url(parms)
@@ -77,11 +77,11 @@ Then /^the "([^\"]*)" email should contain an acknowledgement link$/ do |name|
   url = InnerUrlBuilder.new.get_alert_url(:id => al.id, :host => HOST)
   email = ActionMailer::Base.deliveries.detect do |email|
     status = true
-    status &&= email.subject =~ /#{Regexp.escape(al.title)}/
-    status &&= email.body.gsub(/<br ?\/>/, '') =~ /#{Regexp.escape(url.gsub(/\\n/, "\n"))}/
+    status &&= (email.subject =~ /#{Regexp.escape(al.title)}/) != nil
+    status &&= (email.body.gsub(/<br ?\/>/, '') =~ /#{Regexp.escape(url.gsub(/\\n/, "\n"))}/) != nil
     status
   end
-
+#debugger if email.nil?
   email.should_not be_nil
 end
 

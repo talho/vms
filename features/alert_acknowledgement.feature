@@ -15,7 +15,7 @@ Feature: Alert Acknowledgement
       | type    | VmsStatusCheckAlert  |
       | title   | Test Alert           |
       | message | This is a test alert |
-      | author   | Bartleby Scrivener   |
+      | author  | Bartleby Scrivener   |
     Then the "Test Alert" email should contain an acknowledgement link
     When I visit the "Test Alert" acknowledgement link without login
     Then I should see "This is a test alert"

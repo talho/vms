@@ -23,9 +23,10 @@ class Vms::ScenarioSite < ActiveRecord::Base
   has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.to_s}" }, :app => 'vms' }
   
   def as_json (options = {})
-    options[:include] = {} if options[:include].nil?
-    options[:include].merge! :site => {}
-    json = super(options)    
+    opts = Marshal::load(Marshal.dump(options))
+    opts[:include] = {} if opts[:include].nil?
+    opts[:include].merge! :site => {}
+    json = super(opts)    
     ( json.key?("scenario_site") ? json["scenario_site"] : json).merge!( 
       {:qualifications => qualification_list.map(&:titleize).join(', ') }
     )
@@ -45,14 +46,14 @@ class Vms::ScenarioSite < ActiveRecord::Base
   end
   
   def alert_users_of_site_deactivation
-    al = VmsAlert.new :title => "Site #{site.name} deactivated", :author => scenario.users.owner, :audiences => [Audience.new :users => all_staff.map(&:user)], :scenario => scenario,
-                      :message => "The site #{site.name} located at #{site.address} has been deactivated. You were assigned to that site. You will be notified when the site is reactivated."
+    al = VmsAlert.new(:title => "Site #{site.name} deactivated", :author => scenario.users.owner, :audiences => [Audience.new(:users => all_staff.map(&:user))], :scenario => scenario,
+                      :message => "The site #{site.name} located at #{site.address} has been deactivated. You were assigned to that site. You will be notified when the site is reactivated.")
     al.save
   end
   handle_asynchronously :alert_users_of_site_deactivation
   
   def alert_users_of_site_activation
-    al = VmsAlert.new :title => "Site #{site.name} activated", :author => scenario.users.owner, :audiences => [Audience.new :users => all_staff.map(&:user)], :scenario => scenario,
+    al = VmsAlert.new :title => "Site #{site.name} activated", :author => scenario.users.owner, :audiences => [Audience.new( :users => all_staff.map(&:user))], :scenario => scenario,
                       :message => "The site #{site.name} located at #{site.address} has been activated. You are assigned to that site and should resume your duties."
     al.save
   end

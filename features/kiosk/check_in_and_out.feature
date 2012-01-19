@@ -102,6 +102,7 @@ Feature: Checking in and out of a VMS site
 
     When I select the "Bob Dobbs" grid row
     And I press "Check Out" within ".vms-kiosk-registered-panel"
+    And I wait for 1 second
     Then "Bob Dobbs" should be checked out as a walk-up volunteer at "Mirrorball Mountain" for scenario "Di Scopare Ti"
 
   Scenario: Walk-up check-in with account creation

@@ -11,7 +11,7 @@ class VmsExecutionAlert < VmsAlert
   has_many :volunteers, :class_name => "User", :through => :vms_volunteer_roles, :uniq => true
   has_many :recipients, :class_name => "User", :finder_sql => 'SELECT users.* FROM users, targets, targets_users WHERE targets.item_type=\'VmsExecutionAlert\' AND targets.item_id=#{id} AND targets_users.target_id=targets.id AND targets_users.user_id=users.id'
   
-  has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.scenario.name} - #{x.to_s}" }, :app => 'vms' }
+  has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.scenario.name} - #{x.to_s}" }, :app => Proc.new {|x| x.app} }
   
   def self.default_alert
     title = "VMS Execution Alert"
@@ -80,8 +80,8 @@ class VmsExecutionAlert < VmsAlert
        vols.each do |recipient|
         rcpts.Recipient(:id => recipient.id, :givenName => recipient.first_name, :surname => recipient.last_name, :display_name => recipient.display_name) do |rcpt|
           (recipient.devices.find_all_by_type(self.alert_device_types.map(&:device)) | [Device::ConsoleDevice.new]).each do |device|
-            rcpt.Device(:id => device.methods.include?('attributes') ? device.id : '', :device_type =>  device.class.display_name) do |d|
-              d.URN device.URN if device.methods.include?("URN")
+            rcpt.Device(:id => device.respond_to?('attributes') ? device.id : '', :device_type =>  device.class.display_name) do |d|
+              d.URN device.URN if device.respond_to?("URN")
               role_name = build_role_name(vhash[recipient])
               d.Message(:name => 'role_list', :ref => "#{role_name}_list")
               d.Message(:name => 'role_opts', :ref => "#{role_name}_opts")
