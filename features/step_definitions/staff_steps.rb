@@ -29,7 +29,7 @@ end
 Given /^"([^\"]*)" is assigned to "([^\"]*)" for scenario "([^\"]*)"$/ do |staff_name, site_name, scenario_name|
   scenario_site = Vms::Scenario.find_by_name(scenario_name).site_instances.for_site(Vms::Site.find_by_name(site_name))
   user = User.find_by_display_name(staff_name)
-  Factory.create(:staff, {:user => user, :scenario_site => scenario_site})
+  FactoryGirl.create(:staff, {:user => user, :scenario_site => scenario_site})
 end
 
 When /^I right click on staff group "([^\"]*)"$/ do |group_name|

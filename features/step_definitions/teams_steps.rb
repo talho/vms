@@ -61,11 +61,11 @@ Given /^a team "([^\"]*)"( assigned to site "(?:[^\"]*)" scenario "(?:[^\"]*)")?
     users << User.find_by_display_name(row[0])
   end
   type = site_instance.nil? ? 'group' : 'audience'
-  aud = Factory.create(type.to_sym, :name => team_name, :users => users, :scope => 'Team', :owner_id => current_user.id)
+  aud = FactoryGirl.create(type.to_sym, :name => team_name, :users => users, :scope => 'Team', :owner_id => current_user.id)
   unless site_instance.nil?
-    Factory.create(:team, :scenario_site => site_instance, :audience => aud)
+    FactoryGirl.create(:team, :scenario_site => site_instance, :audience => aud)
     unless templated.nil?
-      Factory.create(:group, :name => aud.name, :users => aud.users, :scope => 'Team', :owner_id => current_user.id)
+      FactoryGirl.create(:group, :name => aud.name, :users => aud.users, :scope => 'Team', :owner_id => current_user.id)
     end
   end
 end

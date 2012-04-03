@@ -44,7 +44,7 @@ Given /^the following inventories exist:$/ do |table|
   # table is a | name | site | source | type | template |
   table.hashes.each do |hash|
     scenario_site = hash[:site].blank? ? nil : Vms::Scenario.find_by_name(hash[:scenario]).site_instances.for_site(Vms::Site.find_by_name(hash[:site]))
-    Factory.create(:inventory, {:name => hash[:name], :pod => hash[:type] == "pod", :template => hash[:template] == "true",
+    FactoryGirl.create(:inventory, {:name => hash[:name], :pod => hash[:type] == "pod", :template => hash[:template] == "true",
         :source => Vms::Inventory::Source.find_or_create_by_name(hash[:source]),
         :scenario_site => scenario_site
     })
@@ -56,8 +56,8 @@ Given /^the "([^\"]*)" inventory has the following items:$/ do |inv_name, table|
   it_coll = Vms::Inventory.find_by_name(inv_name).item_collections.find_or_build_by_status(Vms::Inventory::ItemCollection::STATUS[:available])
   table.hashes.each do |hash|
     cat = Vms::Inventory::ItemCategory.find_by_name(hash[:category]) || Factory.build(:item_category, :name => hash[:category])
-    item = Vms::Inventory::Item.find_by_name(hash[:name]) || Factory.create(:item, :name => hash[:name], :consumable => (hash[:consumable] == 'true'), :item_category => cat)
-    Factory.create(:item_instance, :item => item, :item_collection => it_coll, :quantity => hash[:quantity].to_i)
+    item = Vms::Inventory::Item.find_by_name(hash[:name]) || FactoryGirl.create(:item, :name => hash[:name], :consumable => (hash[:consumable] == 'true'), :item_category => cat)
+    FactoryGirl.create(:item_instance, :item => item, :item_collection => it_coll, :quantity => hash[:quantity].to_i)
   end
 end
 
@@ -86,7 +86,7 @@ Given /^the following items exist:$/ do |table|
   # table is a | name | category | consumable |
   table.hashes.each do |hash|
     cat = Vms::Inventory::ItemCategory.find_by_name(hash[:category]) || Factory.build(:item_category, :name => hash[:category])
-    Vms::Inventory::Item.find_by_name(hash[:name]) || Factory.create(:item, :name => hash[:name], :consumable => (hash[:consumable] == 'true'), :item_category => cat)
+    Vms::Inventory::Item.find_by_name(hash[:name]) || FactoryGirl.create(:item, :name => hash[:name], :consumable => (hash[:consumable] == 'true'), :item_category => cat)
   end
 end
 

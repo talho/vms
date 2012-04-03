@@ -1,6 +1,6 @@
 class Vms::KiosksController < ApplicationController
 
-  skip_before_filter :authenticate
+  skip_before_filter :authorize
   before_filter :vms_session_required, :except => [:registered_checkin, :walkup_checkin]
   before_filter :vms_site_admin_required, :except => [:index, :registered_checkin, :walkup_checkin]
   before_filter :vms_active_scenario_required, :except => [:index]

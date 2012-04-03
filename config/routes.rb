@@ -1,38 +1,43 @@
-ActionController::Routing::Routes.draw do |map|
-  map.resources :vms_scenarios, :controller => 'vms/scenarios', :as => 'vms/scenarios', :member => {:execute => :put, :pause => :put, :stop => :put, :alert => :put, :copy => [:post, :put]} do |scenarios|
-    scenarios.resources :vms_sites, :controller => 'vms/sites', :as => 'sites', :collection => [:existing] do |sites|
-      sites.roles_show 'roles.:format', :controller => 'vms/roles', :action => 'show', :conditions => { :method => :get }
-      sites.roles_update 'roles.:format', :controller => 'vms/roles', :action => 'update', :conditions => { :method => [:put, :post] }
-      sites.staff_show 'staff.:format', :controller => 'vms/staff', :action => 'show', :conditions => { :method => :get }
-      sites.staff_update 'staff.:format', :controller => 'vms/staff', :action => 'update', :conditions => { :method => [:put, :post] }
-      sites.resources :vms_teams, :controller => 'vms/teams', :as => 'teams', :except => [:index]
-      sites.qualifications_create 'qualifications.:format', :controller => 'vms/qualifications', :action => 'create', :conditions => { :method => :post }
-      sites.qualifications_update 'qualifications.:format', :controller => 'vms/qualifications', :action => 'update', :conditions => { :method => :put }
-      sites.qualifications_destroy 'qualifications.:format', :controller => 'vms/qualifications', :action => 'destroy', :conditions => { :method => :delete }
+Openphin::Application.routes.draw do
+  namespace :vms do 
+    resources :scenarios, :member => {:execute => :put, :pause => :put, :stop => :put, :alert => :put, :copy => [:post, :put]} do
+      resources :sites, :collection => [:existing] do
+        get 'roles.:format', :to => 'roles#show', :as => :roles_show
+        put 'roles.:format', :to => 'roles#update', :as => :roles_update
+        post 'roles.:format', :to => 'roles#update', :as => :roles_update
+        get 'staff.:format', :to => 'staff#show', :as => :staff_show
+        put 'staff.:format', :to => 'staff#update', :as => :staff_update
+        post 'staff.:format', :to => 'staff#update', :as => :staff_update
+        resources :teams, :except => [:index]
+        post 'qualifications.:format', :to => 'qualifications#create', :as => :qualifications_create
+        put 'qualifications.:format', :to => 'qualifications#update', :as => :qualifications_update
+        delete 'qualifications.:format', :to => 'qualifications#destroy', :as => :qualifications_destroy
+      end
+      resources :inventories, :collection => [:templates]
+      get 'roles.:format', :to => 'roles#index', :as => :roles
+      get 'staff.:format', :to => 'staff#index', :as => :staff 
+      get 'teams.:format', :to => 'teams#index', :as => :teams 
+      get 'qualifications.:format', :to => 'qualifications#index', :as => :quals 
     end
-    scenarios.resources :vms_inventories, :controller => 'vms/inventories', :as => 'inventories', :collection => [:templates]
-    scenarios.roles 'roles.:format', :controller => 'vms/roles', :action => 'index'
-    scenarios.staff 'staff.:format', :controller => 'vms/staff', :action => 'index'
-    scenarios.teams 'teams.:format', :controller => 'vms/teams', :action => 'index'
-    scenarios.quals 'qualifications.:format', :controller => 'vms/qualifications', :action => 'index'
+  
+    resources :users, :only=> [:new, :create]
+    
+    # no app linking for now....   :collection => { :link_app => :put, :link_app_page => :get } 
+    match 'session/new', :to => 'sessions#new', :via => :get, :as => :vms_session_new
+    match 'session/create', :to => 'sessions#create', :via => :post, :as => :vms_session_create 
+    match 'session/destroy', :to => 'sessions#destroy', :as => :vms_session_destroy 
+    match 'kiosk', :to => 'kiosks#index', :as => :kiosk_index 
+    match 'kiosk/:id.:format', :to => 'kiosks#show', :as => :kiosk_show 
+    match 'site_checkin.:format', :to => 'kiosks#registered_checkin', :as => :site_checkin 
+    match 'site_walkup.:format', :to => 'kiosks#walkup_checkin', :as => :site_walkup 
+    match 'user_active_sites', :to => 'sites#user_active_sites', :via => :get, :as => :vms_active_sites 
+  
+    match 'inventory_sources.:format', :to => 'inventories#sources', :as => :inventory_sources 
+    match 'inventory_items.:format', :to => 'inventories#items', :as => :inventory_items 
+    match 'inventory_item_categories.:format', :to => 'inventories#categories', :as => :inventory_item_categories 
+    match 'qualifications.:format', :to => 'qualifications#list', :as => :qualification_list 
+    resources :user_qualifications, :only => [:index, :create, :destroy]
+    resources :alerts, :only => [:index, :create, :show], :member => {:acknowledge => :post}, :collection => [:status_checks]
+    resources :volunteers, :only => [:index]
   end
-
-  map.resources :vms_users, :as=> 'vms/users', :controller=> 'vms/users', :only=> [:new, :create]
-  # no app linking for now....   :collection => { :link_app => :put, :link_app_page => :get } 
-  map.vms_session_new 'vms/session/new', :controller => "vms/sessions", :action => 'new', :conditions => { :method => :get }
-  map.vms_session_create 'vms/session/create', :controller => "vms/sessions", :action => 'create', :conditions => { :method => :post }
-  map.vms_session_destroy 'vms/session/destroy', :controller => "vms/sessions", :action => 'destroy'#, :conditions => { :method => :get }
-  map.kiosk_index 'vms/kiosk', :controller => "vms/kiosks", :action => 'index'
-  map.kiosk_show 'vms/kiosk/:id.:format', :controller => "vms/kiosks", :action => 'show'  
-  map.site_checkin 'vms/site_checkin.:format', :controller => "vms/kiosks", :action => 'registered_checkin'
-  map.site_walkup 'vms/site_walkup.:format', :controller => "vms/kiosks", :action => 'walkup_checkin'
-  map.vms_active_sites 'vms/user_active_sites', :controller => "vms/sites", :action => 'user_active_sites', :conditions => { :method => :get }
-
-  map.inventory_sources 'vms/inventory_sources.:format', :controller => 'vms/inventories', :action => 'sources'
-  map.inventory_items 'vms/inventory_items.:format', :controller => 'vms/inventories', :action => 'items'
-  map.inventory_item_categories 'vms/inventory_item_categories.:format', :controller => 'vms/inventories', :action => 'categories'
-  map.qualification_list 'vms/qualifications.:format', :controller => 'vms/qualifications', :action => 'list'
-  map.resources :vms_user_qualifications, :as => 'vms/user_qualifications', :controller => 'vms/user_qualifications', :only => [:index, :create, :destroy]
-  map.resources :vms_alerts, :as => 'vms/alerts', :controller => 'vms/alerts', :only => [:index, :create, :show], :member => {:acknowledge => :post}, :collection => [:status_checks]
-  map.resources :vms_volunteers, :as => 'vms/volunteers', :controller => 'vms/volunteers', :only => [:index]
 end

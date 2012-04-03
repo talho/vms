@@ -67,14 +67,7 @@ Then /^the "([^\"]*)" email should contain an acknowledgement link$/ do |name|
   al = Alert.find_by_title(name)
   al = al.alert_type.constantize.find(al)
   
-  class InnerUrlBuilder
-    include ActionController::UrlWriter
-    def get_alert_url(parms)
-      alert_url parms
-    end
-  end
-
-  url = InnerUrlBuilder.new.get_alert_url(:id => al.id, :host => HOST)
+  url = Rails.application.routes.url_helpers.alert_url(:id => al.id, :host => HOST)
   email = ActionMailer::Base.deliveries.detect do |email|
     status = true
     status &&= (email.subject =~ /#{Regexp.escape(al.title)}/) != nil
@@ -89,20 +82,10 @@ When /^I visit the "([^\"]*)" acknowledgement link (with|without) login$/ do |na
   al = Alert.find_by_title(name)
   al = al.alert_type.constantize.find(al)
 
-  class InnerUrlBuilder
-    include ActionController::UrlWriter
-    def get_alert_path(parms)
-      alert_path parms
-    end
-    def get_alert_with_token_path(parms)
-      alert_with_token_path parms
-    end
-  end
-
   if login_requirement == "without"
-    url = InnerUrlBuilder.new.get_alert_with_token_path(:id => al.id, :token => al.alert_attempts.first.token, :host => HOST)
+    url = Rails.application.routes.url_helpers.alert_with_token_path(:id => al.id, :token => al.alert_attempts.first.token, :host => HOST)
   else
-    url = InnerUrlBuilder.new.get_alert_path(:id => al.id, :host => HOST)
+    url = Rails.application.routes.url_helpers.alert_path(:id => al.id, :host => HOST)
   end
   visit url
 end

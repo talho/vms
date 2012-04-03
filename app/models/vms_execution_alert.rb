@@ -1,6 +1,5 @@
 
 class VmsExecutionAlert < VmsAlert
-  include ActionController::UrlWriter
   acts_as_MTI
   set_table_name 'view_execution_vms_alerts'
   
@@ -9,7 +8,7 @@ class VmsExecutionAlert < VmsAlert
   
   has_many :vms_volunteer_roles, :class_name => "Vms::VolunteerRole", :foreign_key => :alert_id, :autosave => true
   has_many :volunteers, :class_name => "User", :through => :vms_volunteer_roles, :uniq => true
-  has_many :recipients, :class_name => "User", :finder_sql => 'SELECT users.* FROM users, targets, targets_users WHERE targets.item_type=\'VmsExecutionAlert\' AND targets.item_id=#{id} AND targets_users.target_id=targets.id AND targets_users.user_id=users.id'
+  has_many :recipients, :class_name => "User", :finder_sql => proc{"SELECT users.* FROM users, targets, targets_users WHERE targets.item_type='VmsExecutionAlert' AND targets.item_id=#{id} AND targets_users.target_id=targets.id AND targets_users.user_id=users.id"}
   
   has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.scenario.name} - #{x.to_s}" }, :app => Proc.new {|x| x.app} }
   
@@ -86,7 +85,7 @@ class VmsExecutionAlert < VmsAlert
               d.Message(:name => 'role_list', :ref => "#{role_name}_list")
               d.Message(:name => 'role_opts', :ref => "#{role_name}_opts")
               aa = self.alert_attempts.find_by_user_id(recipient.id)
-              url = alert_with_token_url :id => self.id, :token => aa.token, :host => HOST
+              url = Rails.application.routes.url_helpers.alert_with_token_url :id => self.id, :token => aa.token, :host => HOST
               d.Message(:name => 'alert_url'){|msg| msg.Value url}
             end
           end

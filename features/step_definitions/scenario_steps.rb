@@ -6,7 +6,7 @@ Given /^([^ ]*) (?:have|has) the scenarios? "([^\"]*)"$/ do |email, scenarios|
   email == "I" ? user = current_user : user = User.find_by_email(email)
   scenarios = scenarios.split(',')
   scenarios.each do |scenario|
-    Factory(:scenario, :name => scenario.strip,
+    FactoryGirl.create(:scenario, :name => scenario.strip,
             :user_rights => [ Vms::UserRight.new( :user => user, :permission_level => Vms::UserRight::PERMISSIONS[:owner])] )
   end
 end

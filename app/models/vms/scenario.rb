@@ -45,8 +45,8 @@ class Vms::Scenario < ActiveRecord::Base
     end
   end
 
-  STATES.each { |k,v| named_scope k, :conditions => { :state => v } }
-  named_scope :active, :conditions => [ "state IN (?)", [STATES[:executing], STATES[:paused]] ]
+  STATES.each { |k,v| scope k, :conditions => { :state => v } }
+  scope :active, :conditions => [ "state IN (?)", [STATES[:executing], STATES[:paused]] ]
 
   has_paper_trail :meta => { :item_desc  => Proc.new { |x| x.to_s }, :app => 'vms' }
   

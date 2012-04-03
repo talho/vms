@@ -2,9 +2,7 @@ class CreateTeams < ActiveRecord::Migration
   def self.up
     create_table :vms_teams do |t|
       t.integer :audience_id
-      t.index :audience_id
       t.integer :scenario_site_id
-      t.index :scenario_site_id
     end
     
     add_index :vms_teams, :audience_id

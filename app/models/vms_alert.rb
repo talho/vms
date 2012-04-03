@@ -6,7 +6,7 @@ class VmsAlert < Alert
   acts_as_MTI
   before_create :create_email_alert_device_type
   
-  has_many :recipients, :class_name => "User", :finder_sql => 'SELECT users.* FROM users, targets, targets_users WHERE targets.item_type=\'VmsAlert\' AND targets.item_id=#{id} AND targets_users.target_id=targets.id AND targets_users.user_id=users.id'
+  has_many :recipients, :class_name => "User", :finder_sql => proc{"SELECT users.* FROM users, targets, targets_users WHERE targets.item_type='VmsAlert' AND targets.item_id=#{id} AND targets_users.target_id=targets.id AND targets_users.user_id=users.id"}
   belongs_to :scenario, :class_name => "Vms::Scenario"
   
   has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.scenario.name} - #{x.to_s}" }, :app => Proc.new {|x| x.app} }

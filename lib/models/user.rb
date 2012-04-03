@@ -1,4 +1,4 @@
-require 'dispatcher'
+require 'action_controller/deprecated/dispatcher'
 
 module Vms
   module User
@@ -47,7 +47,7 @@ module Vms
     end
 end
 
-  Dispatcher.to_prepare do
+  ActionController::Dispatcher.to_prepare do
     ::User.send(:include, Vms::User)
   end
 end

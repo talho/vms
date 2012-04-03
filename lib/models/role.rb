@@ -1,4 +1,4 @@
-require 'dispatcher'
+require 'action_controller/deprecated/dispatcher'
 
 module Vms
   module Role
@@ -9,7 +9,7 @@ module Vms
     end
   end
   
-  Dispatcher.to_prepare do
+  ActionController::Dispatcher.to_prepare do
     ::Role.send(:include, Vms::Role)
   end
 end

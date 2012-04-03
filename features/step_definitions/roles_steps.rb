@@ -26,7 +26,7 @@ end
 Given /^the site "([^\"]*)" for scenario "([^\"]*)" has the role "([^\"]*)"$/ do |site_name, scenario_name, role_name|
   scenario_site = Vms::Scenario.find_by_name(scenario_name).site_instances.for_site(Vms::Site.find_by_name(site_name))
   role = Role.find_by_name(role_name)
-  Factory.create(:role_scenario_site, {:role => role, :count => 1, :scenario_site => scenario_site})
+  FactoryGirl.create(:role_scenario_site, {:role => role, :count => 1, :scenario_site => scenario_site})
 end
 
 Then /^the "([^\"]*)" site for scenario "([^\"]*)" should not have the "([^\"]*)" role$/ do |site_name, scenario_name, role_name|

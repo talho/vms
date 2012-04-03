@@ -30,7 +30,7 @@ Given /^the following sites exist:$/ do |table|
       scenario_sites.push(Factory.build(:scenario_site, {:scenario => Vms::Scenario.find_by_name(row[:scenario]),
                                                          :status => Vms::ScenarioSite::STATES[row[:status].to_sym]}))
     end
-    Factory.create(:site, :name => row[:name], :address => row[:address], :lat => row[:lat], :lng => row[:lng], :scenario_instances => scenario_sites )
+    FactoryGirl.create(:site, :name => row[:name], :address => row[:address], :lat => row[:lat], :lng => row[:lng], :scenario_instances => scenario_sites )
   end
 end
 

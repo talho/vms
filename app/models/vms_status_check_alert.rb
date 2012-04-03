@@ -1,12 +1,11 @@
 
 class VmsStatusCheckAlert < VmsAlert
-  include ActionController::UrlWriter
   
   acts_as_MTI
   set_table_name 'view_status_check_vms_alerts'
   before_create :create_email_alert_device_type, :set_alert_type, :set_acknowledge
   
-  has_many :recipients, :class_name => "User", :finder_sql => 'SELECT users.* FROM users, targets, targets_users WHERE targets.item_type=\'VmsStatusCheckAlert\' AND targets.item_id=#{id} AND targets_users.target_id=targets.id AND targets_users.user_id=users.id'
+  has_many :recipients, :class_name => "User", :finder_sql => proc{"SELECT users.* FROM users, targets, targets_users WHERE targets.item_type='VmsStatusCheckAlert' AND targets.item_id=#{id} AND targets_users.target_id=targets.id AND targets_users.user_id=users.id"}
   
   has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.to_s}" }, :app => Proc.new {|x| x.app} }
   
@@ -72,7 +71,7 @@ class VmsStatusCheckAlert < VmsAlert
               d.URN device.URN if device.respond_to?("URN")
               vols = build_jurisdictions_string(aa.user)
               d.Message(:name => 'juris') {|msg| msg.Value vols}
-              url = alert_with_token_url :id => aa.alert_id, :token => aa.token, :host => HOST
+              url = Rails.application.routes.url_helpers.alert_with_token_url :id => aa.alert_id, :token => aa.token, :host => HOST
               d.Message(:name => 'alert_url'){|msg| msg.Value url}
             end
           end
