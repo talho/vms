@@ -12,14 +12,14 @@ end
 Given /^I force open the kiosk page for "([^"]*)" in scenario "([^"]*)"$/ do |site_name, scenario_name|
   site = Vms::Site.find_by_name(site_name)
   scenario_site = Vms::Scenario.find_by_name(scenario_name).site_instances.find(site.id)
-  Then %{I visit the url "/vms/kiosk/#{scenario_site.id}"}
+  step %{I visit the url "/vms/kiosk/#{scenario_site.id}"}
 end
 
 Given /^I maliciously attempt to check in as "([^"]*)" to site "([^"]*)" in scenario "([^"]*)"$/ do |email, site_name, scenario_name|
   user = User.find_by_email(email)
   site = Vms::Site.find_by_name(site_name)
   scenario_site = Vms::Scenario.find_by_name(scenario_name).site_instances.find(site.id)
-  Then %{I maliciously post formdata to "/vms/site_checkin.json"}, table(%{
+  step %{I maliciously post formdata to "/vms/site_checkin.json"}, table(%{
     | email             | #{user.id}     |
     | password          | Password1           |
     | id                | #{scenario_site.id} |
@@ -29,7 +29,7 @@ end
 Given /^I maliciously attempt to check in as a walkup user to site "([^"]*)" in scenario "([^"]*)"$/ do |site_name, scenario_name|
   site = Vms::Site.find_by_name(site_name)
   scenario_site = Vms::Scenario.find_by_name(scenario_name).site_instances.find(site.id)
-  Then %{I maliciously post formdata to "/vms/site_walkup.json"}, table(%{
+  step %{I maliciously post formdata to "/vms/site_walkup.json"}, table(%{
     | walkup_email      | badguy@example.com  |
     | walkup_first_name | Bad                 |
     | walkup_last_name  | Guy                 |
@@ -51,6 +51,6 @@ end
 Given /^I maliciously attempt to fetch kiosk information for site "([^"]*)" in scenario "([^"]*)"$/ do |site_name, scenario_name|
   site = Vms::Site.find_by_name(site_name)
   scenario_site = Vms::Scenario.find_by_name(scenario_name).site_instances.find(site.id)
-  Then %{I visit the url "/vms/kiosk/#{scenario_site.id}.json"}
+  step %{I visit the url "/vms/kiosk/#{scenario_site.id}.json"}
 end
 

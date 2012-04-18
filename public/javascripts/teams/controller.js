@@ -95,7 +95,7 @@ Talho.VMS.ux.TeamController = Ext.extend(function(){}, {
       url: '/vms/scenarios/' + this.scenarioId + '/sites/' + record.get('site_id') + '/teams/' + record.id + '.json',
       method: 'PUT',
       params: {
-        'site_id': site.id
+        'new_site_id': site.id
       },
       callback: function(options, success, response){
         var result = Ext.decode(response.responseText);

@@ -2,7 +2,7 @@
 When /^backgroundrb has processed the vms alert responses$/ do
   require 'bdrb_server_helper.rb'
   require 'meta_worker.rb'
-  require 'vendor/plugins/vms/lib/workers/watch_for_vms_execution_alert_responses_worker.rb'
+  require Rails.root.join('vendor/plugins/vms/lib/workers/watch_for_vms_execution_alert_responses_worker.rb').to_s
   WatchForVmsExecutionAlertResponsesWorker.new.query
 end
 
@@ -27,8 +27,8 @@ Then /^"([^\"]*)" should( not)? receive a VMS email(?: with)?(?: title "([^\"]*)
       status ||= email.to.include?(user_email)
     end
 
-    status &&= email.subject =~ /#{Regexp.escape(title)}/ unless title.nil?
-    status &&= email.body.gsub(/<br ?\/>/, '') =~ /#{Regexp.escape(message.gsub(/\\n/, "\n"))}/ unless message.nil?
+    status &&= !(email.subject =~ /#{Regexp.escape(title)}/).nil? unless title.nil?
+    status &&= !(email.body.to_s.gsub(/<br ?\/>/, '') =~ /#{Regexp.escape(message.gsub(/\\n/, "\n"))}/).nil? unless message.nil?
     status
   end
   
@@ -71,7 +71,7 @@ Then /^the "([^\"]*)" email should contain an acknowledgement link$/ do |name|
   email = ActionMailer::Base.deliveries.detect do |email|
     status = true
     status &&= (email.subject =~ /#{Regexp.escape(al.title)}/) != nil
-    status &&= (email.body.gsub(/<br ?\/>/, '') =~ /#{Regexp.escape(url.gsub(/\\n/, "\n"))}/) != nil
+    status &&= (email.body.to_s.gsub(/<br ?\/>/, '') =~ /#{Regexp.escape(url.gsub(/\\n/, "\n"))}/) != nil
     status
   end
 #debugger if email.nil?

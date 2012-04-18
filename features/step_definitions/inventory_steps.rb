@@ -55,7 +55,7 @@ Given /^the "([^\"]*)" inventory has the following items:$/ do |inv_name, table|
   # table is a | name | category | quantity | consumable |
   it_coll = Vms::Inventory.find_by_name(inv_name).item_collections.find_or_build_by_status(Vms::Inventory::ItemCollection::STATUS[:available])
   table.hashes.each do |hash|
-    cat = Vms::Inventory::ItemCategory.find_by_name(hash[:category]) || Factory.build(:item_category, :name => hash[:category])
+    cat = Vms::Inventory::ItemCategory.find_by_name(hash[:category]) || FactoryGirl.build(:item_category, :name => hash[:category])
     item = Vms::Inventory::Item.find_by_name(hash[:name]) || FactoryGirl.create(:item, :name => hash[:name], :consumable => (hash[:consumable] == 'true'), :item_category => cat)
     FactoryGirl.create(:item_instance, :item => item, :item_collection => it_coll, :quantity => hash[:quantity].to_i)
   end
@@ -85,7 +85,7 @@ end
 Given /^the following items exist:$/ do |table|
   # table is a | name | category | consumable |
   table.hashes.each do |hash|
-    cat = Vms::Inventory::ItemCategory.find_by_name(hash[:category]) || Factory.build(:item_category, :name => hash[:category])
+    cat = Vms::Inventory::ItemCategory.find_by_name(hash[:category]) || FactoryGirl.build(:item_category, :name => hash[:category])
     Vms::Inventory::Item.find_by_name(hash[:name]) || FactoryGirl.create(:item, :name => hash[:name], :consumable => (hash[:consumable] == 'true'), :item_category => cat)
   end
 end
@@ -115,44 +115,44 @@ end
 When /^inventories "([^\"]*)" are assigned to "([^\"]*)" for scenario "([^\"]*)"$/ do |inventory_name, site_name, scenario_name|
   case inventory_name
     when "One Item"
-      Given "the following inventories exist:", table(%{
+      step "the following inventories exist:", table(%{
         | name        | site         | scenario         | source | type      | template |
         | Inventory 1 | #{site_name} | #{scenario_name} | source | inventory | false    |
       })
-      Given %{the "Inventory 1" inventory has the following items:}, table(%{
+      step %{the "Inventory 1" inventory has the following items:}, table(%{
         | name   | category | quantity | consumable |
         | Item 1 | supplies | 10       | false      |
       })
     when "Many Items"
-      Given "the following inventories exist:", table(%{
+      step "the following inventories exist:", table(%{
         | name        | site         | scenario         | source | type      | template |
         | Inventory 1 | #{site_name} | #{scenario_name} | source | inventory | false    |
       })
-      Given %{the "Inventory 1" inventory has the following items:}, table(%{
+      step %{the "Inventory 1" inventory has the following items:}, table(%{
         | name   | category | quantity | consumable |
         | Item 1 | supplies | 10       | false      |
         | Item 2 | supplies | 10       | false      |
       })
     when "Many Inventories"
-      Given "the following inventories exist:", table(%{
+      step "the following inventories exist:", table(%{
         | name        | site         | scenario         | source | type      | template |
         | Inventory 1 | #{site_name} | #{scenario_name} | source | inventory | false    |
         | Inventory 2 | #{site_name} | #{scenario_name} | source | inventory | false    |
       })
-      Given %{the "Inventory 1" inventory has the following items:}, table(%{
+      step %{the "Inventory 1" inventory has the following items:}, table(%{
         | name   | category | quantity | consumable |
         | Item 1 | supplies | 10       | false      |
       })
-      Given %{the "Inventory 2" inventory has the following items:}, table(%{
+      step %{the "Inventory 2" inventory has the following items:}, table(%{
         | name   | category | quantity | consumable |
         | Item 1 | supplies | 10       | false      |
       })
     when "Out of Items"
-      Given "the following inventories exist:", table(%{
+      step "the following inventories exist:", table(%{
         | name        | site         | scenario         | source | type      | template |
         | Inventory 1 | #{site_name} | #{scenario_name} | source | inventory | false    |
       })
-      Given %{the "Inventory 1" inventory has the following items:}, table(%{
+      step %{the "Inventory 1" inventory has the following items:}, table(%{
         | name   | category | quantity | consumable |
         | Item 1 | supplies | 10       | false      |
         | Item 2 | supplies | 0        | false      |

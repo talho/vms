@@ -1,4 +1,3 @@
-require 'action_controller/deprecated/dispatcher'
 
 module Vms
   module User
@@ -6,7 +5,7 @@ module Vms
       base.has_many :user_rights, :class_name => 'Vms::UserRight'
       base.has_many :scenarios, :class_name => 'Vms::Scenario', :through => :user_rights do
         def editable
-          scoped :conditions => {'vms_user_rights.permission_level' => [Vms::UserRight::PERMISSIONS[:admin], Vms::UserRight::PERMISSIONS[:owner]] }
+          where('vms_user_rights.permission_level' => [Vms::UserRight::PERMISSIONS[:admin], Vms::UserRight::PERMISSIONS[:owner]])
         end
       end
       base.acts_as_taggable_on :qualifications
@@ -26,12 +25,12 @@ module Vms
     
     # TODO: Converte this to a has_many relationship
     def vms_scenario_sites
-      Vms::ScenarioSite.find(:all, :conditions => {:site_admin_id => id}, :order => 'id DESC')
+      Vms::ScenarioSite.where(:site_admin_id => id).order('id DESC')
     end
 
     # TODO: Converte this to a has_many relationship
     def vms_active_scenario_sites
-      Vms::ScenarioSite.find(:all, :conditions => ['site_admin_id = ? AND scenario_id IN (?)', id, Vms::Scenario.active.map(&:id) ], :order => 'id DESC')
+      Vms::ScenarioSite.where('site_admin_id = ? AND scenario_id IN (?)', id, Vms::Scenario.active.map(&:id)).order('id DESC')
     end
 
     def is_vms_active_scenario_site_admin?
@@ -45,10 +44,7 @@ module Vms
     def is_vms_scenario_site_admin_for?(scenario_site)
       scenario_site.site_admin_id == id
     end
-end
-
-  ActionController::Dispatcher.to_prepare do
-    ::User.send(:include, Vms::User)
   end
+
 end
 

@@ -8,7 +8,7 @@
 class Vms::Staff < ActiveRecord::Base  
   set_table_name "vms_staff"
   
-  belongs_to :user
+  belongs_to :user, :class_name => "::User"
   belongs_to :scenario_site, :class_name => "Vms::ScenarioSite"
   has_one :site, :through => :scenario_site, :class_name => "Vms::Site"
 

@@ -3,15 +3,15 @@ Then /^I should not see the volunteer profile menu option$/ do
   # Look for the apps menu
   pass = false
   begin
-    Then %{I should see the following toolbar items in "top_toolbar":}, table(%{| Apps |})
+    step %{I should see the following toolbar items in "top_toolbar":}, table(%{| Apps |})
   rescue
     pass = true # the step passes if Apps is not defined
   end
 
   if !pass
     begin
-      When %{I press "Apps" within "#top_toolbar"}
-      Then %{I should see the following ext menu items:}, table(%{
+      step %{I press "Apps" within "#top_toolbar"}
+      step %{I should see the following ext menu items:}, table(%{
         | name |
         | VMS  |
       })
@@ -20,9 +20,9 @@ Then /^I should not see the volunteer profile menu option$/ do
     end
 
     if !pass
-      When %{I click x-menu-item "VMS" within ".x-menu"}
-      When %{I wait until I have 2 ext menus}
-      Then %{I should not see the following ext menu items:}, table(%{
+      step %{I click x-menu-item "VMS" within ".x-menu"}
+      step %{I wait until I have 2 ext menus}
+      step %{I should not see the following ext menu items:}, table(%{
           | name                 |
           | My Volunteer Profile |
       })
@@ -34,15 +34,15 @@ Then /^I should not see the volunteer list menu option$/ do
   # Look for the apps menu
   pass = false
   begin
-    Then %{I should see the following toolbar items in "top_toolbar":}, table(%{| Apps |})
+    step %{I should see the following toolbar items in "top_toolbar":}, table(%{| Apps |})
   rescue
     pass = true # the step passes if Apps is not defined
   end
 
   if !pass
     begin
-      When %{I press "Apps" within "#top_toolbar"}
-      Then %{I should see the following ext menu items:}, table(%{
+      step %{I press "Apps" within "#top_toolbar"}
+      step %{I should see the following ext menu items:}, table(%{
         | name |
         | VMS  |
       })
@@ -51,9 +51,9 @@ Then /^I should not see the volunteer list menu option$/ do
     end
 
     if !pass
-      When %{I click x-menu-item "VMS" within ".x-menu"}
-      When %{I wait until I have 2 ext menus}
-      Then %{I should not see the following ext menu items:}, table(%{
+      step %{I click x-menu-item "VMS" within ".x-menu"}
+      step %{I wait until I have 2 ext menus}
+      step %{I should not see the following ext menu items:}, table(%{
           | name           |
           | Volunteer List |
       })

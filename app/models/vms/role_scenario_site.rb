@@ -4,7 +4,7 @@ class Vms::RoleScenarioSite < ActiveRecord::Base
   
   acts_as_taggable_on :qualifications
   
-  belongs_to :role
+  belongs_to :role, :class_name => "::Role"
   belongs_to :scenario_site, :class_name => "Vms::ScenarioSite"
   has_one :site, :through => :scenario_site, :class_name => "Vms::Site"
   

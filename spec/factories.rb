@@ -1,65 +1,62 @@
 require 'factory_girl'
 
-Factory.sequence(:scenario_name) {|jn| "Scenario #{jn}"}
-Factory.define :scenario, :class => Vms::Scenario do |m|
-  m.name {Factory.next(:scenario_name)}
-  m.state Vms::Scenario::STATES[:unexecuted]
-end
-
-Factory.define :scenario_site, :class => Vms::ScenarioSite do |m|
-  m.association :scenario, :factory => :scenario
-  m.status Vms::ScenarioSite::STATES[:inactive]
-end
-
-Factory.sequence(:site_name) {|jn| "Site #{jn}"}
-Factory.define :site, :class => Vms::Site do |m|
-  m.name {Factory.next(:site_name)}
-  m.association :scenario_instances, :factory => :scenario_site
-end
-
-Factory.sequence(:inventory_name) {|jn| "Inventory #{jn}"}
-Factory.define :inventory, :class => Vms::Inventory do |m|
-  m.name {Factory.next(:inventory_name)}
-  m.template 0
-  m.association :source, :factory => :inventory_source
-  m.item_collections { |ic| [ic.association(:item_collection)] }
-end
-
-Factory.sequence(:inventory_source_name) {|n| "Source #{n}"}
-Factory.define :inventory_source, :class => Vms::Inventory::Source do |m|
-  m.name {Factory.next(:inventory_source_name)}
-end
-
-Factory.define :item_collection, :class => Vms::Inventory::ItemCollection do |m|
-  m.status Vms::Inventory::ItemCollection::STATUS[:available]
-end
-
-Factory.define :item_instance, :class => Vms::Inventory::ItemInstance do |m|
-  m.quantity 0
-  m.association :item, :factory => :item
-end
-
-Factory.sequence(:item_name) {|n| "Item #{n}"}
-Factory.define :item, :class => Vms::Inventory::Item do |m|
-  m.name {Factory.next(:item_name)}
-  m.consumable 0
-  m.association :item_category, :factory => :item_category
-end
-
-Factory.sequence(:item_category_name) {|n| "Category #{n}"}
-Factory.define :item_category, :class => Vms::Inventory::ItemCategory do |m|
-  m.name {Factory.next(:item_category_name)}
-end
-
-Factory.define :role_scenario_site, :class => Vms::RoleScenarioSite do |m|
-  m.count 1
-end
-
-Factory.define :staff, :class => Vms::Staff do |m|
-  m.status 'assigned'
-end
-
-Factory.sequence(:team_name) {|n| "Team #{n}"}
-Factory.define :team, :class => Vms::Team do |m|
-  m.association :audience
+FactoryGirl.define do
+  
+  factory :scenario, :class => Vms::Scenario do
+    sequence(:name) {|jn| "Scenario #{jn}"}
+    state Vms::Scenario::STATES[:unexecuted]
+  end
+  
+  factory :scenario_site, :class => Vms::ScenarioSite do
+    association :scenario, :factory => :scenario
+    status Vms::ScenarioSite::STATES[:inactive]
+  end
+  
+  factory :site, :class => Vms::Site do
+    sequence(:name) {|jn| "Site #{jn}"}
+    association :scenario_instances, :factory => :scenario_site
+  end
+  
+  factory :inventory, :class => Vms::Inventory do
+    sequence(:name) {|jn| "Inventory #{jn}"}
+    template 0
+    association :source, :factory => :inventory_source
+    item_collections { |ic| [ic.association(:item_collection)] }
+  end
+  
+  factory :inventory_source, :class => Vms::Inventory::Source do
+    sequence(:name) {|n| "Source #{n}"}
+  end
+  
+  factory :item_collection, :class => Vms::Inventory::ItemCollection do
+    status Vms::Inventory::ItemCollection::STATUS[:available]
+  end
+  
+  factory :item_instance, :class => Vms::Inventory::ItemInstance do
+    quantity 0
+    association :item, :factory => :item
+  end
+  
+  factory :item, :class => Vms::Inventory::Item do
+    sequence(:name) {|n| "Item #{n}"}
+    consumable 0
+    association :item_category, :factory => :item_category
+  end
+  
+  factory :item_category, :class => Vms::Inventory::ItemCategory do
+    sequence(:name) {|n| "Category #{n}"}
+  end
+  
+  factory :role_scenario_site, :class => Vms::RoleScenarioSite do
+    count 1
+  end
+  
+  factory :staff, :class => Vms::Staff do
+    status 'assigned'
+  end
+  
+  factory :team, :class => Vms::Team do
+    association :audience
+  end
+  
 end

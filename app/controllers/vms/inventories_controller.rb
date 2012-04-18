@@ -133,7 +133,7 @@ class Vms::InventoriesController < ApplicationController
     end
     
     respond_to do |format|
-      if @inv.save 
+      if @inv.save
         format.json {render :json => {:inventory => @inv, :success => true}}
       else
         format.json {render :json => {:errors => @inv.errors, :success => false}, :status => 406 }

@@ -8,7 +8,7 @@ class Vms::SessionsController < ApplicationController
     else   # user has a valid Phin session.  If they are a site admin, we auto-auth them for VMS
       if User.find(session[:user_id]).is_vms_scenario_site_admin?
         session[:vms_user_id] = session[:user_id]
-        redirect_to :kiosk_index
+        redirect_to :vms_kiosk_index
       else
         flash[:error] = "You are not a VMS Site Administrator"
         redirect_to :sign_in
@@ -22,7 +22,7 @@ class Vms::SessionsController < ApplicationController
       if @user.is_vms_scenario_site_admin?
         session.delete(:user_id)   # kill the phin login session
         session[:vms_user_id] = @user.id
-        redirect_to :kiosk_index
+        redirect_to :vms_kiosk_index
       else
         flash[:error] = "You are not a VMS Site Administrator"
         redirect_to :sign_in

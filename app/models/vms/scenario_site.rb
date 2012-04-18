@@ -6,24 +6,24 @@ class Vms::ScenarioSite < ActiveRecord::Base
 
   belongs_to :site, :class_name => "Vms::Site"
   belongs_to :scenario, :class_name => "Vms::Scenario"
-  belongs_to :site_admin, :class_name => "User"
   before_update :check_state_for_alert_need
 
   STATES = {:inactive => 1, :active => 2}
 
   has_many :inventories, :class_name => "Vms::Inventory"
   has_many :role_scenario_sites, :class_name => "Vms::RoleScenarioSite", :autosave => true
-  has_many :roles, :through => :role_scenario_sites
+  has_many :roles, :through => :role_scenario_sites, :class_name => "::Role"
   has_many :staff, :class_name => "Vms::Staff", :autosave => true
   has_many :walkups, :class_name => 'Vms::Walkup'
-  has_many :users, :through => :staff
+  has_many :users, :through => :staff, :class_name => "::User"
   has_many :teams, :class_name => "Vms::Team", :autosave => true
-  belongs_to :site_admin, :class_name => "User"
+  belongs_to :site_admin, :class_name => "::User"
 
   has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.to_s}" }, :app => 'vms' }
   
   def as_json (options = {})
-    opts = Marshal::load(Marshal.dump(options))
+    opts = Marshal::load(Marshal.dump(options)) if options
+    opts = {} if options.blank?
     opts[:include] = {} if opts[:include].nil?
     opts[:include].merge! :site => {}
     json = super(opts)    

@@ -2,8 +2,8 @@
 class Vms::VolunteerRole < ActiveRecord::Base
   set_table_name :vms_volunteer_roles
   
-  belongs_to :volunteer, :class_name => 'User'
-  belongs_to :role
+  belongs_to :volunteer, :class_name => '::User'
+  belongs_to :role, :class_name => '::Role'
   belongs_to :alert, :class_name => 'VmsExecutionAlert'
   
   def alert_type=(sType)

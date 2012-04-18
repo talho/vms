@@ -4,9 +4,9 @@ class Vms::ScenariosController < ApplicationController
   
   def index
     conditions = params[:state] ? {:state => params[:state].map{|x| x.to_i} } : {}
-    @scenarios = current_user.scenarios.find(:all, :conditions => conditions, :order=> 'created_at', :include => [:user_rights, :site_instances]).paginate(:page => ( (params[:start]||0).to_i/(params[:limit]||10).to_i ) + 1, :per_page => params[:limit] || 10)
+    @scenarios = current_user.scenarios.where(conditions).order('created_at').includes(:user_rights, :site_instances).paginate(:page => ( (params[:start]||0).to_i/(params[:limit]||10).to_i ) + 1, :per_page => params[:limit] || 10)
     @scenarios.each do |sc|
-      perm_lvl = sc.user_rights.find_by_user_id(current_user).permission_level
+      perm_lvl = sc.user_rights.where(user_id: current_user).first.permission_level
       sc[:can_admin] =  perm_lvl == Vms::UserRight::PERMISSIONS[:owner] || perm_lvl == Vms::UserRight::PERMISSIONS[:admin]
       sc[:is_owner] = perm_lvl == Vms::UserRight::PERMISSIONS[:owner]
       sc[:user_rights] = sc.user_rights
@@ -18,8 +18,8 @@ class Vms::ScenariosController < ApplicationController
   end  
   
   def show
-    @scenario = current_user.scenarios.find(params[:id], :include => {:user_rights => [], :site_instances => [:site], :inventories => [], :staff => [], :teams => [], :role_scenario_sites => []})
-    perm_lvl = @scenario.user_rights.find_by_user_id(current_user).permission_level
+    @scenario = current_user.scenarios.includes(:user_rights, {:site_instances => [:site]}, :inventories, :staff, :teams, :role_scenario_sites).find(params[:id])
+    perm_lvl = @scenario.user_rights.where(user_id: current_user).first.permission_level
     @scenario[:can_admin] = perm_lvl == Vms::UserRight::PERMISSIONS[:owner] || perm_lvl == Vms::UserRight::PERMISSIONS[:admin]
     @scenario[:site_instances] = @scenario.site_instances.as_json
     @scenario[:inventories] = @scenario.inventories.as_json

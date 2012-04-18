@@ -14,14 +14,14 @@ class Vms::RolesController < ApplicationController
   end
   
   def show
-    @site_instance = @scenario.site_instances.for_site(params[:vms_site_id])
+    @site_instance = @scenario.site_instances.for_site(params[:site_id])
     respond_to do |format|
       format.json {render :json => @site_instance.role_scenario_sites.find(:all, :include => [:role , :site]).as_json }
     end
   end
   
   def update
-    @site_instance = @scenario.site_instances.first( {:conditions => {:site_id => params[:vms_site_id]}, :include => [:role_scenario_sites] })
+    @site_instance = @scenario.site_instances.first( {:conditions => {:site_id => params[:site_id]}, :include => [:role_scenario_sites] })
     
     roles = JSON.parse(params[:roles])
     

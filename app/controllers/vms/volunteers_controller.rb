@@ -8,6 +8,7 @@ class Vms::VolunteersController < ApplicationController
     if paging
       per_page = params[:limit] || 50
       page = ( (params[:start]||0).to_i/(per_page).to_i ) + 1
+      require 'will_paginate/array'
       vols = vols.paginate(:page => page, :per_page => per_page)
     end
     

@@ -16,9 +16,10 @@ class Vms::UsersController < Clearance::UsersController
 
     @user.email = @user.email.downcase
     if @user.save
-      flash_notice_after_create
-      redirect_to(url_after_create)
+      sign_in(@user)
+      redirect_back_or(url_after_create)
     else
+      flash_failure_after_create
       @user[:vms_jurisdiction_id] = jurisdiction.blank? ? nil : jurisdiction.id
       @jurisdictions = Jurisdiction.all.sort_by{|j| j.name}
       render :template => 'users/new' 

@@ -10,9 +10,12 @@ Dir[File.join(File.dirname(__FILE__), '../vendor/plugins/*/lib')].each do |path|
   $LOAD_PATH << path
 end
 
-# Require any submodule dependencies here
-# For example, if this depended on open_flash_chart you would require init.rb as follows:
-#   require File.join(File.dirname(__FILE__), '..', 'vendor', 'plugins', 'open_flash_chart', 'init.rb')
+
+Rails.configuration.after_initialize do
+  ::User.send(:include, Vms::User)
+  ::Jurisdiction.send(:include, Vms::Jurisdiction)
+  ::Role.send(:include, Vms::Role)
+end
 
 # Register the plugin expansion in the $expansion_list global variable
 $expansion_list = [] unless defined?($expansion_list)

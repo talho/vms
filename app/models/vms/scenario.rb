@@ -8,7 +8,7 @@ class Vms::Scenario < ActiveRecord::Base
     end
   end
   
-  has_many :users, :through => :user_rights do
+  has_many :users, :class_name => "::User", :through => :user_rights do
     def owner
       find(:first, :conditions => {'vms_user_rights.permission_level' => Vms::UserRight::PERMISSIONS[:owner] })
     end
@@ -24,7 +24,7 @@ class Vms::Scenario < ActiveRecord::Base
   end
   has_many :sites, :through => :site_instances
   
-  has_many :inventories, :through => :site_instances
+  has_many :inventories, :through => :site_instances, :readonly => false
   has_many :staff, :through => :site_instances, :order => 'vms_staff.id'
   has_many :teams, :through => :site_instances
   has_many :walkups, :through => :site_instances

@@ -27,7 +27,7 @@ Given /^the following sites exist:$/ do |table|
   table.hashes.each do |row|
     scenario_sites = []
     unless row[:scenario].blank?
-      scenario_sites.push(Factory.build(:scenario_site, {:scenario => Vms::Scenario.find_by_name(row[:scenario]),
+      scenario_sites.push(FactoryGirl.build(:scenario_site, {:scenario => Vms::Scenario.find_by_name(row[:scenario]),
                                                          :status => Vms::ScenarioSite::STATES[row[:status].to_sym]}))
     end
     FactoryGirl.create(:site, :name => row[:name], :address => row[:address], :lat => row[:lat], :lng => row[:lng], :scenario_instances => scenario_sites )
@@ -53,12 +53,12 @@ end
 Given /^the site "([^\"]*)" exists for scenario "([^\"]*)"$/ do |site_name, scenario_name|
   case site_name
     when "Malawi"
-      When "the following sites exist:", table(%{
+      step "the following sites exist:", table(%{
         | name                | address                                 | lat                 | lng              | status | scenario     |
         | Malawi              | Kenyatta, Lilongwe, Malawi              | -13.962475513490757 | 33.7866090623169 | active | #{scenario_name} |
       })
     when "Immunization Center"
-      When "the following sites exist:", table(%{
+      step "the following sites exist:", table(%{
         | name                | address                                 | lat       | lng       | status | scenario     |
         | Immunization Center | 1303 Atkinson Dr, Lufkin, TX 75901, USA | 31.347573 | -94.71391 | active | #{scenario_name} |
       })

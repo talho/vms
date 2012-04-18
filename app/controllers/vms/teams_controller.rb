@@ -13,7 +13,7 @@ class Vms::TeamsController < ApplicationController
   end
   
   def show
-    @team = @scenario.site_instances.for_site(params[:vms_site_id]).teams.find(params[:id], :include => {:audience => [:users]})
+    @team = @scenario.site_instances.for_site(params[:site_id]).teams.find(params[:id], :include => {:audience => [:users]})
     
     @team[:users] = []
     @team.audience.users.each do |u|        
@@ -33,7 +33,7 @@ class Vms::TeamsController < ApplicationController
   end
   
   def create
-    @scenario_site = @scenario.site_instances.for_site(params[:vms_site_id])
+    @scenario_site = @scenario.site_instances.for_site(params[:site_id])
     
     par_aud = Audience.find(params[:audience_parent_id], :include => [:roles, :jurisdictions, :sub_audiences]) unless params[:audience_parent_id].nil?
     
@@ -72,8 +72,8 @@ class Vms::TeamsController < ApplicationController
   end
   
   def update
-    @team = @scenario.site_instances.for_site(params[:vms_site_id]).teams.find(params[:id])
-    @scenario_site = @scenario.site_instances.find_by_site_id_and_scenario_id(params[:site_id], params[:vms_scenario_id])
+    @team = @scenario.site_instances.for_site(params[:site_id]).teams.find(params[:id])
+    @scenario_site = @scenario.site_instances.find_by_site_id_and_scenario_id(params[:new_site_id], params[:scenario_id])
 
     unless params[:team].nil? || params[:team][:audience].nil?
       #build team. params[:team] should contain team[audience][name] and team[audience][users]
@@ -83,7 +83,7 @@ class Vms::TeamsController < ApplicationController
       @team.audience.attributes = params[:team][:audience]
     end
     
-    unless params[:site_id].nil? || @team.scenario_site == @scenario_site
+    unless params[:new_site_id].nil? || @team.scenario_site == @scenario_site
       @team.audience.recipients.each do | u |
         #remove any members of this team from other sites staffs if they are not checked in
         @scenario.staff.find(:all, :conditions=>['scenario_site_id != ? AND user_id = ? AND checked_in = ?',@scenario_site.id, u.id, false]).each{ |s| s.destroy }
@@ -104,7 +104,7 @@ class Vms::TeamsController < ApplicationController
   end
     
   def destroy
-    si = @scenario.site_instances.for_site(params[:vms_site_id])
+    si = @scenario.site_instances.for_site(params[:site_id])
     @team = si.teams.find(params[:id])
     @team.audience.recipients.each do | u |
         #remove any members of this team from other sites staffs if they are not checked in

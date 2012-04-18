@@ -130,7 +130,7 @@ class Vms::KiosksController < ApplicationController
        respond_to do |format|
          format.html {
           flash[:error] = "You are not the Administrator for that site"
-          redirect_to kiosk_index_path
+          redirect_to vms_kiosk_index_path
          }
        end
       end
@@ -148,7 +148,7 @@ class Vms::KiosksController < ApplicationController
     if params['id']
       unless Vms::ScenarioSite.find(params['id']).scenario.active?
         flash[:error] = "That scenario is not currently active"
-        redirect_to kiosk_index_path
+        redirect_to vms_kiosk_index_path
       end
     else
       flash[:error] = "Invalid Action."

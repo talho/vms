@@ -21,7 +21,6 @@ Feature: VMS Signup
     And I fill in "Password Confirmation" with "Password1"
     And I select "Test County" from "Home County"
     And I press "Sign Up"
-    Then I should see "You will receive an email within the next few minutes. It contains instructions for confirming your account."
     And "vmstestuser@example.com" should have the "Volunteer" role in "Test County"
     And "vmstestuser@example.com" should not have the "Public" role in "Texas"
     And "vmstestuser@example.com" should not have the "Public" role in "Test County"

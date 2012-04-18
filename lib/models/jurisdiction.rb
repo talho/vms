@@ -1,4 +1,3 @@
-require 'action_controller/deprecated/dispatcher'
 
 module Vms
   module Jurisdiction
@@ -15,8 +14,5 @@ module Vms
     end
   end
   
-  ActionController::Dispatcher.to_prepare do
-    ::Jurisdiction.send(:include, Vms::Jurisdiction)
-  end
 end
 

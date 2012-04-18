@@ -11,14 +11,14 @@ Given /^([^ ]*) (?:have|has) the scenarios? "([^\"]*)"$/ do |email, scenarios|
   end
 end
 When /^I open the "([^\"]*)" scenario$/ do |name|
-    When %Q{I go to the ext dashboard page}
-    When %Q{I navigate to "Apps > VMS > Manage Scenarios"}
-    When %Q{I select the "#{name}" grid row}
-    When %Q{I click vms-row-button "Open Scenario"}
-    Then %Q{the "Command Center - #{name}" tab should be open}
-    When %Q{I wait for the "Loading..." mask to go away}
-    When %Q{I wait for the "Loading..." mask to go away}
-    Then %Q{I should see "New Site (drag to create)"}
+    step %Q{I go to the ext dashboard page}
+    step %Q{I navigate to "Apps > VMS > Manage Scenarios"}
+    step %Q{I select the "#{name}" grid row}
+    step %Q{I click vms-row-button "Open Scenario"}
+    step %Q{the "Command Center - #{name}" tab should be open}
+    step %Q{I wait for the "Loading..." mask to go away}
+    step %Q{I wait for the "Loading..." mask to go away}
+    step %Q{I should see "New Site (drag to create)"}
 end
 
 Then /^"([^\"]*)" should be an? ([a-zA-Z0-9\-_]*) for scenario "([^\"]*)"$/ do |user_name, role, scenario|

@@ -20,7 +20,7 @@ class Vms::StaffController < ApplicationController
   end
   
   def show
-    @site_instance = @scenario.site_instances.for_site(params[:vms_site_id])
+    @site_instance = @scenario.site_instances.for_site(params[:site_id])
     @staff = @site_instance.staff.find(:all, :include => [:user , :site])
     @walkups = @site_instance.walkups
     @staff.each do |s|
@@ -34,7 +34,7 @@ class Vms::StaffController < ApplicationController
   end
   
   def update
-    @site_instance = @scenario.site_instances.first( {:conditions => {:site_id => params[:vms_site_id]}, :include => [:role_scenario_sites] })
+    @site_instance = @scenario.site_instances.first( {:conditions => {:site_id => params[:site_id]}, :include => [:role_scenario_sites] })
     
     # pull out new, updated, and deleted staff from params
     new_staff = params[:added_staff].nil? ? [] : JSON.parse(params[:added_staff])
@@ -50,7 +50,7 @@ class Vms::StaffController < ApplicationController
       db_staff.mark_for_destruction
       deleted_users_for_alerts << db_staff.user
     end
-    Vms::Staff.send_later(:send_removed_message, deleted_users_for_alerts, @scenario) unless deleted_users_for_alerts.blank?
+    Vms::Staff.delay.send_removed_message(deleted_users_for_alerts, @scenario) unless deleted_users_for_alerts.blank?
     
     added_staff_for_alerts = []
     #create new staff
@@ -60,7 +60,7 @@ class Vms::StaffController < ApplicationController
       st.destroy unless st.nil?
       added_staff_for_alerts << @site_instance.staff.build(s)
     end
-    Vms::Staff.send_later(:send_added_message, added_staff_for_alerts, @site_instance) unless added_staff_for_alerts.blank?
+    Vms::Staff.delay.send_added_message(added_staff_for_alerts, @site_instance) unless added_staff_for_alerts.blank?
     
     updated_staff_for_alerts = []
     #update existing staff
@@ -68,7 +68,7 @@ class Vms::StaffController < ApplicationController
       updated_staff_for_alerts << db_staff = current_staff[current_staff.index{ |ts| ts.id === s['id']}]
       db_staff.attributes = s
     end
-    Vms::Staff.send_later(:send_updated_message, updated_staff_for_alerts) unless updated_staff_for_alerts.blank?
+    Vms::Staff.delay.send_updated_message(updated_staff_for_alerts) unless updated_staff_for_alerts.blank?
 
     @site_instance.site_admin_id = params[:site_admin] unless params[:site_admin].nil?
 

@@ -5,7 +5,7 @@ class Vms::AlertsController < ApplicationController
   def index
     page = ( (params[:start]||0).to_i/(params[:limit]||10).to_i ) + 1
     per_page = params[:limit] || 10
-    aas = current_user.alert_attempts.find_all_by_alert_type(['VmsAlert', 'VmsStatusAlert', 'VmsExecutionAlert', 'VmsStatusCheckAlert']).paginate(:page => page, :per_page => per_page)
+    aas = current_user.alert_attempts.where(alert_type: ['VmsAlert', 'VmsStatusAlert', 'VmsExecutionAlert', 'VmsStatusCheckAlert']).paginate(:page => page, :per_page => per_page)
     
     # reformat the alert object so that the json comes back as expected
     aas.each do |aa|
@@ -24,7 +24,7 @@ class Vms::AlertsController < ApplicationController
   
   def create
     # create a new vms alert. This can either be a base VmsAlert or a VmsStatusCheckAlert
-    
+
     # Find out which alert it is
     alert = (params[:alert_type] || "VmsAlert").constantize.default_alert
     alert.title = params[:title] unless params[:title].blank?
@@ -64,7 +64,7 @@ class Vms::AlertsController < ApplicationController
   def status_checks
     page = ( (params[:start]||0).to_i/(params[:limit]||50).to_i ) + 1
     per_page = params[:limit] || 50
-    checks = VmsStatusCheckAlert.find_all_by_author_id(current_user.id).paginate(:page => page, :per_page => per_page)
+    checks = VmsStatusCheckAlert.where(author_id: current_user.id).paginate(:page => page, :per_page => per_page)
     
     respond_to do |format|
       format.json {render :json => {:status_checks => checks, :total => checks.total_entries}}

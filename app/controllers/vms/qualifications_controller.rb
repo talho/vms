@@ -22,7 +22,7 @@ class Vms::QualificationsController < ApplicationController
   end
     
   def create
-    @si = @scenario.site_instances.for_site(Vms::Site.find(params[:vms_site_id]))
+    @si = @scenario.site_instances.for_site(Vms::Site.find(params[:site_id]))
     if params[:role_id].nil?
       v = @si
     else
@@ -41,7 +41,7 @@ class Vms::QualificationsController < ApplicationController
   end
   
   def update
-    @si = @scenario.site_instances.for_site(Vms::Site.find(params[:vms_site_id]))
+    @si = @scenario.site_instances.for_site(Vms::Site.find(params[:site_id]))
     if params[:original_role_id].nil?
       v = @si
     else
@@ -66,7 +66,7 @@ class Vms::QualificationsController < ApplicationController
   end
   
   def destroy
-    @si = @scenario.site_instances.for_site(Vms::Site.find(params[:vms_site_id]))
+    @si = @scenario.site_instances.for_site(Vms::Site.find(params[:site_id]))
     if params[:role_id].nil?
       v = @si
     else
