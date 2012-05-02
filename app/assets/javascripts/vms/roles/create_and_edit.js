@@ -9,10 +9,10 @@ Talho.VMS.ux.CreateAndEditRoles = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
     this.deleted_records = [];
     var start_editing = Ext.isDefined(this.creatingRecord),
         columns = [{dataIndex: 'role', id: 'role_name'}, 
-          {xtype: 'xactioncolumn', icon: '/stylesheets/vms/images/list-remove-2.png', iconCls: 'decrease_count', handler: this.decrementQuantity, scope: this},
+          {xtype: 'xactioncolumn', icon: '/assets/vms/list-remove-2.png', iconCls: 'decrease_count', handler: this.decrementQuantity, scope: this},
           {dataIndex: 'count', width: 20},
-          {xtype: 'xactioncolumn', icon: '/stylesheets/vms/images/list-add-2.png', iconCls: 'increase_count', handler: this.incrementQuantity, scope: this},
-          {xtype: 'xactioncolumn', icon: '/stylesheets/vms/images/action_delete.png', iconCls: 'remove_role', handler: this.removeRole, scope: this}
+          {xtype: 'xactioncolumn', icon: '/assets/vms/list-add-2.png', iconCls: 'increase_count', handler: this.incrementQuantity, scope: this},
+          {xtype: 'xactioncolumn', icon: '/assets/vms/action_delete.png', iconCls: 'remove_role', handler: this.removeRole, scope: this}
         ],
         body = [];
         

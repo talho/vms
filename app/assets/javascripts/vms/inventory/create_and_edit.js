@@ -27,8 +27,8 @@ Talho.VMS.ux.InventoryWindow = Ext.extend(Talho.VMS.ux.ItemDetailWindow, {
     
     if(this.mode !== 'show'){
       columns.push({xtype: 'xactioncolumn', items: [
-        {icon: '/stylesheets/vms/images/list-remove-2.png', iconCls: 'decreaseItem', handler: this.decrementQuantity, scope: this},
-        {icon: '/stylesheets/vms/images/list-add-2.png', iconCls: 'increaseItem', handler: this.incrementQuantity, scope: this}
+        {icon: '/assets/vms/list-remove-2.png', iconCls: 'decreaseItem', handler: this.decrementQuantity, scope: this},
+        {icon: '/assets/vms/list-add-2.png', iconCls: 'increaseItem', handler: this.incrementQuantity, scope: this}
       ]});
     }
     else{

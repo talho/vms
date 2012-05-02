@@ -20,10 +20,10 @@ Talho.VMS.ux.SiteInfoWindow = Ext.extend(Ext.ux.GMap.GMapInfoWindow, {
           }),
           columns: [
             {header: 'In', dataIndex: 'checked_in', width: 24, menuDisabled: true, renderer: function(checked_in){
-              if (checked_in) { return '<img src="/stylesheets/vms/images/cc_icons/check-12.png">'; } else { return null;}
+              if (checked_in) { return '<img src="/assets/vms/cc_icons/check-12.png">'; } else { return null;}
             }},
             {header: 'A',  dataIndex: 'site_admin', width: 24, menuDisabled: true, renderer: function(site_admin){
-              if (site_admin) {return '<img src="/stylesheets/vms/images/cc_icons/star-12.png">'; } else { return null;}
+              if (site_admin) {return '<img src="/assets/vms/cc_icons/star-12.png">'; } else { return null;}
             }},
             {header: 'Name', dataIndex: 'user', menuDisabled: true},
             // {header: 'Role Filled', dataIndex: 'role_filled', menuDisabled: true},

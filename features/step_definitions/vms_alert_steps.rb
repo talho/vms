@@ -1,8 +1,6 @@
 
 When /^backgroundrb has processed the vms alert responses$/ do
-  require 'bdrb_server_helper.rb'
-  require 'meta_worker.rb'
-  require Rails.root.join('vendor/plugins/vms/lib/workers/watch_for_vms_execution_alert_responses_worker.rb').to_s
+  require File.join(File.dirname(__FILE__), '..', '..', 'lib/workers/watch_for_vms_execution_alert_responses_worker.rb').to_s
   WatchForVmsExecutionAlertResponsesWorker.new.query
 end
 

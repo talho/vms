@@ -10,8 +10,8 @@ class VmsExecutionAlert < VmsAlert
   has_many :volunteers, :class_name => "User", :through => :vms_volunteer_roles, :uniq => true
   has_many :recipients, :class_name => "User", :finder_sql => proc{"SELECT users.* FROM users, targets, targets_users WHERE targets.item_type='VmsExecutionAlert' AND targets.item_id=#{id} AND targets_users.target_id=targets.id AND targets_users.user_id=users.id"}
   
-  has_paper_trail :meta => { :item_desc  => Proc.new { |x| "#{x.scenario.name} - #{x.to_s}" }, :app => Proc.new {|x| x.app} }
-  
+  has_paper_trail :meta => { :item_desc  => Proc.new { |x| x.to_s }, :app => Proc.new {|x| x.app} }
+    
   def self.default_alert
     title = "VMS Execution Alert"
     message = "This alert is looking for volunteers for the newly executing scenario"

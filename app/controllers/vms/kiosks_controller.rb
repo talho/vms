@@ -23,7 +23,7 @@ class Vms::KiosksController < ApplicationController
           volunteers.push({
                   # Somewhat hacky: to simplify handling two users and walkup, they are pushed together into one object and store in EXT.
                   # This can cause id conflict, so 'w:' is appended to walkup ids, and split off before it's sent back to registered_checkin.
-            :id => "w:"+w.id.to_s, :display_name => w.first_name + ' ' + w.last_name,:email => nil,:image => '/stylesheets/vms/images/walkup-icon.png',:checked_in => w.checked_in, :type => 'walkup'
+            :id => "w:"+w.id.to_s, :display_name => w.first_name + ' ' + w.last_name,:email => nil,:image => '/assets/vms/walkup-icon.png',:checked_in => w.checked_in, :type => 'walkup'
           })
         end
         render :json=>{ :volunteers => volunteers.uniq }

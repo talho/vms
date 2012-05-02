@@ -1,28 +1,8 @@
-require 'inflections'
-
-# Require VMS models
-Dir[File.join(File.dirname(__FILE__), 'models', '*.rb')].each do |f|
-  require f
-end
-
-# Add PLUGIN_NAME vendor/plugins/*/lib to LOAD_PATH
-Dir[File.join(File.dirname(__FILE__), '../vendor/plugins/*/lib')].each do |path|
-  $LOAD_PATH << path
-end
-
-
-Rails.configuration.after_initialize do
-  ::User.send(:include, Vms::User)
-  ::Jurisdiction.send(:include, Vms::Jurisdiction)
-  ::Role.send(:include, Vms::Role)
-end
-
-# Register the plugin expansion in the $expansion_list global variable
-$expansion_list = [] unless defined?($expansion_list)
-$expansion_list.push(:vms) unless $expansion_list.index(:vms)
-
-$menu_config = {} unless defined?($menu_config)
                     
+# Tell the main app that this extension exists
+$extensions = [] unless defined?($extensions)
+$extensions << :vms
+
 $menu_config[:vms] = <<EOF
   nav = "{name: 'VMS', items:["
   if current_user.vms_admin?
@@ -38,19 +18,17 @@ $menu_config[:vms] = <<EOF
   nav += "]}"
 EOF
 
-# Register any required javascript or stylesheet files with the appropriate
-# rails expansion helper
-ActionView::Helpers::AssetTagHelper.register_javascript_expansion(
-  :vms => [ "vms/script_config" ])
-ActionView::Helpers::AssetTagHelper.register_stylesheet_expansion(
-  :vms => [ "vms/vms" ])
-
-begin
-  $public_roles = [] unless defined?($public_roles)
-  r = Role.find_by_name_and_application('Volunteer', 'vms')
-  $public_roles << r.id unless r.nil?
-rescue
-end
-
+$extensions_css = {} unless defined?($extensions_css)
+$extensions_css[:vms] = [ "vms/vms.css" ]
+$extensions_js = {} unless defined?($extensions_js)
+$extensions_js[:vms] = [ "vms/script_config.js" ]
+  
 module Vms
+  module Models
+    autoload :Jurisdiction, 'vms/models/jurisdiction'
+    autoload :User, 'vms/models/user'
+    autoload :Role, 'vms/models/role'
+  end
 end
+
+require 'vms/engine'

@@ -168,7 +168,7 @@ Ext.ns("Talho.VMS");
       this.volunteerTemplate = new Ext.XTemplate(
         '<div style="width: 70px; height: 55px; float:left;"><img src="{image}"></div>' +
         '<div style="float: left; padding-top: 20px; font-weight: bold; font-size: 200%;">{display_name}<tpl if="scenario_site_admin"> - <span style="color: green;">Site Admin</span></tpl></div>' +
-        '<div style="float: right;"><img src="/stylesheets/vms/images/check-box<tpl if="checked_in">-checked</tpl>.png"></div>'
+        '<div style="float: right;"><img src="/assets/vms/check-box<tpl if="checked_in">-checked</tpl>.png"></div>'
       );
 
       this.refresherSlider = new Ext.Slider ({

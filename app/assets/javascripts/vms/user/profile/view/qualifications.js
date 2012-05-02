@@ -46,7 +46,7 @@ Talho.VMS.User.Profile.View.Qualifications = Ext.extend(Ext.Panel, {
         }),
         hideHeaders: true, columns: [
           {id: 'name_column', dataIndex: 'name'},
-          {xtype: 'xactioncolumn', icon: '/stylesheets/vms/images/action_delete.png', iconCls: 'remove_qual', handler: this._removeQual_click, scope: this}
+          {xtype: 'xactioncolumn', icon: '/assets/vms/action_delete.png', iconCls: 'remove_qual', handler: this._removeQual_click, scope: this}
         ],
         autoExpandColumn: 'name_column', loadMask: true
       }

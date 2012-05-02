@@ -1,5 +1,5 @@
 
-dominoes.property('vms', '/javascripts/vms');
+dominoes.property('vms', '/assets/vms');
 dominoes.rule('VMS_Inventory', '$(vms)/inventory/inventory_controller.js $(ext_extensions)/xActionColumn.js ( $(vms)/item_detail_windows.js > $(vms)/inventory/create_and_edit.js )');
 dominoes.rule('VMS_Site', '$(vms)/site/controller.js ( $(vms)/item_detail_windows.js > $(vms)/site/create_and_edit.js ) $(ext_extensions)/DoNotCollapseActive.js $(vms)/site/site_info_window.js ');
 dominoes.rule('VMS_Roles', '$(ext_extensions)/xActionColumn.js $(vms)/roles/controller.js ( $(vms)/item_detail_windows.js > $(vms)/roles/create_and_edit.js )');

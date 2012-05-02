@@ -43,8 +43,7 @@ class Vms::TeamsController < ApplicationController
     
     #build team. params[:team] should contain team[audience][name] and team[audience][users]
     team = @scenario_site.teams.build
-    team.audience = Audience.new
-    team.audience.build params[:team][:audience]
+    team.audience = Audience.new params[:team][:audience]
     team.audience.scope = "Team"
     team.audience.owner = current_user
 
