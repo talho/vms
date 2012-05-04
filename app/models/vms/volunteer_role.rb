@@ -1,6 +1,6 @@
 
 class Vms::VolunteerRole < ActiveRecord::Base
-  set_table_name :vms_volunteer_roles
+  self.table_name = "vms_volunteer_roles"
   
   belongs_to :volunteer, :class_name => '::User'
   belongs_to :role, :class_name => '::Role'

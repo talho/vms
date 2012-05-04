@@ -1,5 +1,5 @@
 class Vms::UserRight < ActiveRecord::Base  
-  set_table_name "vms_user_rights"
+  self.table_name = "vms_user_rights"
   
   belongs_to :user, :class_name => "::User"
   belongs_to :scenario, :class_name => "Vms::Scenario"

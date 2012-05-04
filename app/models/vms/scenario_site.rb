@@ -1,6 +1,6 @@
 
 class Vms::ScenarioSite < ActiveRecord::Base  
-  set_table_name "vms_scenario_site"
+  self.table_name = "vms_scenario_site"
 
   acts_as_taggable_on :qualifications
 

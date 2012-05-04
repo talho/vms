@@ -1,6 +1,8 @@
 
 class Vms::RoleScenarioSite < ActiveRecord::Base  
-  set_table_name "vms_roles_scenario_sites"
+  self.table_name = "vms_roles_scenario_sites"
+  
+  include ActionView::Helpers::TextHelper
   
   acts_as_taggable_on :qualifications
   

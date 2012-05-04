@@ -1,6 +1,6 @@
 
 class Vms::Site < ActiveRecord::Base  
-  set_table_name "vms_sites"
+  self.table_name = "vms_sites"
   
   has_many :scenario_instances, :class_name => "Vms::ScenarioSite", :dependent => :destroy
   has_many :scenarios, :through => :scenario_instances

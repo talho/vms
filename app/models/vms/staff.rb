@@ -6,7 +6,7 @@
 # updated_at       | timestamp without time zone |
 
 class Vms::Staff < ActiveRecord::Base  
-  set_table_name "vms_staff"
+  self.table_name = "vms_staff"
   
   belongs_to :user, :class_name => "::User"
   belongs_to :scenario_site, :class_name => "Vms::ScenarioSite"

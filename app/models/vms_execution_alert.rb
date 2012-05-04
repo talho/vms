@@ -1,7 +1,7 @@
 
 class VmsExecutionAlert < VmsAlert
   acts_as_MTI
-  set_table_name 'view_execution_vms_alerts'
+  self.table_name = 'view_execution_vms_alerts'
   
   before_create :before_vol_roles, :set_defaults
   after_create :after_vol_roles

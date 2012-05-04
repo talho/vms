@@ -1,6 +1,6 @@
 
 class Vms::Inventory::ItemCollection < ActiveRecord::Base  
-  set_table_name "vms_inventory_item_collections"  
+  self.table_name = "vms_inventory_item_collections"  
   
   belongs_to :inventory, :class_name => "Vms::Inventory"
   belongs_to :user

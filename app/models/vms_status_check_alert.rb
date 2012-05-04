@@ -2,7 +2,7 @@
 class VmsStatusCheckAlert < VmsAlert
   
   acts_as_MTI
-  set_table_name 'view_status_check_vms_alerts'
+  self.table_name = 'view_status_check_vms_alerts'
   before_create :create_email_alert_device_type, :set_alert_type, :set_acknowledge
   
   has_many :recipients, :class_name => "User", :finder_sql => proc{"SELECT users.* FROM users, targets, targets_users WHERE targets.item_type='VmsStatusCheckAlert' AND targets.item_id=#{id} AND targets_users.target_id=targets.id AND targets_users.user_id=users.id"}

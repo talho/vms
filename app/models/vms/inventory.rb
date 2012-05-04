@@ -1,5 +1,5 @@
 class Vms::Inventory < ActiveRecord::Base
-    set_table_name "vms_inventories"
+    self.table_name = "vms_inventories"
 
     belongs_to :scenario_site, :class_name => "Vms::ScenarioSite"
     has_one :site, :through => :scenario_site, :class_name => "Vms::Site"

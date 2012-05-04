@@ -1,6 +1,6 @@
 
 class Vms::Scenario < ActiveRecord::Base  
-  set_table_name "vms_scenarios"
+  self.table_name = "vms_scenarios"
     
   has_many :user_rights, :class_name => 'Vms::UserRight' do
     def non_owners

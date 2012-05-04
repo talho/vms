@@ -1,5 +1,5 @@
 class Vms::Team < ActiveRecord::Base  
-  set_table_name "vms_teams"
+  self.table_name = "vms_teams"
 
   belongs_to :audience, :autosave => true, :dependent => :destroy
   belongs_to :scenario_site, :class_name => "Vms::ScenarioSite"

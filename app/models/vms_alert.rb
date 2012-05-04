@@ -1,6 +1,5 @@
 
 class VmsAlert < Alert
-  # set_table_name 'alerts'
   # default_scope :conditions => {:alert_type => 'VmsAlert'}  
   # before_create :set_alert_type
   acts_as_MTI
