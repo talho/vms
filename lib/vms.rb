@@ -31,4 +31,8 @@ module Vms
   end
 end
 
+if defined? BDRB_CONFIG
+  $LOAD_PATH.unshift(File.join(File.dirname(__FILE__),"workers"))
+end
+
 require 'vms/engine'
