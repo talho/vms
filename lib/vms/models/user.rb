@@ -14,11 +14,11 @@ module Vms
       end
       
       def vms_admin?
-        roles.exists?(:name => 'Admin', :application => 'vms')
+        self.has_role?('Admin', 'vms')
       end
       
       def vms_volunteer?
-        roles.exists?(:name => 'Volunteer', :application => 'vms')
+        self.has_role?('Volunteer', 'vms')
       end
   
       module ClassMethods
