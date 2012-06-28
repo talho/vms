@@ -31,7 +31,7 @@ Feature: Checking in and out of a VMS site
     When I select the "Mirrorball Mountain" grid row
     And I press "Launch Check-In Kiosk"
     And I press "Yes"
-    Then I should see "Please check in and out with your TxPhin Account"
+    Then I should see "Please check in and out with your OpenPhin Account"
 
   Scenario: Volunteer list should show all assigned users for the site
     Then I should see "Joseph Underthunder"
@@ -68,7 +68,7 @@ Feature: Checking in and out of a VMS site
     When I select the "Bellbottoms 'R' Us" grid row
     And I press "Launch Check-In Kiosk"
     And I press "Yes"
-    Then I should see "Please check in and out with your TxPhin Account"
+    Then I should see "Please check in and out with your OpenPhin Account"
     And I should not see "Ned Neiderlander"
 
     When I fill in "Email Address" with "ned@example.com"
@@ -92,7 +92,7 @@ Feature: Checking in and out of a VMS site
     Given I should not see "Bob Dobbs"
     When I fill in "First Name" with "Bob"
     And I fill in "Last Name" with "Dobbs"
-    And I uncheck "Create a TxPhin Account?"
+    And I uncheck "Create a OpenPhin Account?"
     And I press "Check In" within ".vms-kiosk-walkup-panel"
     And I wait for the "Loading..." mask to go away
     And I press "OK" within ".x-window"
@@ -110,7 +110,7 @@ Feature: Checking in and out of a VMS site
     When I fill in "First Name" with "Bob" within ".vms-kiosk-walkup-panel"
     And I fill in "Last Name" with "Dobbs" within ".vms-kiosk-walkup-panel"
     And I fill in "Email Address" with "dobbs@example.com" within ".vms-kiosk-walkup-panel"
-    And I check "Create a TxPhin Account?"
+    And I check "Create a OpenPhin Account?"
     And I fill in "New Password" with "Password1" within ".vms-kiosk-walkup-panel"
     And I fill in "Confirm Password" with "Password1" within ".vms-kiosk-walkup-panel"
     And I press "Check In" within ".vms-kiosk-walkup-panel"
@@ -124,7 +124,7 @@ Feature: Checking in and out of a VMS site
     Given I should not see "Bob Dobbs"
     When I fill in "First Name" with "Bob"
     And I fill in "Last Name" with "Dobbs"
-    And I uncheck "Create a TxPhin Account?"
+    And I uncheck "Create a OpenPhin Account?"
     And I press "Check In" within ".vms-kiosk-walkup-panel"
     And I wait for the "Loading..." mask to go away
     And I press "OK" within ".x-window"

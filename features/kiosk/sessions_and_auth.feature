@@ -28,7 +28,7 @@ Feature: Checking in and out of a VMS site
     When I select the "Emergency BBQ" grid row
     And I press "Launch Check-In Kiosk"
     And I press "Yes"
-    Then I should see "Please check in and out with your TxPhin Account"
+    Then I should see "Please check in and out with your OpenPhin Account"
 
     When I go to the ext dashboard page
     Then I should see "Sign In to Your Account"

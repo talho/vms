@@ -56,4 +56,4 @@ Feature: Accessing site check-in kiosks from the phin app
     When I select the "Triage Station 2" grid row
     And I press "Launch Check-In Kiosk"
     And I press "Yes"
-    Then I should see "Please check in and out with your TxPhin Account"
+    Then I should see "Please check in and out with your OpenPhin Account"

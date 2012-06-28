@@ -32,9 +32,7 @@ Openphin::Application.routes.draw do
       get 'teams(.:format)', :to => 'teams#index', :as => :teams 
       get 'qualifications(.:format)', :to => 'qualifications#index', :as => :quals 
     end
-  
-    resources :users, :only=> [:new, :create]
-    
+      
     # no app linking for now....   :collection => { :link_app => :put, :link_app_page => :get } 
     match 'session/new', :to => 'sessions#new', :via => :get, :as => :vms_session_new
     match 'session/create', :to => 'sessions#create', :via => :post, :as => :vms_session_create 

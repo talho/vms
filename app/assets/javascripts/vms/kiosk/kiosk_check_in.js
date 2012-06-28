@@ -270,7 +270,7 @@ Ext.ns("Talho.VMS");
       this.signInForm = new Ext.FormPanel({
         url: '/vms/site_checkin.json', region: 'north', border: false, style: {'padding':'10px 0'}, bodyStyle: 'background-color: #DFE8F6;',
         items: [
-          new Ext.form.DisplayField({ html: 'Please check in and out with your TxPhin Account', style:{'text-align': 'center', 'font-size':'150%'}, hideLabel: true}) ,
+          new Ext.form.DisplayField({ html: 'Please check in and out with your OpenPhin Account', style:{'text-align': 'center', 'font-size':'150%'}, hideLabel: true}) ,
           this.signinEmailField,
           this.signinPasswordField
         ],
@@ -294,7 +294,7 @@ Ext.ns("Talho.VMS");
         height: 35, anchor:'90%', style:{'fontSize':'150%'}, vtype: 'email',
         listeners: { scope: this, 'focus': function(){ this.signInForm.getForm().reset(); this.walkupEmailField.clearInvalid(); } }
       });
-      this.walkupNewUserCheckbox = new Ext.form.Checkbox({ boxLabel: 'Create a TxPhin Account?', name: 'walkup_new_account', checked: true,
+      this.walkupNewUserCheckbox = new Ext.form.Checkbox({ boxLabel: 'Create a OpenPhin Account?', name: 'walkup_new_account', checked: true,
         listeners:{ scope: this,
           'check': function(box,checked){
             if (checked) {
@@ -331,7 +331,7 @@ Ext.ns("Talho.VMS");
         url: '/vms/site_walkup.json',
         border: false,
         items: [
-          new Ext.form.DisplayField({ html: "Don't have a TxPhin Account?  <br>Please enter your name.", style:{'text-align': 'center', 'padding':'10px 0 10px 0', 'font-size':'150%'}, hideLabel: true}),
+          new Ext.form.DisplayField({ html: "Don't have a OpenPhin Account?  <br>Please enter your name.", style:{'text-align': 'center', 'padding':'10px 0 10px 0', 'font-size':'150%'}, hideLabel: true}),
           this.walkupFirstNameField,
           this.walkupLastNameField,
           this.walkupEmailField,
