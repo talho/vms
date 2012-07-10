@@ -10,7 +10,13 @@ Feature: Roles for application "vms"
       | Ad min | admin@dallas.gov | Admin | Dallas County |
     And I log in as "admin@dallas.gov"
     And I navigate to the ext dashboard page
-    Then I should not see "Apps"
+    Then I should see the following toolbar items in "top_toolbar":
+      | Apps |
+    When I press "Apps" within "#top_toolbar"
+    Then I should see the following ext menu items:
+      | name          |
+      | Get More Apps |
+    And I should not see "VMS"
 
   Scenario: User has vms Admin role
     Given the following users exist:

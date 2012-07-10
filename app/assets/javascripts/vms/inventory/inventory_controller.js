@@ -1,3 +1,7 @@
+//= require ext_extensions/xActionColumn
+//= require vms/item_detail_windows
+//= require ./create_and_edit
+
 Ext.ns('Talho.VMS.ux');
 
 Talho.VMS.ux.InventoryController = Ext.extend(Ext.util.Observable, {  

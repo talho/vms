@@ -1,3 +1,9 @@
+//= require vms/extensions/column_panel
+//= require vms/model/volunteer
+//= require vms/extensions/action_button
+//= require_tree ./view
+//= require vms/user/profile/view/qualifications
+
 Ext.ns('Talho.VMS.Volunteer.List')
 
 Talho.VMS.Volunteer.List.Controller = Ext.extend(Ext.util.Observable, {

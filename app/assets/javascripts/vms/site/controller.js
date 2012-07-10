@@ -1,3 +1,8 @@
+//= require ../item_detail_windows
+//= require ./create_and_edit
+//= require ext_extensions/DoNotCollapseActive
+//= require ./site_info_window
+
 /**
  * @author Charles DuBose
  */

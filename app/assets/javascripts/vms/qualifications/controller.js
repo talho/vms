@@ -1,3 +1,6 @@
+//= require  ../item_detail_windows
+//= require ./create_and_edit
+
 /**
  * @author Charles DuBose
  */

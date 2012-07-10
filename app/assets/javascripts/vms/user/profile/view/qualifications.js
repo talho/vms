@@ -1,4 +1,5 @@
-
+//= require vms/model/qualification
+//= require ext_extensions/xActionColumn
 
 Ext.ns("Talho.VMS.User.Profile.View");
 

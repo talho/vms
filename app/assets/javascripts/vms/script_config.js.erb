@@ -1,0 +1,20 @@
+
+dominoes.property('vms', '/assets/vms');
+dominoes.rule('VMS_Inventory', '<%= javascript_dominoes_paths("vms/inventory/inventory_controller") %>');
+dominoes.rule('VMS_Site', '<%= javascript_dominoes_paths("vms/site/controller") %>');
+dominoes.rule('VMS_Roles', '<%= javascript_dominoes_paths("vms/roles/controller") %>');
+dominoes.rule('VMS_Staff', '<%= javascript_dominoes_paths("vms/staff/controller") %>');
+dominoes.rule('VMS_Teams', '<%= javascript_dominoes_paths("vms/teams/controller") %>');
+dominoes.rule('VMS_Qualifications', '<%= javascript_dominoes_paths("vms/qualifications/controller") %>');
+dominoes.rule('VMS_CommandCenter', '<%= javascript_dominoes_paths("vms/command_center/command_center") %>')
+dominoes.rule('VMS_Scenario_Manager', '<%= javascript_dominoes_paths("vms/scenario/manager/controller") %>')
+dominoes.rule('VMS_User_Profile', '<%= javascript_dominoes_paths("vms/user/profile/controller") %>');
+dominoes.rule('VMS_Volunteer_List', '<%= javascript_dominoes_paths("vms/volunteer/list/controller.js") %>');
+
+Talho.ScriptManager.addInitializer('Talho.VMS.CommandCenter', {js:'GMap > $(ext_extensions)/DoNotCollapseActive.js VMS_Site VMS_Roles VMS_Inventory VMS_Staff VMS_Teams VMS_Qualifications VMS_CommandCenter'});
+Talho.ScriptManager.addInitializer('Talho.VMS.CreateAndEditScenario', {js: '<%= javascript_dominoes_paths("vms/scenario/create_and_edit.js") %>'});
+Talho.ScriptManager.addInitializer('Talho.VMS.ManageScenarios', {js: '<%= javascript_dominoes_paths("vms/scenario/manage_scenarios.js") %>'});
+Talho.ScriptManager.addInitializer('Talho.VMS.Scenario.Manager', {js: 'GMap VMS_Scenario_Manager'});
+Talho.ScriptManager.addInitializer('Talho.VMS.AdministerSites', {js: '<%= javascript_dominoes_paths("vms/site/administer_sites.js") %>'});
+Talho.ScriptManager.addInitializer('Talho.VMS.User.Profile', {js: 'VMS_User_Profile'});
+Talho.ScriptManager.addInitializer('Talho.VMS.Volunteer.List', {js: 'VMS_Volunteer_List'});

@@ -16,10 +16,9 @@ class WatchForVmsExecutionAlertResponsesWorker < BackgrounDRb::MetaWorker
       
       if attempt.call_down_response.to_i != roles.count + 2
         # the user responded that they will fill a speficic role
-        roles = [ roles[attempt.call_down_response.to_i] ]
+        roles = [ roles[attempt.call_down_response.to_i - 2] ]
       end
-      
-      rsss = attempt.alert.scenario.role_scenario_sites.find(:all, :conditions => {:role_id => roles.map(&:role_id)})
+      rsss = attempt.alert.scenario.role_scenario_sites.find(:all, :conditions => {:role_id => roles.compact.map(&:role_id)})
       rsss.each do |rss|
         rss.calculate_assignment(rss.scenario_site.all_staff.map(&:user))
       end

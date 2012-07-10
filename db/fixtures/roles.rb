@@ -1,7 +1,7 @@
 app = App.find_by_name('vms')
 
 p 'Writing Roles'
-r = Role.find_or_create_by_name_and_approval_required_and_user_role_and_app_id('Admin', true, false, app.id)
+r = Role.find_or_create_by_name_and_user_role_and_app_id('Admin', false, app.id)
 p "#{r.name} - #{r.application}"
 r = Role.find_or_create_by_name_and_app_id('Volunteer', app.id) do |role|
   role.public = true

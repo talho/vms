@@ -1,3 +1,11 @@
+//= require ./context_menus
+//= require ./site_applications
+//= require ./scenario_status
+//= require_self
+//= require vms/extensions/action_button
+//= require audience/UserSelectionGrid 
+//= require vms/scenario/status_change
+
 Ext.ns("Talho.VMS");
 
 Talho.VMS.CommandCenter = Ext.extend(Ext.Panel, {

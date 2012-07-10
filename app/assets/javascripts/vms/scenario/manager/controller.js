@@ -1,3 +1,9 @@
+//= require vms/model/scenario
+//= require audience/UserSelectionGrid
+//= require vms/extensions/action_button
+//= require vms/extensions/column_panel
+//= require_tree ./view
+
 /**
  * @author Charles DuBose
  */

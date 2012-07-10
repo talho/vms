@@ -1,3 +1,5 @@
+//= require ext_extensions/xActionColumn
+
 Ext.ns("Talho.VMS");
 
 Talho.VMS.ManageScenarios = Ext.extend(Ext.Window, {

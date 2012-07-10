@@ -1,3 +1,4 @@
+//= require ext_extensions/xActionColumn
 Ext.ns("Talho.VMS");
 
 Talho.VMS.AdministerSites = Ext.extend(Ext.Window, {

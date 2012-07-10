@@ -1,3 +1,4 @@
+//= require audience/UserSelectionGrid
 Ext.ns("Talho.VMS")
 
 Talho.VMS.CreateAndEditScenario = Ext.extend(Ext.Window, {

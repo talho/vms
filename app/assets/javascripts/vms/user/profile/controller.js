@@ -1,3 +1,7 @@
+//= require vms/extensions/column_panel
+//= require_tree ./view
+//= require vms/extensions/action_button
+//= require vms/model/alert
 
 Ext.ns('Talho.VMS.User.Profile')
 
