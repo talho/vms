@@ -28,7 +28,7 @@ Feature: Modify Roles for VMS Sites
     And I press "Add Role"
     Then the grid ".modifyRoleGrid" should contain:
       | Roles                  |
-      | Chief Veterinarian     |
+      | Phin: Chief Veterinarian     |
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
@@ -48,7 +48,7 @@ Feature: Modify Roles for VMS Sites
     And I press "Add Role"
     Then the grid ".modifyRoleGrid" should contain:
       | Roles                  |
-      | Chief Veterinarian     |
+      | Phin: Chief Veterinarian     |
       | Border Health Director | 
     When I press "Save"
     And I wait for the "Saving..." mask to go away
@@ -67,7 +67,7 @@ Feature: Modify Roles for VMS Sites
     And I press "Add Role"
     Then the grid ".modifyRoleGrid" should contain:
       | Roles                  |
-      | Border Health Director |
+      | Phin: Border Health Director |
     When I press "Save"
     And I wait for the "Saving..." mask to go away
     And I wait for the "Loading..." mask to go away
