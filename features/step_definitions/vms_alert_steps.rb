@@ -5,12 +5,12 @@ When /^backgroundrb has processed the vms alert responses$/ do
 end
 
 When /^"([^\"]*)" has responded to a ([^ ]*)(?: with title "([^\"]*)")? with ([0-9]*)(?: at "([^"]*)")?$/ do |name, alert_type, title, count, time|
-  conditions = {:alert_type => alert_type}
+  conditions = {"alerts.alert_type" => alert_type}
   conditions['alerts.title'] = title unless title.nil?
   user = User.find_by_display_name(name)
   aa = AlertAttempt.find_by_user_id(user.id, :joins => "INNER JOIN alerts ON alert_attempts.alert_id = alerts.id",
                                          :conditions => conditions)
-  aa = AlertAttempt.find(aa.id)
+  aa = AlertAttempt.find(aa.id) #re-find this to get a non-read only object
 
   aa.update_attributes :acknowledged_at => time.nil? ? Time.now : DateTime.strptime(time, '%m/%d/%y %H:%M:%S').change(:offset => 'CDT'), :call_down_response => count.to_i
 end

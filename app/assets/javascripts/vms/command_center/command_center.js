@@ -1,3 +1,4 @@
+//= require ext_extensions/GMapPanel
 //= require ./context_menus
 //= require ./site_applications
 //= require ./scenario_status

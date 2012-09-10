@@ -1,14 +1,14 @@
 
 class VmsExecutionAlert < VmsAlert
-  acts_as_MTI
-  self.table_name = 'view_execution_vms_alerts'
+  #acts_as_MTI :vms_alerts
+  #table_name = "vms_alerts"
   
   before_create :before_vol_roles, :set_defaults
   after_create :after_vol_roles
   
   has_many :vms_volunteer_roles, :class_name => "Vms::VolunteerRole", :foreign_key => :alert_id, :autosave => true
   has_many :volunteers, :class_name => "User", :through => :vms_volunteer_roles, :uniq => true
-  has_many :recipients, :class_name => "User", :finder_sql => proc{"SELECT users.* FROM users, targets, targets_users WHERE targets.item_type='VmsExecutionAlert' AND targets.item_id=#{id} AND targets_users.target_id=targets.id AND targets_users.user_id=users.id"}
+  #has_many :recipients, :class_name => "User", :finder_sql => proc{"SELECT users.* FROM users, targets, targets_users WHERE targets.item_type='VmsExecutionAlert' AND targets.item_id=#{id} AND targets_users.target_id=targets.id AND targets_users.user_id=users.id"}
   
   has_paper_trail :meta => { :item_desc  => Proc.new { |x| x.to_s }, :app => Proc.new {|x| x.app} }
     
@@ -74,7 +74,6 @@ class VmsExecutionAlert < VmsAlert
     
     vols = volunteers
     vols = vms_volunteer_roles.map(&:volunteer).uniq if vols.empty?
-    
     options[:Recipients][:override] = Proc.new do |rcpts|
        vols.each do |recipient|
         rcpts.Recipient(:id => recipient.id, :givenName => recipient.first_name, :surname => recipient.last_name, :display_name => recipient.display_name) do |rcpt|

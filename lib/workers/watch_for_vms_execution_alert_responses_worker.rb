@@ -18,7 +18,8 @@ class WatchForVmsExecutionAlertResponsesWorker < BackgrounDRb::MetaWorker
         # the user responded that they will fill a speficic role
         roles = [ roles[attempt.call_down_response.to_i - 2] ]
       end
-      rsss = attempt.alert.scenario.role_scenario_sites.find(:all, :conditions => {:role_id => roles.compact.map(&:role_id)})
+      atalert = attempt.alert.class.find(attempt.alert.id) # When alert is called as an association, it doesn't respect the default scope on the Alert class, at least for now. Get around that here.
+      rsss = atalert.scenario.role_scenario_sites.find(:all, :conditions => {:role_id => roles.compact.map(&:role_id)})
       rsss.each do |rss|
         rss.calculate_assignment(rss.scenario_site.all_staff.map(&:user))
       end
